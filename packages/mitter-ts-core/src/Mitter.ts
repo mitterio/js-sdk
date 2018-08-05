@@ -1,8 +1,12 @@
-import { KvStore } from './index'
-import { MitterApiGateway, MitterAxiosApiInterceptor, MitterFetchApiInterceptor } from 'lib/mitter-core/MitterApiGateway'
-import MessagingPipelineDriver from 'lib/mitter-core/specs/MessagingPipelineDriver'
-import { MessagingPipelineDriverHost } from 'lib/mitter-core/driver-host/MessagingPipelineDriverHost'
-import { MessagingPipelinePayload } from 'lib/mitter-ts-models'
+import { KvStore } from './mitter-core'
+import {
+  MitterApiGateway,
+  MitterAxiosApiInterceptor,
+  MitterFetchApiInterceptor
+} from './MitterApiGateway'
+import MessagingPipelineDriver from './specs/MessagingPipelineDriver'
+import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
+import { MessagingPipelinePayload } from 'mitter-models'
 import { AxiosInstance } from 'axios'
 
 export class Mitter {
@@ -37,23 +41,26 @@ export class Mitter {
     pipelineDrivers: Array<MessagingPipelineDriver> | MessagingPipelineDriver,
     private onTokenExpireFunctions: Array<() => void>,
     globalHostObject: any,
-    public globalStore
+    public globalStore: any
   ) {
     this.getUserAuthorization()
-      .then((authToken) => this.cachedUserAuthorization = authToken)
+      .then(authToken => (this.cachedUserAuthorization = authToken))
       .then(() => {
         if (this.cachedUserAuthorization !== undefined) {
           this.announceAuthorizationAvailable()
-        } else
-          this.executeOnTokenExpireFunctions()
+        } else this.executeOnTokenExpireFunctions()
       })
-      .catch((err) => {
+      .catch(err => {
         throw new Error(`Error re-hydrating auth token ${err}`)
       })
 
-    this.messagingPipelineDriverHost = new MessagingPipelineDriverHost(pipelineDrivers, this, kvStore)
-    this.messagingPipelineDriverHost.subscribe(
-      (messagingPayload) => this.subscriptions.forEach((subscription) => subscription(messagingPayload))
+    this.messagingPipelineDriverHost = new MessagingPipelineDriverHost(
+      pipelineDrivers,
+      this,
+      kvStore
+    )
+    this.messagingPipelineDriverHost.subscribe((messagingPayload: any) =>
+      this.subscriptions.forEach(subscription => subscription(messagingPayload))
     )
 
     globalHostObject._mitter_context = this
@@ -86,8 +93,9 @@ export class Mitter {
   setUserAuthorization(authorizationToken: string) {
     this.cachedUserAuthorization = authorizationToken
     this.announceAuthorizationAvailable()
-    this.kvStore.setItem(Mitter.StoreKey.UserAuthorizationToken, authorizationToken)
-      .catch((err) => {
+    this.kvStore
+      .setItem(Mitter.StoreKey.UserAuthorizationToken, authorizationToken)
+      .catch((err: any) => {
         throw new Error(`Error storing key ${err}`)
       })
   }
@@ -101,12 +109,10 @@ export class Mitter {
   }
 
   setUserId(userId: string) {
-    if (this.cachedUserId === userId)
-      return
-    this.kvStore.setItem(Mitter.StoreKey.UserId, userId)
-      .catch((err) => {
-        throw new Error(`Error storing userId ${err}`)
-      })
+    if (this.cachedUserId === userId) return
+    this.kvStore.setItem(Mitter.StoreKey.UserId, userId).catch((err: any) => {
+      throw new Error(`Error storing userId ${err}`)
+    })
   }
 
   getUserId(): Promise<string | undefined> {
@@ -123,12 +129,12 @@ export class Mitter {
   }
 
   private executeOnTokenExpireFunctions() {
-    this.onTokenExpireFunctions.forEach((onTokenExpire) => {
+    this.onTokenExpireFunctions.forEach(onTokenExpire => {
       onTokenExpire()
     })
   }
 
   private announceAuthorizationAvailable() {
-    this.onAuthAvailableSubscribers.forEach((subscriber) => subscriber())
+    this.onAuthAvailableSubscribers.forEach(subscriber => subscriber())
   }
 }

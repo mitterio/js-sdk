@@ -1,27 +1,32 @@
 import fetchIntercept from 'fetch-intercept'
 import { MitterConstants } from './services/constants'
 import URI from 'urijs'
-import { parseJSON } from 'utils/responseUtils'
-import axios, { AxiosError, AxiosInstance, AxiosInterceptorManager, AxiosRequestConfig, AxiosResponse } from 'axios'
+import { parseJSON } from './utils'
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosInterceptorManager,
+  AxiosRequestConfig,
+  AxiosResponse
+} from 'axios'
 
 export class MitterFetchApiInterceptor {
   // tslint:disable-next-line:variable-name
-  private static MitterUrls = [ MitterConstants.MitterApiUrl, MitterConstants.MitterApiStagingUrl ]
-  private unregister: () => void
+  private static MitterUrls = [MitterConstants.MitterApiUrl, MitterConstants.MitterApiStagingUrl]
+  private unregister: (() => void) | undefined = undefined
 
   constructor(
     private applicationId: string,
     private userAuthorizationFetcher: () => string | undefined,
     private onTokenExpireExecutor: () => () => void
-  ) {
-  }
+  ) {}
 
   enable() {
     fetchIntercept.register({
       request: this.requestInterceptor.bind(this),
       response: this.responseInterceptor.bind(this),
       responseError: function(error: Error) {
-        return Promise.reject({message: error})
+        return Promise.reject({ message: error })
       }
     })
   }
@@ -33,8 +38,10 @@ export class MitterFetchApiInterceptor {
   }
 
   private interceptFilter(url: string, _: any): boolean {
-    return ( MitterFetchApiInterceptor.MitterUrls
-      .find((mitterUrl) => url.startsWith(mitterUrl)) !== undefined )
+    return (
+      MitterFetchApiInterceptor.MitterUrls.find(mitterUrl => url.startsWith(mitterUrl)) !==
+      undefined
+    )
   }
 
   private requestInterceptor(url: string, config: any) {
@@ -44,7 +51,9 @@ export class MitterFetchApiInterceptor {
       let interceptedConfig = config
 
       if (authorization === undefined) {
-        console.warn('Calling an intercepted API, but credentials are not available. This call might fail')
+        console.warn(
+          'Calling an intercepted API, but credentials are not available. This call might fail'
+        )
       } else {
         if (config === undefined) {
           interceptedConfig = {}
@@ -55,13 +64,13 @@ export class MitterFetchApiInterceptor {
           'X-Mitter-Application-Id': this.applicationId
         }
 
-        interceptedConfig.headers = {...interceptedConfig.headers, ...additionalHeaders}
+        interceptedConfig.headers = { ...interceptedConfig.headers, ...additionalHeaders }
       }
 
-      return [ interceptedUrl, interceptedConfig ]
+      return [interceptedUrl, interceptedConfig]
     }
 
-    return [ url, config ]
+    return [url, config]
   }
 
   private responseInterceptor(response: Response, config: any) {
@@ -71,7 +80,7 @@ export class MitterFetchApiInterceptor {
       }
 
       if (response && typeof response.text === 'function') {
-        return ( async () => {
+        return (async () => {
           let message = ''
           let errorCode = ''
           const responseStatus = response.status
@@ -83,18 +92,16 @@ export class MitterFetchApiInterceptor {
           if (responseStatus === 401 && errorCode === 'claim_rejected') {
             this.onTokenExpireExecutor()
           }
-          return Promise.reject({message: message, errorCode: errorCode, status: responseStatus})
-        } )()
+          return Promise.reject({ message: message, errorCode: errorCode, status: responseStatus })
+        })()
       }
       return Promise.reject(response)
     }
     return response
   }
-
 }
 
 export class MitterApiGateway {
-
   static centralApiUrl(): string {
     return MitterConstants.MitterApiUrl
   }
@@ -102,13 +109,11 @@ export class MitterApiGateway {
   constructor(
     private applicationId: string,
     private userAuthorizationFetcher: () => string | undefined
-  ) {
-  }
+  ) {}
 
   userAuthorizedPath(path: string): string {
     const userAuthorization = this.userAuthorizationFetcher()
-    let authorizedPath = URI(path)
-      .addQuery('mitter.x_mitter_application_id', this.applicationId)
+    let authorizedPath = URI(path).addQuery('mitter.x_mitter_application_id', this.applicationId)
 
     if (userAuthorization !== undefined) {
       authorizedPath.addQuery('mitter.x_issued_mitter_user_authorization', userAuthorization)
@@ -120,19 +125,20 @@ export class MitterApiGateway {
 
 export class MitterAxiosApiInterceptor {
   // tslint:disable-next-line:variable-name
-  private static MitterUrls = [ MitterConstants.MitterApiUrl, MitterConstants.MitterApiStagingUrl ]
-  private mitterAxiosRequestInterceptor: AxiosInterceptorManager<AxiosRequestConfig> = axios.interceptors.request
-  private mitterAxiosResponseInterceptor: AxiosInterceptorManager<AxiosResponse> = axios.interceptors.response
+  private static MitterUrls = [MitterConstants.MitterApiUrl, MitterConstants.MitterApiStagingUrl]
+  private mitterAxiosRequestInterceptor: AxiosInterceptorManager<AxiosRequestConfig> =
+    axios.interceptors.request
+  private mitterAxiosResponseInterceptor: AxiosInterceptorManager<AxiosResponse> =
+    axios.interceptors.response
 
   constructor(
     private applicationId: string,
     private userAuthorizationFetcher: () => string | undefined,
     private onTokenExpireExecutor: () => () => void
-  ) {
-  }
+  ) {}
 
   requestInterceptor(config: AxiosRequestConfig) {
-    if (this.interceptFilter(config.url)) {
+    if (this.interceptFilter(config!!.url!!)) {
       config.headers = this.getHeaders()
       return config
     }
@@ -140,7 +146,7 @@ export class MitterAxiosApiInterceptor {
   }
 
   responseInterceptor(response: AxiosResponse<any>) {
-    if (this.interceptFilter(response.config.url)) {
+    if (this.interceptFilter(response!!.config!!.url!!)) {
       return response
     } else {
       return response
@@ -148,24 +154,30 @@ export class MitterAxiosApiInterceptor {
   }
 
   responseErrorInterceptor(error: AxiosError) {
-    if (error.response.status === 401 && error.code === 'claim_rejected') {
+    if (error!!.response!!.status === 401 && error.code === 'claim_rejected') {
       this.onTokenExpireExecutor()
     }
     return Promise.reject(error)
   }
 
   enable(axiosInstance?: AxiosInstance) {
-
     if (axiosInstance !== undefined) {
-      axiosInstance.interceptors.request.use((config: AxiosRequestConfig) => this.requestInterceptor(config))
-      axiosInstance.interceptors.response.use((response: AxiosResponse<any>) => this.responseInterceptor(response),
-        (error: AxiosError) => this.responseErrorInterceptor(error))
+      axiosInstance.interceptors.request.use((config: AxiosRequestConfig) =>
+        this.requestInterceptor(config)
+      )
+      axiosInstance.interceptors.response.use(
+        (response: AxiosResponse<any>) => this.responseInterceptor(response),
+        (error: AxiosError) => this.responseErrorInterceptor(error)
+      )
     } else {
-      this.mitterAxiosRequestInterceptor.use((config: AxiosRequestConfig) => this.requestInterceptor(config))
-      this.mitterAxiosResponseInterceptor.use((response: AxiosResponse<any>) => this.responseInterceptor(response),
-        (error: AxiosError) => this.responseErrorInterceptor(error))
+      this.mitterAxiosRequestInterceptor.use((config: AxiosRequestConfig) =>
+        this.requestInterceptor(config)
+      )
+      this.mitterAxiosResponseInterceptor.use(
+        (response: AxiosResponse<any>) => this.responseInterceptor(response),
+        (error: AxiosError) => this.responseErrorInterceptor(error)
+      )
     }
-
   }
 
   disable(axiosInstance?: AxiosInstance) {
@@ -179,8 +191,10 @@ export class MitterAxiosApiInterceptor {
   }
 
   private interceptFilter(url: string): boolean {
-    return ( MitterAxiosApiInterceptor.MitterUrls
-      .find((mitterUrl) => url.startsWith(mitterUrl)) !== undefined )
+    return (
+      MitterAxiosApiInterceptor.MitterUrls.find(mitterUrl => url.startsWith(mitterUrl)) !==
+      undefined
+    )
   }
 
   private getHeaders() {
@@ -191,5 +205,4 @@ export class MitterAxiosApiInterceptor {
       'X-Mitter-Application-Id': applicationId
     }
   }
-
 }

@@ -1,6 +1,6 @@
-// Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
-  // import "core-js/fn/array.find"
-  // ...
-export default class DummyClass {
+export * from './Mitter'
 
+export interface KvStore {
+  getItem<T>(key: string): Promise<T | undefined>
+  setItem<T>(key: string, value: T): Promise<void>
 }
