@@ -69,7 +69,8 @@ export class MessagingPipelineDriverHost {
 
   private async initializeMessagingPipelines(): Promise<void> {
     this.pipelineDrivers.forEach(async driver => {
-      let driverInitialized, driverSpec
+      let driverInitialized: Promise<boolean | void>, driverSpec: PipelineDriverSpec
+
       try {
         let { initialized, pipelineDriverSpec } = await driver.initialize(this.mitterContext)
         driverInitialized = initialized
@@ -139,7 +140,7 @@ export class MessagingPipelineDriverHost {
   }
 
   private registerEndpoint(
-    driverSpec,
+    driverSpec: PipelineDriverSpec,
     deliveryEndpoint: DeliveryEndpoint
   ): Promise<DeliveryEndpoint | Error> {
     console.log('delivery endpoint is', deliveryEndpoint)
