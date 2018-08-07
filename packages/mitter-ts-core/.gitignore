@@ -5,6 +5,7 @@ coverage
 *.log
 .vscode
 .idea
+*.iml
 dist
 compiled
 .awcache

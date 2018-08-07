@@ -1,2 +1,3 @@
-export const noOp = (f: any) => f
+// tslint:disable-next-line:no-empty
+export const noOp = () => {}
 export * from './response-utils'
