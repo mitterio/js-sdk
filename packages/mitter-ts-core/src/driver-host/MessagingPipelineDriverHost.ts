@@ -97,18 +97,22 @@ export class MessagingPipelineDriverHost {
             }
 
             preProvisionPromise.then(syncedEndpoint => {
-                let operatingEndpoint: Promise<DeliveryEndpoint>
+                let operatingEndpoint: Promise<DeliveryEndpoint | undefined>
 
                 if (syncedEndpoint === undefined) {
                     console.log('The endpoint on sync was determined to be invalid, refreshing')
 
                     operatingEndpoint = driverInitialized
                         .then(() => driver.getDeliveryEndpoint())
-                        .then(deliveryEndpoint =>
-                            this.registerEndpoint(driverSpec, deliveryEndpoint).then(
-                                provisionedEndpoint => provisionedEndpoint
-                            )
-                        )
+                        .then(deliveryEndpoint => {
+                            if (deliveryEndpoint !== undefined) {
+                                this.registerEndpoint(driverSpec, deliveryEndpoint).then(
+                                    provisionedEndpoint => provisionedEndpoint
+                                )
+                            } else {
+                                return undefined
+                            }
+                        })
                         .catch(e => {
                             console.warn(
                                 `Could not instantiate pipeline driver ${driverSpec.name}`,
@@ -124,7 +128,9 @@ export class MessagingPipelineDriverHost {
                 }
 
                 operatingEndpoint.then(endpoint => {
-                    driver.endpointRegistered(this.generatePipelineSink(driverSpec), endpoint)
+                    if (endpoint !== undefined) {
+                        driver.endpointRegistered(this.generatePipelineSink(driverSpec), endpoint)
+                    }
                 })
             })
         })

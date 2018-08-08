@@ -8,6 +8,7 @@ import MessagingPipelineDriver from './specs/MessagingPipelineDriver'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
 import { MessagingPipelinePayload } from 'mitter-models'
 import { AxiosInstance } from 'axios'
+import { MitterConstants } from './services/constants'
 
 export class Mitter {
     // tslint:disable-next-line:variable-name
@@ -37,11 +38,12 @@ export class Mitter {
 
     constructor(
         public kvStore: KvStore,
-        private applicationId: string,
+        public readonly applicationId: string,
         pipelineDrivers: Array<MessagingPipelineDriver> | MessagingPipelineDriver,
         private onTokenExpireFunctions: Array<() => void>,
         globalHostObject: any,
-        public globalStore: any
+        public globalStore: any,
+        public readonly mitterApiBaseUrl: string = MitterConstants.MitterApiUrl
     ) {
         this.getUserAuthorization()
             .then(authToken => (this.cachedUserAuthorization = authToken))

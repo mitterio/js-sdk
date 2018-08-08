@@ -1,5 +1,6 @@
 export * from './Mitter'
 export * from './specs/MessagingPipelineDriver'
+export * from './services/constants'
 
 export { default as MessagingPipelineDriver } from './specs/MessagingPipelineDriver'
 
