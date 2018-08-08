@@ -6,7 +6,7 @@ import {
   Presence,
   AttributeDef,
   UserProfile
-} from '../index'
+} from '../mitter-models'
 
 import UserLocator from '../user/locators/UserLocator'
 import ApplicationProperty from '../application/properties/ApplicationProperty'

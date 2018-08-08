@@ -2,7 +2,7 @@ import {
   MessagingPipelinePayload,
   PipelineControlPayload,
   StandardPipelinePayloadNames
-} from './..'
+} from './../mitter-models'
 
 import { MitterError, MitterErrorCodes } from './../wire/errors'
 
