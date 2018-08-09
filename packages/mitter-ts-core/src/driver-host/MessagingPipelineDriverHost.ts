@@ -78,8 +78,8 @@ export class MessagingPipelineDriverHost {
                 driverInitialized = initialized
                 driverSpec = pipelineDriverSpec
             } catch (ex) {
-                console.log('unable to initialize pipeline driver')
-                return
+                console.log('Unable to initialize pipeline driver', ex)
+                throw ex
             }
             console.log(`Initializing pipeline driver '${driverSpec.name}'`)
 
