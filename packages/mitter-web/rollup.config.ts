@@ -5,8 +5,8 @@ import camelCase from 'lodash.camelcase'
 import typescript from 'rollup-plugin-typescript2'
 import json from 'rollup-plugin-json'
 import builtins from 'rollup-plugin-node-builtins'
-import replace from 'rollup-plugin-replace'
 import globals from 'rollup-plugin-node-globals'
+import replace from 'rollup-plugin-replace'
 
 const pkg = require('./package.json')
 
@@ -26,21 +26,23 @@ export default {
     include: 'src/**',
   },
   plugins: [
-    builtins(),
-    globals(),
-
+    replace({
+        'process.version.': '"v9.5.0".',
+        delimiters: ['', '']
+    }),
     commonjs(),
+    globals(),
+    json(),
+    builtins(),
 
     resolve({
         browser: true,
-        jsnext: true,
-        preferBuiltins: true
+        jsnext: true
     }),
 
     typescript({ useTsconfigDeclarationDir: true }),
 
-    json(),
     // Resolve source maps to the original source
-    sourceMaps(),
-  ],
+    sourceMaps()
+  ]
 }
