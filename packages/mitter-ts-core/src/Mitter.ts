@@ -1,13 +1,13 @@
 import { KvStore } from './mitter-core'
 import {
     MitterApiGateway,
-    MitterAxiosApiInterceptor,
+    /* MitterAxiosApiInterceptor, */
     MitterFetchApiInterceptor
 } from './MitterApiGateway'
 import MessagingPipelineDriver from './specs/MessagingPipelineDriver'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
 import { MessagingPipelinePayload } from 'mitter-models'
-import { AxiosInstance } from 'axios'
+// import { AxiosInstance } from 'axios'
 import { MitterConstants } from './services/constants'
 
 export class Mitter {
@@ -27,11 +27,15 @@ export class Mitter {
         () => this.cachedUserAuthorization,
         () => this.executeOnTokenExpireFunctions
     )
+
+    /*
     private mitterAxiosInterceptor: MitterAxiosApiInterceptor = new MitterAxiosApiInterceptor(
         this.applicationId,
         () => this.cachedUserAuthorization,
         () => this.executeOnTokenExpireFunctions
     )
+    */
+
     private messagingPipelineDriverHost: MessagingPipelineDriverHost
     private subscriptions: Array<(payload: MessagingPipelinePayload) => void> = []
     private onAuthAvailableSubscribers: Array<() => void> = []
@@ -84,6 +88,7 @@ export class Mitter {
         this.mitterFetchInterceptor.disable()
     }
 
+    /*
     enableAxiosInterceptor(axiosInstance?: AxiosInstance) {
         this.mitterAxiosInterceptor.enable(axiosInstance)
     }
@@ -91,6 +96,7 @@ export class Mitter {
     disableAxiosInterceptor(axiosInstance?: AxiosInstance) {
         this.mitterAxiosInterceptor.disable(axiosInstance)
     }
+    */
 
     setUserAuthorization(authorizationToken: string) {
         this.cachedUserAuthorization = authorizationToken

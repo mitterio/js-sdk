@@ -1,14 +1,12 @@
-// import fetchIntercept from 'fetch-intercept'
+import fetchIntercept from 'fetch-intercept'
 import { MitterConstants } from './services/constants'
 import URI from 'urijs'
 import { parseJSON } from './utils'
+/*
 import axios, {
-    AxiosError,
-    AxiosInstance,
-    AxiosInterceptorManager,
-    AxiosRequestConfig,
-    AxiosResponse
+  AxiosError, AxiosInstance, AxiosInterceptorManager, AxiosRequestConfig, AxiosResponse
 } from 'axios'
+*/
 
 export class MitterFetchApiInterceptor {
     // tslint:disable-next-line:variable-name
@@ -21,16 +19,15 @@ export class MitterFetchApiInterceptor {
         private onTokenExpireExecutor: () => () => void
     ) {}
 
-    /*
-  enable() {
-    fetchIntercept.register({
-      request: this.requestInterceptor.bind(this),
-      response: this.responseInterceptor.bind(this),
-      responseError: function(error: Error) {
-        return Promise.reject({ message: error })
-      }
-    })
-  } */
+    enable() {
+        fetchIntercept.register({
+            request: this.requestInterceptor.bind(this),
+            response: this.responseInterceptor.bind(this),
+            responseError: function(error: Error) {
+                return Promise.reject({ message: error })
+            }
+        })
+    }
 
     disable() {
         if (this.unregister !== undefined) {
@@ -45,63 +42,65 @@ export class MitterFetchApiInterceptor {
         )
     }
 
-    /*
-  private requestInterceptor(url: string, config: any) {
-    if (this.interceptFilter(url, config)) {
-      let authorization = this.userAuthorizationFetcher()
-      let interceptedUrl = url
-      let interceptedConfig = config
+    private requestInterceptor(url: string, config: any) {
+        if (this.interceptFilter(url, config)) {
+            let authorization = this.userAuthorizationFetcher()
+            let interceptedUrl = url
+            let interceptedConfig = config
 
-      if (authorization === undefined) {
-        console.warn(
-          'Calling an intercepted API, but credentials are not available. This call might fail'
-        )
-      } else {
-        if (config === undefined) {
-          interceptedConfig = {}
+            if (authorization === undefined) {
+                console.warn(
+                    'Calling an intercepted API, but credentials are not available. This call might fail'
+                )
+            } else {
+                if (config === undefined) {
+                    interceptedConfig = {}
+                }
+
+                const additionalHeaders = {
+                    'X-Issued-Mitter-User-Authorization': authorization,
+                    'X-Mitter-Application-Id': this.applicationId
+                }
+
+                interceptedConfig.headers = { ...interceptedConfig.headers, ...additionalHeaders }
+            }
+
+            return [interceptedUrl, interceptedConfig]
         }
 
-        const additionalHeaders = {
-          'X-Issued-Mitter-User-Authorization': authorization,
-          'X-Mitter-Application-Id': this.applicationId
+        return [url, config]
+    }
+
+    private responseInterceptor(response: Response, config: any) {
+        if (this.interceptFilter(response.url, config)) {
+            if (response.status >= 200 && response.status < 300) {
+                return parseJSON(response)
+            }
+
+            if (response && typeof response.text === 'function') {
+                return (async () => {
+                    let message = ''
+                    let errorCode = ''
+                    const responseStatus = response.status
+                    await response.text().then(error => {
+                        message = JSON.parse(error).message
+                        errorCode = JSON.parse(error).errorCode
+                        console.log(message)
+                    })
+                    if (responseStatus === 401 && errorCode === 'claim_rejected') {
+                        this.onTokenExpireExecutor()
+                    }
+                    return Promise.reject({
+                        message: message,
+                        errorCode: errorCode,
+                        status: responseStatus
+                    })
+                })()
+            }
+            return Promise.reject(response)
         }
-
-        interceptedConfig.headers = { ...interceptedConfig.headers, ...additionalHeaders }
-      }
-
-      return [interceptedUrl, interceptedConfig]
+        return response
     }
-
-    return [url, config]
-  }
-
-  private responseInterceptor(response: Response, config: any) {
-    if (this.interceptFilter(response.url, config)) {
-      if (response.status >= 200 && response.status < 300) {
-        return parseJSON(response)
-      }
-
-      if (response && typeof response.text === 'function') {
-        return (async () => {
-          let message = ''
-          let errorCode = ''
-          const responseStatus = response.status
-          await response.text().then(error => {
-            message = JSON.parse(error).message
-            errorCode = JSON.parse(error).errorCode
-            console.log(message)
-          })
-          if (responseStatus === 401 && errorCode === 'claim_rejected') {
-            this.onTokenExpireExecutor()
-          }
-          return Promise.reject({ message: message, errorCode: errorCode, status: responseStatus })
-        })()
-      }
-      return Promise.reject(response)
-    }
-    return response
-  }
-  */
 }
 
 export class MitterApiGateway {
@@ -129,6 +128,7 @@ export class MitterApiGateway {
     }
 }
 
+/*
 export class MitterAxiosApiInterceptor {
     // tslint:disable-next-line:variable-name
     private static MitterUrls = [MitterConstants.MitterApiUrl, MitterConstants.MitterApiStagingUrl]
@@ -205,10 +205,11 @@ export class MitterAxiosApiInterceptor {
 
     private getHeaders() {
         const authorization = this.userAuthorizationFetcher()
-        const applicationId = this.applicationId
+
         return {
             'X-Issued-Mitter-User-Authorization': authorization,
-            'X-Mitter-Application-Id': applicationId
+            'X-Mitter-Application-Id': this.applicationId
         }
     }
 }
+*/

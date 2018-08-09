@@ -111,8 +111,8 @@
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
+    "@types/lodash.camelcase": "^4.3.4",
     "@types/urijs": "^1.15.38",
-    "axios": "^0.18.0",
     "fetch-intercept": "^2.2.3",
     "urijs": "^1.19.1"
   }
