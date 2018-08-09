@@ -116,6 +116,7 @@
     "@types/stompjs": "^2.3.3",
     "rollup-plugin-babel": "^3.0.7",
     "sockjs-client": "^1.1.5",
-    "websocket": "^1.0.26"
+    "websocket": "^1.0.26",
+    "whatwg-fetch": "^2.0.4"
   }
 }

@@ -7,7 +7,7 @@ import {
 
 import { DeliveryEndpoint } from 'mitter-models'
 
-import * as SockJS from 'sockjs-client'
+import SockJs from 'sockjs-client'
 import * as Stomp from '@stomp/stompjs'
 import { Message } from '@stomp/stompjs'
 
@@ -26,7 +26,7 @@ export class WebSocketPipelineDriver implements MessagingPipelineDriver {
     halt(): void {}
 
     initialize(mitter: Mitter): PipelineDriverInitialization {
-        const sockJs = new SockJS(`${mitter.mitterApiBaseUrl}/v1/socket/control/sockjs`)
+        const sockJs = new SockJs(`${mitter.mitterApiBaseUrl}/v1/socket/control/sockjs`)
         this.activeSocket = Stomp.over(sockJs)
 
         return {

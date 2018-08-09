@@ -30,15 +30,18 @@ export default {
         'process.version.': '"v9.5.0".',
         delimiters: ['', '']
     }),
-    commonjs(),
-    globals(),
-    json(),
-    builtins(),
 
     resolve({
         browser: true,
         jsnext: true
     }),
+
+    commonjs(),
+
+    globals(),
+    json(),
+
+    builtins(),
 
     typescript({ useTsconfigDeclarationDir: true }),
 
