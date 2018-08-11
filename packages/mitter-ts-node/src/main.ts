@@ -16,19 +16,22 @@ export function testFunction() {
     const digestParts = new DigestParts('get', path, Buffer.from(md5(''), 'hex').toString('base64'))
 
     const generatedDigest = accessKeySigner.signRequest(digestParts)
+    const headers = {
+        Date: generatedDigest.date,
+        'X-Mitter-Application-Access-Key': accessKeySigner.accessKey,
+        Authorization: generatedDigest.authorizationHeader,
+        Nonce: generatedDigest.nonce,
+        'Content-Md5': Buffer.from(md5(''), 'hex').toString('base64')
+    }
+
+    console.log('>>>>>>>>> ', headers)
 
     http.request(
         {
             host: 'localhost',
             port: 8080,
             path: path,
-            headers: {
-                Date: generatedDigest.date,
-                'X-Mitter-Application-Access-Key': accessKeySigner.accessKey,
-                Authorization: generatedDigest.authorizationHeader,
-                Nonce: generatedDigest.nonce,
-                'Content-Md5': Buffer.from(md5(''), 'hex').toString('base64')
-            }
+            headers: headers
         },
         (res: IncomingMessage) => {
             let data = ''
