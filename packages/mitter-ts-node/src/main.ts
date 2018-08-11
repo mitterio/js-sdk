@@ -12,15 +12,8 @@ export function testFunction() {
             'C2oxu8fk1pdT69L5GnNWE='
     )
 
-    console.log(md5(''))
-
     const path = '/test/application/by/accesskey'
-    const digestParts = new DigestParts(
-        'get',
-        path,
-        Buffer.from(md5(''), 'hex').toString('base64'),
-        'application/json'
-    )
+    const digestParts = new DigestParts('get', path, Buffer.from(md5(''), 'hex').toString('base64'))
 
     const generatedDigest = accessKeySigner.signRequest(digestParts)
 
@@ -30,7 +23,6 @@ export function testFunction() {
             port: 8080,
             path: path,
             headers: {
-                'Content-Type': 'application/json',
                 Date: generatedDigest.date,
                 'X-Mitter-Application-Access-Key': accessKeySigner.accessKey,
                 Authorization: generatedDigest.authorizationHeader,
@@ -49,7 +41,9 @@ export function testFunction() {
                 console.log(JSON.parse(data))
             })
         }
-    ).on('error', e => {
-        console.error(`Got error: ${e.message}`)
-    })
+    )
+        .on('error', e => {
+            console.error(`Got error: ${e.message}`)
+        })
+        .end()
 }

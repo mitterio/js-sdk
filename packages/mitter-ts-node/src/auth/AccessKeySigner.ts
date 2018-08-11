@@ -39,7 +39,7 @@ export default class AccessKeySigner {
         if (digestParts.contentType !== undefined) {
             return digestParts.contentType
         } else {
-            return ''
+            return 'application/json'
         }
     }
 
