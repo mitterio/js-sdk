@@ -20,7 +20,7 @@ export default class AccessKeySigner {
         ].join('\n')
 
         const digest = crypto
-            .createHmac('sha1', this.accessSecret)
+            .createHmac('sha1', Buffer.from(this.accessSecret, 'base64'))
             .update(computePayload)
             .digest('base64')
 
@@ -39,7 +39,7 @@ export default class AccessKeySigner {
         if (digestParts.contentType !== undefined) {
             return digestParts.contentType
         } else {
-            return 'application/json'
+            return ''
         }
     }
 
