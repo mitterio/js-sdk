@@ -107,5 +107,11 @@
     "typedoc": "^0.11.0",
     "typescript": "^2.6.2",
     "validate-commit-msg": "^2.12.2"
+  },
+  "dependencies": {
+    "@types/md5": "^2.1.32",
+    "@types/randomstring": "^1.1.6",
+    "md5": "^2.2.1",
+    "randomstring": "^1.1.5"
   }
 }
