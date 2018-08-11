@@ -111,9 +111,11 @@
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
+    "@types/isomorphic-fetch": "^0.0.34",
     "@types/lodash.camelcase": "^4.3.4",
     "@types/urijs": "^1.15.38",
     "fetch-intercept": "^2.2.3",
+    "isomorphic-fetch": "^2.2.1",
     "urijs": "^1.19.1",
     "whatwg-fetch": "^2.0.4"
   }
