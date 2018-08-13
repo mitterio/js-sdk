@@ -20,11 +20,12 @@ export default class AccessKeySigner {
         ].join('\n')
 
         const digest = crypto
-            .createHmac('sha1', Buffer.from(this.accessSecret, 'base64'))
+            .createHmac('SHA1', Buffer.from(this.accessSecret, 'base64'))
+            //.createHmac('sha1', this.accessSecret)
             .update(computePayload)
             .digest('base64')
 
-        return new DigestGenerationArtifacts(nonce, date, `Auth: ${this.accessKey}:${digest}`)
+        return new DigestGenerationArtifacts(nonce, date, `Auth ${this.accessKey}:${digest}`)
     }
 
     private getNonce(digestParts: DigestParts): string {
@@ -39,7 +40,7 @@ export default class AccessKeySigner {
         if (digestParts.contentType !== undefined) {
             return digestParts.contentType
         } else {
-            return ''
+            return 'null'
         }
     }
 

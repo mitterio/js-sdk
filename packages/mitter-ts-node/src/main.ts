@@ -4,12 +4,19 @@ import md5 from 'md5'
 import { DigestParts } from './auth/digest-objects'
 import { IncomingMessage } from 'http'
 
-export function testFunction() {
+type AccessCredentials = {
+    accessKey: {
+        key: string
+    }
+    accessSecret: {
+        secret: string
+    }
+}
+
+export function testFunction(accessCredential: AccessCredentials) {
     const accessKeySigner = new AccessKeySigner(
-        'TV7i5qT8BmePytcH',
-        'Sj4q1nmDeNHZRKSJ05PXHV68grmkLd09S6Fj71OCZ5uvJH9T4zaeNBajZgNsETNM9MaoY' +
-            'y6s60actgcjssG2RgSB6T+Yl12v8KEAkv7p0ItAvb/msI+j82RqLvVxb91IT2QPKClZk+hgfzVtuHmGAR' +
-            'C2oxu8fk1pdT69L5GnNWE='
+        accessCredential['accessKey']['key'],
+        accessCredential['accessSecret']['secret']
     )
 
     const path = '/test/application/by/accesskey'
@@ -23,8 +30,6 @@ export function testFunction() {
         Nonce: generatedDigest.nonce,
         'Content-Md5': Buffer.from(md5(''), 'hex').toString('base64')
     }
-
-    console.log('>>>>>>>>> ', headers)
 
     http.request(
         {
