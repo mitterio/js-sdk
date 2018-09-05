@@ -23,13 +23,14 @@ export default {
     'websocket'
   ],
   watch: {
-    include: 'src/**',
+    include: ['src/**', 'node_modules']
   },
   plugins: [
     replace({
         'process.version.': '"v9.5.0".',
         delimiters: ['', '']
     }),
+
 
     resolve({
         browser: true,
