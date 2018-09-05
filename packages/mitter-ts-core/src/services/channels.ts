@@ -1,14 +1,20 @@
-import fetch from 'isomorphic-fetch'
-import { MitterConstants } from './constants'
+import baseClient, { processRestResponse } from './common-rest'
+import * as rm from 'typed-rest-client/RestClient'
+import { Mitter } from '../Mitter'
+import { Channel } from 'mitter-models'
 
 export class MitterChannels {
-    constructor(private readonly mitterApiUrl: string = MitterConstants.MitterApiUrl) {}
+    private baseClient: rm.RestClient
 
-    async getParticipatedChannels(userId: string | undefined = undefined): Promise<Response> {
-        let userIdParam = userId === undefined ? 'me' : userId
+    constructor(private readonly mitter: Mitter) {
+        this.baseClient = baseClient(mitter)
+    }
 
-        return await fetch(`${this.mitterApiUrl}/v1/users/${userIdParam}/channels`)
+    async getParticipatedChannels(userId: string): Promise<Channel[]> {
+        return this.baseClient
+            .get<Channel[]>(`/v1/users/${userId}/channels`)
+            .then(processRestResponse)
     }
 }
 
-export default new MitterChannels()
+export default (mitter: Mitter) => new MitterChannels(mitter)

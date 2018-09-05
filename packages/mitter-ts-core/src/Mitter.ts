@@ -1,14 +1,15 @@
 import { KvStore } from './mitter-core'
 import {
     MitterApiGateway,
-    /* MitterAxiosApiInterceptor, */
+    MitterAxiosApiInterceptor,
     MitterFetchApiInterceptor
 } from './MitterApiGateway'
 import MessagingPipelineDriver from './specs/MessagingPipelineDriver'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
 import { MessagingPipelinePayload } from 'mitter-models'
-// import { AxiosInstance } from 'axios'
+import { AxiosInstance } from 'axios'
 import { MitterConstants } from './services/constants'
+import User from './objects/Users'
 
 export class Mitter {
     // tslint:disable-next-line:variable-name
@@ -28,13 +29,11 @@ export class Mitter {
         () => this.executeOnTokenExpireFunctions
     )
 
-    /*
     private mitterAxiosInterceptor: MitterAxiosApiInterceptor = new MitterAxiosApiInterceptor(
         this.applicationId,
         () => this.cachedUserAuthorization,
         () => this.executeOnTokenExpireFunctions
     )
-    */
 
     private messagingPipelineDriverHost: MessagingPipelineDriverHost
     private subscriptions: Array<(payload: MessagingPipelinePayload) => void> = []
@@ -42,7 +41,7 @@ export class Mitter {
 
     constructor(
         public kvStore: KvStore,
-        public readonly applicationId: string,
+        public readonly applicationId: string | undefined,
         pipelineDrivers: Array<MessagingPipelineDriver> | MessagingPipelineDriver,
         private onTokenExpireFunctions: Array<() => void>,
         globalHostObject: any,
@@ -81,14 +80,13 @@ export class Mitter {
     }
 
     enableFetchInterceptor() {
-        // this.mitterFetchInterceptor.enable()
+        this.mitterFetchInterceptor.enable()
     }
 
     disableFetchInterceptor() {
         this.mitterFetchInterceptor.disable()
     }
 
-    /*
     enableAxiosInterceptor(axiosInstance?: AxiosInstance) {
         this.mitterAxiosInterceptor.enable(axiosInstance)
     }
@@ -96,7 +94,6 @@ export class Mitter {
     disableAxiosInterceptor(axiosInstance?: AxiosInstance) {
         this.mitterAxiosInterceptor.disable(axiosInstance)
     }
-    */
 
     setUserAuthorization(authorizationToken: string) {
         this.cachedUserAuthorization = authorizationToken
@@ -134,6 +131,16 @@ export class Mitter {
     getGlobalStore() {
         console.log('global store is', this.globalStore)
         return this.globalStore()
+    }
+
+    // Smart-object values
+
+    me(): User {
+        return new User(this)
+    }
+
+    version() {
+        return '0.4.2'
     }
 
     private executeOnTokenExpireFunctions() {

@@ -17,8 +17,11 @@ export interface PipelineDriverInitialization {
     initialized: Promise<void | boolean>
 }
 
-export interface PipelineSink {
+export interface BasePipelineSink {
     received(payload: MessagingPipelinePayload): void
+}
+
+export interface PipelineSink extends BasePipelineSink {
     endpointInvalidated(deliveryEndpoint: DeliveryEndpoint): void
     authorizedUserUnavailable(): void
     statusUpdate(newStatus: PipelineStatus): void
@@ -30,6 +33,8 @@ export default interface MessagingPipelineDriver {
     getDeliveryEndpoint(): Promise<DeliveryEndpoint | undefined>
 
     endpointRegistered(pipelineSink: PipelineSink, userDeliveryEndpoint: DeliveryEndpoint): void
+
+    pipelineSinkChanged?(pipelineSink: BasePipelineSink): void
 
     halt(): void
 }

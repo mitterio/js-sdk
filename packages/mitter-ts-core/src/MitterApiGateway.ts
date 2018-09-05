@@ -2,11 +2,13 @@ import fetchIntercept from 'fetch-intercept'
 import { MitterConstants } from './services/constants'
 import URI from 'urijs'
 import { parseJSON } from './utils'
-/*
 import axios, {
-  AxiosError, AxiosInstance, AxiosInterceptorManager, AxiosRequestConfig, AxiosResponse
+    AxiosError,
+    AxiosInstance,
+    AxiosInterceptorManager,
+    AxiosRequestConfig,
+    AxiosResponse
 } from 'axios'
-*/
 
 export class MitterFetchApiInterceptor {
     // tslint:disable-next-line:variable-name
@@ -14,7 +16,7 @@ export class MitterFetchApiInterceptor {
     private unregister: (() => void) | undefined = undefined
 
     constructor(
-        private applicationId: string,
+        private applicationId: string | undefined,
         private userAuthorizationFetcher: () => string | undefined,
         private onTokenExpireExecutor: () => () => void
     ) {}
@@ -57,9 +59,12 @@ export class MitterFetchApiInterceptor {
                     interceptedConfig = {}
                 }
 
-                const additionalHeaders = {
-                    'X-Issued-Mitter-User-Authorization': authorization,
-                    'X-Mitter-Application-Id': this.applicationId
+                const additionalHeaders: any = {
+                    'X-Issued-Mitter-User-Authorization': authorization
+                }
+
+                if (this.applicationId !== undefined) {
+                    additionalHeaders['X-Mitter-Application-Id'] = this.applicationId
                 }
 
                 interceptedConfig.headers = { ...interceptedConfig.headers, ...additionalHeaders }
@@ -109,7 +114,7 @@ export class MitterApiGateway {
     }
 
     constructor(
-        private applicationId: string,
+        private applicationId: string | undefined,
         private userAuthorizationFetcher: () => string | undefined
     ) {}
 
@@ -128,7 +133,6 @@ export class MitterApiGateway {
     }
 }
 
-/*
 export class MitterAxiosApiInterceptor {
     // tslint:disable-next-line:variable-name
     private static MitterUrls = [MitterConstants.MitterApiUrl, MitterConstants.MitterApiStagingUrl]
@@ -138,7 +142,7 @@ export class MitterAxiosApiInterceptor {
         axios.interceptors.response
 
     constructor(
-        private applicationId: string,
+        private applicationId: string | undefined,
         private userAuthorizationFetcher: () => string | undefined,
         private onTokenExpireExecutor: () => () => void
     ) {}
@@ -205,11 +209,14 @@ export class MitterAxiosApiInterceptor {
 
     private getHeaders() {
         const authorization = this.userAuthorizationFetcher()
-
-        return {
-            'X-Issued-Mitter-User-Authorization': authorization,
-            'X-Mitter-Application-Id': this.applicationId
+        const headers: any = {
+            'X-Issued-Mitter-User-Authorization': authorization
         }
+
+        if (this.applicationId !== undefined) {
+            headers['X-Mitter-Application-Id'] = this.applicationId
+        }
+
+        return headers
     }
 }
-*/

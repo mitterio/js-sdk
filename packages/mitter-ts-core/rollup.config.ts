@@ -18,23 +18,27 @@ export default {
     { file: pkg.module, format: 'es', sourcemap: true },
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
-  external: [],
+  external: [
+      'websocket',
+      'axios',
+      'sockjs-client'
+  ],
   watch: {
-    include: 'src/**',
+    include: ['src/**', 'node_modules']
   },
   plugins: [
-    globals(),
-    builtins(),
     // Allow json resolution
     json(),
+    commonjs({
+        ignoreGlobals: true
+    }),
+    globals(),
+    builtins(),
+    // Allow node_modules resolution, so you can use 'external' to control
     // Compile TypeScript files
     typescript({ useTsconfigDeclarationDir: true }),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     resolve(),
-    commonjs({
-      ignoreGlobals: true
-    }),
-    // Allow node_modules resolution, so you can use 'external' to control
     // which external modules to include in the bundle
     // https://github.com/rollup/rollup-plugin-node-resolve#usage
 

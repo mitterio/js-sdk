@@ -1,4 +1,5 @@
 export * from './Mitter'
+export * from './drivers/WebsocketMessagingPipelineDriver'
 export * from './specs/MessagingPipelineDriver'
 export * from './services/constants'
 

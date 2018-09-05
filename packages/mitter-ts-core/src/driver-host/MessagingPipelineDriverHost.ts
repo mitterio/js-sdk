@@ -1,5 +1,6 @@
 import { DeliveryEndpoint, MessagingPipelinePayload } from 'mitter-models'
 import MessagingPipelineDriver, {
+    BasePipelineSink,
     PipelineDriverSpec,
     PipelineSink
 } from './../specs/MessagingPipelineDriver'
@@ -75,12 +76,14 @@ export class MessagingPipelineDriverHost {
                 let { initialized, pipelineDriverSpec } = await driver.initialize(
                     this.mitterContext
                 )
+
                 driverInitialized = initialized
                 driverSpec = pipelineDriverSpec
             } catch (ex) {
                 console.log('Unable to initialize pipeline driver', ex)
                 throw ex
             }
+
             console.log(`Initializing pipeline driver '${driverSpec.name}'`)
 
             let preProvisionPromise = Promise.resolve<DeliveryEndpoint | undefined>(undefined)
@@ -129,11 +132,33 @@ export class MessagingPipelineDriverHost {
 
                 operatingEndpoint.then(endpoint => {
                     if (endpoint !== undefined) {
-                        driver.endpointRegistered(this.generatePipelineSink(driverSpec), endpoint)
+                        this.announceSinkForDriver(
+                            driver,
+                            endpoint,
+                            this.generatePipelineSink(driverSpec)
+                        )
+                    } else {
+                        if (driver.pipelineSinkChanged !== undefined) {
+                            driver.pipelineSinkChanged(
+                                this.generateStatelessPipelineSink(driverSpec)
+                            )
+                        }
                     }
                 })
             })
         })
+    }
+
+    private announceSinkForDriver(
+        driver: MessagingPipelineDriver,
+        endpoint: DeliveryEndpoint,
+        pipelineSink: PipelineSink
+    ) {
+        driver.endpointRegistered(pipelineSink, endpoint)
+
+        if (driver.pipelineSinkChanged !== undefined) {
+            driver.pipelineSinkChanged(pipelineSink)
+        }
     }
 
     private async syncEndpoint(
@@ -159,7 +184,6 @@ export class MessagingPipelineDriverHost {
         driverSpec: PipelineDriverSpec,
         deliveryEndpoint: DeliveryEndpoint
     ): Promise<DeliveryEndpoint> {
-        console.log('delivery endpoint is', deliveryEndpoint)
         return fetch(`${MitterApiGateway.centralApiUrl()}/v1/users/me/delivery-endpoints`, {
             method: 'POST',
             headers: {
@@ -192,6 +216,14 @@ export class MessagingPipelineDriverHost {
                 this.savedDeliveryEndpoints
             )
             .catch(e => console.warn('Error syncing delivery endpoints to storage', e))
+    }
+
+    private generateStatelessPipelineSink(driverSpec: PipelineDriverSpec): BasePipelineSink {
+        return {
+            received: (payload: MessagingPipelinePayload) => {
+                this.consumeNewPayload(driverSpec, payload)
+            }
+        }
     }
 
     private generatePipelineSink(driverSpec: PipelineDriverSpec): PipelineSink {
