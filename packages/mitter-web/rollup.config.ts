@@ -23,7 +23,7 @@ export default {
     'websocket'
   ],
   watch: {
-    include: ['src/**', 'node_modules']
+    include: ['src/**', 'node_modules/**']
   },
   plugins: [
     replace({

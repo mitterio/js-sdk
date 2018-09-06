@@ -11,7 +11,8 @@ export const Mitter = {
     forWeb: function(
         applicationId: string | undefined = undefined,
         onTokenExpire: TokenExpireFunction[] = [],
-        mitterApiBaseUrl: string = MitterConstants.MitterApiUrl
+        mitterApiBaseUrl: string = MitterConstants.MitterApiUrl,
+        mitterInstanceReady: () => void = () => {}
     ): MitterCore {
         return new MitterCore(
             new WebKvStore(),
@@ -20,7 +21,8 @@ export const Mitter = {
             onTokenExpire,
             window,
             () => {},
-            mitterApiBaseUrl
+            mitterApiBaseUrl,
+            mitterInstanceReady
         )
     }
 }
