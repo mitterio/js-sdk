@@ -2,5 +2,9 @@
 export let MitterConstants = {
     // MitterApiUrl: 'https://api.mitter.io',
     MitterApiUrl: 'https://api.mitter.io',
-    MitterApiStagingUrl: 'https://api.staging.mitter.io'
+    MitterApiStagingUrl: 'https://api.staging.mitter.io',
+
+    Api: {
+        VersionPrefix: '/v1'
+    }
 }

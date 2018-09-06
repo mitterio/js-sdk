@@ -2,6 +2,7 @@ export * from './Mitter'
 export * from './drivers/WebsocketMessagingPipelineDriver'
 export * from './specs/MessagingPipelineDriver'
 export * from './services/constants'
+export * from './MitterApiGateway'
 
 export { default as MessagingPipelineDriver } from './specs/MessagingPipelineDriver'
 

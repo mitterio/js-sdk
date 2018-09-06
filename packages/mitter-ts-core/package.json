@@ -120,6 +120,7 @@
     "axios": "^0.18.0",
     "fetch-intercept": "^2.2.3",
     "isomorphic-fetch": "^2.2.1",
+    "restyped-axios": "^2.0.0",
     "sockjs-client": "^1.1.5",
     "typed-rest-client": "^1.0.9",
     "urijs": "^1.19.1",

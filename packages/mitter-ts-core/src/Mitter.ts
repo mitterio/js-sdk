@@ -30,6 +30,7 @@ export class Mitter {
     )
 
     private mitterAxiosInterceptor: MitterAxiosApiInterceptor = new MitterAxiosApiInterceptor(
+        this,
         this.applicationId,
         () => this.cachedUserAuthorization,
         () => this.executeOnTokenExpireFunctions
@@ -46,7 +47,8 @@ export class Mitter {
         private onTokenExpireFunctions: Array<() => void>,
         globalHostObject: any,
         public globalStore: any,
-        public readonly mitterApiBaseUrl: string = MitterConstants.MitterApiUrl
+        public readonly mitterApiBaseUrl: string = MitterConstants.MitterApiUrl,
+        public mitterInstanceReady: () => void
     ) {
         this.getUserAuthorization()
             .then(authToken => (this.cachedUserAuthorization = authToken))
@@ -55,6 +57,7 @@ export class Mitter {
                     this.announceAuthorizationAvailable()
                 } else this.executeOnTokenExpireFunctions()
             })
+            .then(this.mitterInstanceReady)
             .catch(err => {
                 throw new Error(`Error re-hydrating auth token ${err}`)
             })
@@ -64,6 +67,7 @@ export class Mitter {
             this,
             kvStore
         )
+
         this.messagingPipelineDriverHost.subscribe((messagingPayload: any) =>
             this.subscriptions.forEach(subscription => subscription(messagingPayload))
         )
@@ -96,6 +100,10 @@ export class Mitter {
     }
 
     setUserAuthorization(authorizationToken: string) {
+        if (this.cachedUserAuthorization === authorizationToken) {
+            return
+        }
+
         this.cachedUserAuthorization = authorizationToken
         this.announceAuthorizationAvailable()
         this.kvStore

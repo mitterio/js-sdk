@@ -9,6 +9,7 @@ import axios, {
     AxiosRequestConfig,
     AxiosResponse
 } from 'axios'
+import { Mitter } from './Mitter'
 
 export class MitterFetchApiInterceptor {
     // tslint:disable-next-line:variable-name
@@ -142,6 +143,7 @@ export class MitterAxiosApiInterceptor {
         axios.interceptors.response
 
     constructor(
+        private mitter: Mitter,
         private applicationId: string | undefined,
         private userAuthorizationFetcher: () => string | undefined,
         private onTokenExpireExecutor: () => () => void
@@ -201,10 +203,7 @@ export class MitterAxiosApiInterceptor {
     }
 
     private interceptFilter(url: string): boolean {
-        return (
-            MitterAxiosApiInterceptor.MitterUrls.find(mitterUrl => url.startsWith(mitterUrl)) !==
-            undefined
-        )
+        return url.startsWith(this.mitter.mitterApiBaseUrl)
     }
 
     private getHeaders() {
