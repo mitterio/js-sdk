@@ -17,12 +17,13 @@ export const Mitter = {
         return new MitterCore(
             new WebKvStore(),
             applicationId,
-            new WebSocketPipelineDriver(),
-            onTokenExpire,
-            window,
-            () => {},
             mitterApiBaseUrl,
-            mitterInstanceReady
+
+            onTokenExpire,
+
+            mitterInstanceReady,
+            new WebSocketPipelineDriver(),
+            window
         )
     }
 }
