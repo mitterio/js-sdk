@@ -5,6 +5,12 @@ import crypto from 'crypto'
 export default class AccessKeySigner {
     constructor(public readonly accessKey: string, private readonly accessSecret: string) {}
 
+    static Headers = {
+        Nonce: 'Nonce',
+        Date: 'Date',
+        ContentMD5: 'Content-Md5'
+    }
+
     public signRequest(digestParts: DigestParts): DigestGenerationArtifacts {
         const date = this.getDate(digestParts)
         const contentType = this.getContentType(digestParts)
@@ -21,7 +27,6 @@ export default class AccessKeySigner {
 
         const digest = crypto
             .createHmac('SHA1', Buffer.from(this.accessSecret, 'base64'))
-            //.createHmac('sha1', this.accessSecret)
             .update(computePayload)
             .digest('base64')
 
