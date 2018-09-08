@@ -5,7 +5,6 @@ import MessagingPipelineDriver, {
     PipelineSink
 } from './../specs/MessagingPipelineDriver'
 import { KvStore, Mitter } from '../mitter-core'
-import { MitterApiGateway } from '../MitterApiGateway'
 import { noOp } from '../utils'
 
 export type MessageSink = (payload: MessagingPipelinePayload) => void
@@ -27,7 +26,8 @@ export class MessagingPipelineDriverHost {
     constructor(
         pipelineDrivers: Array<MessagingPipelineDriver> | MessagingPipelineDriver,
         private mitterContext: Mitter,
-        private kvStore: KvStore | undefined = undefined
+        private kvStore: KvStore | undefined = undefined,
+        private onAllPipelinesInitialized: (e?: any) => void = () => {}
     ) {
         if (pipelineDrivers instanceof Array) {
             this.pipelineDrivers = pipelineDrivers
@@ -43,7 +43,14 @@ export class MessagingPipelineDriverHost {
     }
 
     public refresh() {
-        this.loadStoredEndpoints().then(() => this.initializeMessagingPipelines())
+        this.loadStoredEndpoints().then(() =>
+            this.initializeMessagingPipelines()
+                .then(this.onAllPipelinesInitialized)
+                .catch(e => {
+                    console.log('Caught error :D')
+                    this.onAllPipelinesInitialized(e)
+                })
+        )
     }
 
     private async loadStoredEndpoints(): Promise<void> {
@@ -67,8 +74,10 @@ export class MessagingPipelineDriverHost {
         }
     }
 
-    private async initializeMessagingPipelines(): Promise<void> {
-        this.pipelineDrivers.forEach(async driver => {
+    private async initializeMessagingPipelines(): Promise<any> {
+        const pipelineInits: Promise<any>[] = []
+
+        await this.pipelineDrivers.forEach(async driver => {
             let driverInitialized: Promise<boolean | void>
             let driverSpec: PipelineDriverSpec
 
@@ -77,7 +86,9 @@ export class MessagingPipelineDriverHost {
                     this.mitterContext
                 )
 
+                console.log('Pushing....')
                 driverInitialized = initialized
+                pipelineInits.push(driverInitialized)
                 driverSpec = pipelineDriverSpec
             } catch (ex) {
                 console.log('Unable to initialize pipeline driver', ex)
@@ -147,6 +158,8 @@ export class MessagingPipelineDriverHost {
                 })
             })
         })
+
+        return Promise.all(pipelineInits)
     }
 
     private announceSinkForDriver(
@@ -165,7 +178,7 @@ export class MessagingPipelineDriverHost {
         deliveryEndpoint: DeliveryEndpoint
     ): Promise<DeliveryEndpoint | undefined> {
         return fetch(
-            `${MitterApiGateway.centralApiUrl()}/v1/users/me/delivery-endpoints/${
+            `${this.mitterContext.mitterApiBaseUrl}/v1/users/me/delivery-endpoints/${
                 deliveryEndpoint.serializedEndpoint
             }`
         )
@@ -184,7 +197,7 @@ export class MessagingPipelineDriverHost {
         driverSpec: PipelineDriverSpec,
         deliveryEndpoint: DeliveryEndpoint
     ): Promise<DeliveryEndpoint> {
-        return fetch(`${MitterApiGateway.centralApiUrl()}/v1/users/me/delivery-endpoints`, {
+        return fetch(`${this.mitterContext.mitterApiBaseUrl}/v1/users/me/delivery-endpoints`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

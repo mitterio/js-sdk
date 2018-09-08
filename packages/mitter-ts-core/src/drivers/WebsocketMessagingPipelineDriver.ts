@@ -7,6 +7,7 @@ import {
 } from '../mitter-core'
 
 import { DeliveryEndpoint } from 'mitter-models'
+import { StandardHeaders } from '../mitter-core'
 
 import SockJs from 'sockjs-client'
 import * as Stomp from '@stomp/stompjs'
@@ -35,17 +36,18 @@ export class WebSocketPipelineDriver implements MessagingPipelineDriver {
             pipelineDriverSpec: {
                 name: 'mitter-ws-driver'
             },
+
             initialized: new Promise((resolve, reject) => {
                 mitter.getUserAuthorization().then(userAuthorization => {
                     if (userAuthorization === undefined || this.activeSocket === undefined) {
                         reject(Error('Cannot construct websocket without user authorization'))
                     } else {
                         const authHeaders: any = {
-                            'X-Issued-Mitter-User-Authorization': userAuthorization
+                            [StandardHeaders.UserAuthorizationHeader]: userAuthorization
                         }
 
                         if (mitter.applicationId !== undefined) {
-                            authHeaders['X-Mitter-Application-Id'] = mitter.applicationId
+                            authHeaders[StandardHeaders.ApplicationIdHeader] = mitter.applicationId
                         }
 
                         this.activeSocket.connect(authHeaders, frame => {
@@ -53,6 +55,7 @@ export class WebSocketPipelineDriver implements MessagingPipelineDriver {
                                 '/user/event-stream',
                                 this.processMessage.bind(this)
                             )
+
                             resolve(true)
                         })
                     }

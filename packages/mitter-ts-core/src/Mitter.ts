@@ -1,15 +1,14 @@
 import { KvStore } from './mitter-core'
-import {
-    MitterApiGateway,
-    MitterAxiosApiInterceptor,
-    MitterFetchApiInterceptor
-} from './MitterApiGateway'
+import { MitterAxiosApiInterceptor } from './MitterApiGateway'
 import MessagingPipelineDriver from './specs/MessagingPipelineDriver'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
 import { MessagingPipelinePayload } from 'mitter-models'
-import { AxiosInstance } from 'axios'
 import { MitterConstants } from './services/constants'
-import User from './objects/Users'
+import { UserAuthorizationInterceptor } from './auth/user-interceptors'
+import MitterUser from './objects/Users'
+
+import { AxiosInstance } from 'axios'
+import { statefulPromise } from './utils/StatefulPromise'
 
 export class Mitter {
     // tslint:disable-next-line:variable-name
@@ -18,37 +17,31 @@ export class Mitter {
         UserId: 'userId'
     }
     private cachedUserAuthorization: string | undefined = undefined
-    public mitterApiGateway: MitterApiGateway = new MitterApiGateway(
-        this.applicationId,
-        () => this.cachedUserAuthorization
-    )
     private cachedUserId: string | undefined = undefined
-    private mitterFetchInterceptor: MitterFetchApiInterceptor = new MitterFetchApiInterceptor(
-        this.applicationId,
-        () => this.cachedUserAuthorization,
-        () => this.executeOnTokenExpireFunctions
-    )
 
     private mitterAxiosInterceptor: MitterAxiosApiInterceptor = new MitterAxiosApiInterceptor(
         this,
         this.applicationId,
-        () => this.cachedUserAuthorization,
-        () => this.executeOnTokenExpireFunctions
+        () => this.executeOnTokenExpireFunctions,
+        new UserAuthorizationInterceptor(
+            () => this.cachedUserAuthorization,
+            this.applicationId
+        ).getInterceptor()
     )
 
     private messagingPipelineDriverHost: MessagingPipelineDriverHost
-    private subscriptions: Array<(payload: MessagingPipelinePayload) => void> = []
-    private onAuthAvailableSubscribers: Array<() => void> = []
+    private subscriptions: ((payload: MessagingPipelinePayload) => void)[] = []
+    private onAuthAvailableSubscribers: (() => void)[] = []
+    private onPipelinesInitialized = statefulPromise<void>()
 
     constructor(
-        public kvStore: KvStore,
+        public readonly kvStore: KvStore,
         public readonly applicationId: string | undefined,
-        pipelineDrivers: Array<MessagingPipelineDriver> | MessagingPipelineDriver,
-        private onTokenExpireFunctions: Array<() => void>,
-        globalHostObject: any,
-        public globalStore: any,
         public readonly mitterApiBaseUrl: string = MitterConstants.MitterApiUrl,
-        public mitterInstanceReady: () => void
+        private onTokenExpireFunctions: (() => void)[],
+        mitterInstanceReady: () => void,
+        pipelineDrivers: MessagingPipelineDriver[] | MessagingPipelineDriver,
+        globalHostObject: any
     ) {
         this.getUserAuthorization()
             .then(authToken => (this.cachedUserAuthorization = authToken))
@@ -57,15 +50,22 @@ export class Mitter {
                     this.announceAuthorizationAvailable()
                 } else this.executeOnTokenExpireFunctions()
             })
-            .then(this.mitterInstanceReady)
-            .catch(err => {
+            .then(mitterInstanceReady)
+            .catch((err: any) => {
                 throw new Error(`Error re-hydrating auth token ${err}`)
             })
 
         this.messagingPipelineDriverHost = new MessagingPipelineDriverHost(
             pipelineDrivers,
             this,
-            kvStore
+            kvStore,
+            (e?: any) => {
+                if (e !== undefined) {
+                    this.onPipelinesInitialized.reject(e)
+                } else {
+                    this.onPipelinesInitialized.resolve()
+                }
+            }
         )
 
         this.messagingPipelineDriverHost.subscribe((messagingPayload: any) =>
@@ -81,14 +81,6 @@ export class Mitter {
 
     subscribeToPayload(subscription: (payload: MessagingPipelinePayload) => void) {
         this.subscriptions.push(subscription)
-    }
-
-    enableFetchInterceptor() {
-        this.mitterFetchInterceptor.enable()
-    }
-
-    disableFetchInterceptor() {
-        this.mitterFetchInterceptor.disable()
     }
 
     enableAxiosInterceptor(axiosInstance?: AxiosInstance) {
@@ -136,15 +128,14 @@ export class Mitter {
         }
     }
 
-    getGlobalStore() {
-        console.log('global store is', this.globalStore)
-        return this.globalStore()
+    onPipelinesInit(): Promise<void> {
+        return this.onPipelinesInitialized
     }
 
     // Smart-object values
 
-    me(): User {
-        return new User(this)
+    me(): MitterUser {
+        return new MitterUser(this)
     }
 
     version() {
