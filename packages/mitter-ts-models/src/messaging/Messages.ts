@@ -42,3 +42,21 @@ export class Message implements IdentifiableEntity<Message>, MetadataAttachable 
     return this.messageId
   }
 }
+
+export class ChannelReferencingMessage implements IdentifiableEntity<Message>, MetadataAttachable {
+  constructor(
+    public channelId: string,
+    public messageId: string,
+    public messageType: StandardMessageType = StandardMessageType.Standard,
+    public payloadType: string = StandardPayloadTypeNames.TextMessage,
+    public senderId: { identifier: string },
+    public textPayload: string,
+    public messageData: Array<MessageDatum> = [],
+    public timelineEvents: Array<TimelineEvent>,
+    public entityMetaData: EntityMetadata
+  ) {}
+
+  identifier() {
+    return this.messageId
+  }
+}
