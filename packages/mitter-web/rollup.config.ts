@@ -23,7 +23,7 @@ export default {
     'websocket'
   ],
   watch: {
-    include: ['src/**', 'node_modules/**']
+    include: ['src/**', './../mitter-ts-core/dist/**']
   },
   plugins: [
     replace({
