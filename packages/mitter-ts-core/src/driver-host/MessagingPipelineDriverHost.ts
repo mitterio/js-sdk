@@ -45,9 +45,10 @@ export class MessagingPipelineDriverHost {
     public refresh() {
         this.loadStoredEndpoints().then(() =>
             this.initializeMessagingPipelines()
-                .then(this.onAllPipelinesInitialized)
+                .then(() => {
+                    this.onAllPipelinesInitialized()
+                })
                 .catch(e => {
-                    console.log('Caught error :D')
                     this.onAllPipelinesInitialized(e)
                 })
         )

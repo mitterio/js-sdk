@@ -8,7 +8,7 @@ import { UserAuthorizationInterceptor } from './auth/user-interceptors'
 import MitterUser from './objects/Users'
 
 import { AxiosInstance } from 'axios'
-import { statefulPromise } from './utils/StatefulPromise'
+import { statefulPromise } from './utils'
 
 export class Mitter {
     // tslint:disable-next-line:variable-name

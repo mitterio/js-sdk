@@ -3,6 +3,10 @@ import { User } from 'mitter-models'
 
 const base = `${MitterConstants.Api.VersionPrefix}/users`
 
+export type GetUser = {
+    user: User
+}
+
 export const UsersPaths = {
     GetMe: `${base}/me`,
     GetUser: `${base}/:userId`,
@@ -13,7 +17,7 @@ export const UsersPaths = {
 export interface UsersApi {
     '/v1/users/me': {
         GET: {
-            response: User
+            response: GetUser
         }
     }
 
@@ -23,7 +27,7 @@ export interface UsersApi {
                 userId: string
             }
 
-            response: User
+            response: GetUser
         }
     }
 }
