@@ -8,7 +8,7 @@ import {
   UserProfile
 } from '../mitter-models'
 
-import UserLocator from '../user/locators/UserLocator'
+import { UserLocator } from '../user/locators/UserLocator'
 import ApplicationProperty from '../application/properties/ApplicationProperty'
 
 export enum Central {

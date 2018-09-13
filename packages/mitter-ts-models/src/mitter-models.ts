@@ -47,6 +47,7 @@ export * from './nerif/event-annotation'
 
 export * from './subscriber/Subscriber'
 
+export * from './user/locators/UserLocator'
 export * from './user/locators/EmailLocator'
 export * from './user/locators/MobileNumberLocator'
 export * from './user/Presence'

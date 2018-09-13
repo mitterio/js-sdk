@@ -1,4 +1,4 @@
-import UserLocator from './UserLocator'
+import { UserLocator } from './UserLocator'
 
 export class MobileNumberLocator extends UserLocator {
   public static LOCATOR_SERIALIZED_PREFIX: string = 'tele'

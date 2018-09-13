@@ -1,5 +1,5 @@
 import IdentifiableEntity from '../annotations/IdentifiableEntity'
-import UserLocator from './locators/UserLocator'
+import { UserLocator } from './locators/UserLocator'
 
 export class User implements IdentifiableEntity<User> {
   constructor(

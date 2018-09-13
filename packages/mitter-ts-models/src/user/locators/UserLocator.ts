@@ -1,7 +1,7 @@
 import IdentifiableEntity from '../../annotations/IdentifiableEntity'
 import { VerificationStatus } from '../VerificationStatus'
 
-abstract class UserLocator implements IdentifiableEntity<UserLocator> {
+export abstract class UserLocator implements IdentifiableEntity<UserLocator> {
   public verificationStatus: VerificationStatus
 
   protected constructor(public locatorSerializationPrefix: string, public userLocatorId: string) {
@@ -19,5 +19,3 @@ abstract class UserLocator implements IdentifiableEntity<UserLocator> {
 
   protected abstract serializedLocator(): string
 }
-
-export default UserLocator
