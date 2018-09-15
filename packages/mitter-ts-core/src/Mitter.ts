@@ -120,11 +120,20 @@ export class Mitter {
         })
     }
 
-    getUserId(): Promise<string | undefined> {
+    getUserId(): Promise<string> {
         if (this.cachedUserId !== undefined) {
             return Promise.resolve(this.cachedUserId)
         } else {
-            return this.kvStore.getItem(Mitter.StoreKey.UserId)
+            return this.kvStore.getItem<string>(Mitter.StoreKey.UserId).then(userId => {
+                if (userId === undefined) {
+                    return this.me().userId.then(fetchedUserId => {
+                        this.setUserId(fetchedUserId)
+                        return fetchedUserId
+                    })
+                } else {
+                    return Promise.resolve(userId)
+                }
+            })
         }
     }
 

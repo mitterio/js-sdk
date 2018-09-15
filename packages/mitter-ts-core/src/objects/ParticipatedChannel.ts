@@ -1,6 +1,7 @@
 import { MitterObject } from './mitter-objects'
 import { ParticipatedChannel } from 'mitter-models'
 
+/*
 export default class MitterParticipatedChannel extends MitterObject<
     MitterParticipatedChannel,
     ParticipatedChannel
@@ -37,3 +38,4 @@ export default class MitterParticipatedChannel extends MitterObject<
         return super.proxy('identifier')
     }
 }
+*/

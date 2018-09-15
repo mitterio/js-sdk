@@ -1,4 +1,3 @@
-import { cat } from 'shelljs'
 import {
     MessagingPipelineDriver,
     PipelineSink,
@@ -32,6 +31,7 @@ export class WebSocketPipelineDriver implements MessagingPipelineDriver {
     initialize(mitter: Mitter): PipelineDriverInitialization {
         const sockJs = new SockJs(`${mitter.mitterApiBaseUrl}/v1/socket/control/sockjs`)
         this.activeSocket = Stomp.over(sockJs)
+        this.activeSocket.debug = () => {}
 
         return {
             pipelineDriverSpec: {
@@ -55,7 +55,7 @@ export class WebSocketPipelineDriver implements MessagingPipelineDriver {
                             authHeaders,
                             frame => {
                                 this.activeSocket!!.subscribe(
-                                    'user/event-stream',
+                                    '/user/event-stream',
                                     this.processMessage.bind(this)
                                 )
 
@@ -76,7 +76,6 @@ export class WebSocketPipelineDriver implements MessagingPipelineDriver {
     }
 
     private processMessage(wsMessage: Message) {
-        console.log('MSG', wsMessage)
         if (this.pipelineSink !== undefined) {
             this.pipelineSink.received(JSON.parse(wsMessage.body))
         }

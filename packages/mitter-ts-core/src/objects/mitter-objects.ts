@@ -34,7 +34,6 @@ export abstract class MitterObject<T extends Promsified<U>, U> {
 
     protected proxy<K extends keyof U>(key: K): Promise<U[K]> {
         if (this._ref !== undefined) {
-            console.log('We have ref', this._ref, 'and we have key', key)
             return Promise.resolve(this._ref[key])
         } else {
             return (
