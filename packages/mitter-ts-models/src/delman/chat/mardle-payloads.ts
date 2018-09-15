@@ -61,7 +61,7 @@ export class ParticipationChangedEventPayload extends MessagingPipelinePayload {
     public oldStatus: ParticipationStatus,
     public newStatus: ParticipationStatus,
     public participantId: string,
-    public channelId: string,
+    public channelId: { identifier: string },
     globalPipelinePayloadId: string,
     type: string
   ) {

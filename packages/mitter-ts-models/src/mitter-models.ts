@@ -42,6 +42,7 @@ export * from './messaging/Streams'
 export * from './messaging/TimelineEvents'
 
 export * from './entity/EntityMetadata'
+export * from './entity/EntityProfile'
 
 export * from './nerif/event-annotation'
 
