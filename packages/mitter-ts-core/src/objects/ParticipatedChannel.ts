@@ -1,5 +1,5 @@
 import { MitterObject } from './mitter-objects'
-import { ParticipatedChannel } from 'mitter-models'
+import { ParticipatedChannel } from '@mitter-io/models'
 
 /*
 export default class MitterParticipatedChannel extends MitterObject<
