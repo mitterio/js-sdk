@@ -6,7 +6,6 @@ import axios, {
     AxiosRequestConfig,
     AxiosResponse
 } from 'axios'
-import { Mitter } from './Mitter'
 
 export class MitterAxiosApiInterceptor {
     // tslint:disable-next-line:variable-name
@@ -16,15 +15,14 @@ export class MitterAxiosApiInterceptor {
         axios.interceptors.response
 
     constructor(
-        private mitter: Mitter,
         private applicationId: string | undefined,
-        private onTokenExpireExecutor: () => () => void,
-        private genericInterceptor: GenericInterceptor
+        private genericInterceptor: GenericInterceptor,
+        private mitterApiBaseUrl: string
     ) {}
 
     requestInterceptor(config: AxiosRequestConfig) {
         if (this.interceptFilter(config!!.baseURL!!)) {
-            this.genericInterceptor(this.mitter, {
+            this.genericInterceptor({
                 data: config.data,
                 path: config.url!!,
                 headers: config.headers,
@@ -45,9 +43,14 @@ export class MitterAxiosApiInterceptor {
     }
 
     responseErrorInterceptor(error: AxiosError) {
+        /*
         if (error!!.response!!.status === 401 && error.code === 'claim_rejected') {
-            this.onTokenExpireExecutor()
+            if (this.onTokenExpireExecutor !== undefined) {
+                this.onTokenExpireExecutor()
+            }
         }
+        */
+
         return Promise.reject(error)
     }
 
@@ -82,6 +85,6 @@ export class MitterAxiosApiInterceptor {
     }
 
     private interceptFilter(url: string): boolean {
-        return url.startsWith(this.mitter.mitterApiBaseUrl)
+        return url.startsWith(this.mitterApiBaseUrl)
     }
 }

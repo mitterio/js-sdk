@@ -22,8 +22,8 @@ export abstract class MitterObject<T extends Promsified<U>, U> {
     }
 
     public sync(): Promise<U> {
-        return this.fetchCall!!().then(it => {
-            this._ref = it
+        return this.fetchCall!().then(it => {
+            this.setRef(it)
             return it
         })
     }
@@ -40,7 +40,10 @@ export abstract class MitterObject<T extends Promsified<U>, U> {
                 this.sync()
                     // TODO. we probably need some deadlock prevention mechanism, this can ideally
                     // keep on going on forever
-                    .then(() => this.proxy(key))
+                    .then(it => {
+                        this._ref = it
+                        return this._ref[key]
+                    })
             )
         }
     }

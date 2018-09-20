@@ -1,5 +1,6 @@
 import { KvStore } from './mitter-core'
 import { MitterAxiosApiInterceptor } from './MitterApiGateway'
+import { MitterClientSet } from './MitterClientSet'
 import MessagingPipelineDriver from './specs/MessagingPipelineDriver'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
 import { MessagingPipelinePayload } from 'mitter-models'
@@ -10,7 +11,26 @@ import MitterUser from './objects/Users'
 import { AxiosInstance } from 'axios'
 import { statefulPromise } from './utils'
 
-export class Mitter {
+export interface MitterAxiosInterceptionHost {
+    mitterApiBaseUrl: string
+    enableAxiosInterceptor(axiosInstance: AxiosInstance): void
+    disableAxiosInterceptor?(axiosInstance: AxiosInstance): void
+}
+
+export abstract class MitterBase implements MitterAxiosInterceptionHost {
+    abstract mitterApiBaseUrl: string
+    abstract enableAxiosInterceptor(axiosInstance: AxiosInstance): void
+
+    version(): string {
+        return '0.5.0'
+    }
+
+    clients(): MitterClientSet {
+        return new MitterClientSet(this)
+    }
+}
+
+export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
     // tslint:disable-next-line:variable-name
     private static readonly StoreKey = {
         UserAuthorizationToken: 'userAuthorizationToken',
@@ -20,13 +40,17 @@ export class Mitter {
     private cachedUserId: string | undefined = undefined
 
     private mitterAxiosInterceptor: MitterAxiosApiInterceptor = new MitterAxiosApiInterceptor(
-        this,
+        /* the application if */
         this.applicationId,
-        () => this.executeOnTokenExpireFunctions,
+
+        /* The generic request interceptor to use */
         new UserAuthorizationInterceptor(
             () => this.cachedUserAuthorization,
             this.applicationId
-        ).getInterceptor()
+        ).getInterceptor(),
+
+        /* The base url for mitter apis */
+        this.mitterApiBaseUrl
     )
 
     private messagingPipelineDriverHost: MessagingPipelineDriverHost
@@ -43,6 +67,7 @@ export class Mitter {
         pipelineDrivers: MessagingPipelineDriver[] | MessagingPipelineDriver,
         globalHostObject: any
     ) {
+        super()
         this.getUserAuthorization()
             .then(authToken => (this.cachedUserAuthorization = authToken))
             .then(() => {
@@ -83,11 +108,11 @@ export class Mitter {
         this.subscriptions.push(subscription)
     }
 
-    enableAxiosInterceptor(axiosInstance?: AxiosInstance) {
+    enableAxiosInterceptor(axiosInstance: AxiosInstance) {
         this.mitterAxiosInterceptor.enable(axiosInstance)
     }
 
-    disableAxiosInterceptor(axiosInstance?: AxiosInstance) {
+    disableAxiosInterceptor(axiosInstance: AxiosInstance) {
         this.mitterAxiosInterceptor.disable(axiosInstance)
     }
 
@@ -113,9 +138,10 @@ export class Mitter {
         }
     }
 
-    setUserId(userId: string) {
-        if (this.cachedUserId === userId) return
-        this.kvStore.setItem(Mitter.StoreKey.UserId, userId).catch((err: any) => {
+    setUserId(userId: string): Promise<void> {
+        if (this.cachedUserId === userId) return Promise.resolve()
+
+        return this.kvStore.setItem(Mitter.StoreKey.UserId, userId).catch((err: any) => {
             throw new Error(`Error storing userId ${err}`)
         })
     }
@@ -127,8 +153,7 @@ export class Mitter {
             return this.kvStore.getItem<string>(Mitter.StoreKey.UserId).then(userId => {
                 if (userId === undefined) {
                     return this.me().userId.then(fetchedUserId => {
-                        this.setUserId(fetchedUserId)
-                        return fetchedUserId
+                        return this.setUserId(fetchedUserId).then(() => fetchedUserId)
                     })
                 } else {
                     return Promise.resolve(userId)
@@ -145,10 +170,6 @@ export class Mitter {
 
     me(): MitterUser {
         return new MitterUser(this)
-    }
-
-    version() {
-        return '0.4.2'
     }
 
     private executeOnTokenExpireFunctions() {

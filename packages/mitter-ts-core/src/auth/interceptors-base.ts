@@ -1,5 +1,3 @@
-import { Mitter } from '../Mitter'
-
 export interface GenericRequestParameters {
     data: any
     headers: { [headers: string]: string[] }
@@ -8,5 +6,5 @@ export interface GenericRequestParameters {
 }
 
 export interface GenericInterceptor {
-    (mitter: Mitter, requestParameters: GenericRequestParameters): void
+    (requestParameters: GenericRequestParameters): void
 }

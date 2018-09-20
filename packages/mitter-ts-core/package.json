@@ -1,6 +1,6 @@
 {
-  "name": "mitter-core",
-  "version": "0.0.0",
+  "name": "@mitter-io/core",
+  "version": "0.4.2",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-core.umd.js",
@@ -79,6 +79,7 @@
   "devDependencies": {
     "@types/jest": "^22.0.0",
     "@types/node": "^10.0.3",
+    "axios": "^0.18.0",
     "colors": "^1.1.2",
     "commitizen": "^2.9.6",
     "coveralls": "^3.0.0",
@@ -117,10 +118,8 @@
     "@types/sockjs-client": "^1.1.0",
     "@types/stompjs": "^2.3.4",
     "@types/urijs": "^1.15.38",
-    "axios": "^0.18.0",
     "isomorphic-fetch": "^2.2.1",
     "restyped-axios": "^2.0.0",
-    "sockjs-client": "^1.1.5",
     "typed-rest-client": "^1.0.9",
     "urijs": "^1.19.1",
     "whatwg-fetch": "^2.0.4"

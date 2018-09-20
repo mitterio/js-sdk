@@ -8,7 +8,7 @@ export class UserAuthorizationInterceptor {
     ) {}
 
     getInterceptor(): GenericInterceptor {
-        return (mitter, requestParams) => {
+        return requestParams => {
             if (!(StandardHeaders.UserAuthorizationHeader in requestParams.headers)) {
                 const userAuthorization = this.userAuthorizationFetcher()
 

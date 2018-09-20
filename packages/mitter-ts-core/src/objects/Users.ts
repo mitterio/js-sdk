@@ -2,11 +2,11 @@ import { Mitter } from '../Mitter'
 import { usersClientGenerator, channelsClientGenerator } from '../services'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { UsersApi, ChannelsApi } from '../services'
-import { User, ParticipatedChannel, UserLocator } from 'mitter-models'
+import { User, UserLocator } from 'mitter-models'
 import { MitterObject } from './mitter-objects'
 
 export default class MitterUser extends MitterObject<MitterUser, User> {
-    get userId() {
+    get userId(): Promise<string> {
         return super.proxy('userId')
     }
 
@@ -18,7 +18,7 @@ export default class MitterUser extends MitterObject<MitterUser, User> {
         return super.proxy('synthetic')
     }
 
-    get screenName(): Promise<string> {
+    get screenName(): Promise<{ screenName: string }> {
         return super.proxy('screenName')
     }
 
@@ -49,7 +49,7 @@ export default class MitterUser extends MitterObject<MitterUser, User> {
         super.init(() => {
             return this.usersClient
                 .get<'/v1/users/:userId'>(`/v1/users/${this._userId}`)
-                .then(x => x.data.user)
+                .then(x => x.data)
         })
     }
 

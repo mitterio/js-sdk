@@ -1,3 +1,6 @@
+import { TypedAxiosInstance } from 'restyped-axios'
+import { MitterAxiosInterceptionHost } from '../Mitter'
+import { clientGenerator } from './common'
 import { MitterConstants } from './constants'
 import { ChannelReferencingMessage, Message } from 'mitter-models'
 
@@ -42,5 +45,15 @@ export interface MessagesApi {
 
             body: Message
         }
+    }
+}
+
+export const messagesClientGenerator = clientGenerator<MessagesApi>()
+
+export class MessagesClient {
+    private messagesAxiosClient: TypedAxiosInstance<MessagesApi>
+
+    constructor(private mitterAxiosInterceptionHost: MitterAxiosInterceptionHost) {
+        this.messagesAxiosClient = messagesClientGenerator(mitterAxiosInterceptionHost)
     }
 }
