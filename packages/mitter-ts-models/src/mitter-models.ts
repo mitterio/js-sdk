@@ -61,3 +61,5 @@ export * from './web/objects/PayloadUri'
 
 export * from './wire/MessageWireObjects'
 export * from './wire/TimelineEventWireObjects'
+
+export * from './requests/IssuedTokens'

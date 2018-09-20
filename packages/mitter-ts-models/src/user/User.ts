@@ -7,7 +7,9 @@ export class User implements IdentifiableEntity<User> {
     public userLocators: Array<UserLocator>,
     public systemUser: boolean,
     public synthetic: boolean = false,
-    public screenName: string
+    public screenName: {
+      screenName: string
+    }
   ) {}
 
   public identifier(): string {
