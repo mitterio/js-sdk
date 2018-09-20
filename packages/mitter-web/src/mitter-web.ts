@@ -1,4 +1,4 @@
-import { Mitter as MitterCore, MitterConstants } from 'mitter-core'
+import { Mitter as MitterCore, MitterConstants } from '@mitter-io/core'
 import WebKvStore from './kv-store/KvStore'
 import WebSocketPipelineDriver from './drivers/WebsocketMessagingPipelineDriver'
 

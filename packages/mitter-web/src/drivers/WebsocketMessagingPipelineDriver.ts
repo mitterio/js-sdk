@@ -5,9 +5,9 @@ import {
     Mitter,
     BasePipelineSink,
     StandardHeaders
-} from 'mitter-core'
+} from '@mitter-io/core'
 
-import { DeliveryEndpoint } from 'mitter-models'
+import { DeliveryEndpoint } from '@mitter-io/models'
 
 import SockJs from 'sockjs-client'
 import * as Stomp from '@stomp/stompjs'

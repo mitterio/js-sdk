@@ -1,4 +1,4 @@
-import { KvStore as MitterKvStore } from 'mitter-core'
+import { KvStore as MitterKvStore } from '@mitter-io/core'
 
 declare var localStorage: any
 
