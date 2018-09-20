@@ -2,7 +2,7 @@ import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterAxiosInterceptionHost } from '../Mitter'
 import { clientGenerator } from './common'
 import { MitterConstants } from './constants'
-import { IssuedUserToken } from 'mitter-models'
+import { IssuedUserToken } from '@mitter-io/models'
 
 const base = `${MitterConstants.Api.VersionPrefix}/users/:userId/tokens`
 

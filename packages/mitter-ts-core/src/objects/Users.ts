@@ -2,7 +2,7 @@ import { Mitter } from '../Mitter'
 import { usersClientGenerator, channelsClientGenerator } from '../services'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { UsersApi, ChannelsApi } from '../services'
-import { User, UserLocator } from 'mitter-models'
+import { User, UserLocator } from '@mitter-io/models'
 import { MitterObject } from './mitter-objects'
 
 export default class MitterUser extends MitterObject<MitterUser, User> {

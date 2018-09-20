@@ -3,7 +3,7 @@ import { Identifiable } from '../models/base-types'
 import { clientGenerator } from './common'
 import { MitterAxiosInterceptionHost } from '../Mitter'
 import { MitterConstants } from './constants'
-import { ParticipatedChannel, Channel } from 'mitter-models'
+import { ParticipatedChannel, Channel } from '@mitter-io/models'
 
 const base = `${MitterConstants.Api.VersionPrefix}/channels`
 

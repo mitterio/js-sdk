@@ -1,4 +1,4 @@
-import { DeliveryEndpoint, MessagingPipelinePayload } from 'mitter-models'
+import { DeliveryEndpoint, MessagingPipelinePayload } from '@mitter-io/models'
 import { Mitter } from './../mitter-core'
 
 export interface PipelineDriverSpec {
