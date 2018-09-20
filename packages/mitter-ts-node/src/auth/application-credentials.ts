@@ -1,4 +1,4 @@
-import { MitterAccessCredentials } from 'mitter-core'
+import { MitterAccessCredentials } from '@mitter-io/core'
 
 export interface MitterApplicationCredentials extends MitterAccessCredentials {}
 

@@ -1,4 +1,4 @@
-import { GenericInterceptor, StandardHeaders } from 'mitter-core'
+import { GenericInterceptor, StandardHeaders } from '@mitter-io/core'
 import AccessKeySigner from './AccessKeySigner'
 import { AccessKeyApplicationCredentials } from './application-credentials'
 import { DigestParts } from './digest-objects'

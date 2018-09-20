@@ -3,7 +3,7 @@ import {
     MitterAxiosInterceptionHost,
     MitterAxiosApiInterceptor,
     MitterConstants
-} from 'mitter-core'
+} from '@mitter-io/core'
 import { AxiosInstance } from 'axios'
 import { AccessKeySigningInterceptor } from './auth/access-key-interceptor'
 import { AccessKeyApplicationCredentials } from './auth/application-credentials'
