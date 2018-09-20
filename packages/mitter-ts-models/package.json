@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/models",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-models.umd.js",
