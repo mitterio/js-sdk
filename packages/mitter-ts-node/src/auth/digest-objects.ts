@@ -3,8 +3,8 @@ export class DigestParts {
         public readonly method: string,
         public readonly path: string,
         public readonly payloadMd5: string,
-        public readonly nonce?: string | undefined,
         public readonly contentType?: string | undefined,
+        public readonly nonce?: string | undefined,
         public readonly date?: string | undefined
     ) {}
 }

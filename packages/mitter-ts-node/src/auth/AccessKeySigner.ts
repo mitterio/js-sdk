@@ -8,7 +8,8 @@ export default class AccessKeySigner {
     static Headers = {
         Nonce: 'Nonce',
         Date: 'Date',
-        ContentMD5: 'Content-Md5'
+        ContentMD5: 'Content-Md5',
+        ContentType: 'Content-Type'
     }
 
     public signRequest(digestParts: DigestParts): DigestGenerationArtifacts {

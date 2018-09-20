@@ -15,20 +15,25 @@ export class AccessKeySigningInterceptor {
     }
 
     getInterceptor(): GenericInterceptor {
-        return (mitter, requestParams) => {
+        return requestParams => {
             const payload =
                 requestParams.data === null || requestParams.data === undefined
                     ? ''
                     : requestParams.data
+
+            const wirePayload = typeof payload === 'object' ? JSON.stringify(payload) : payload
+            const contentType = payload == '' ? 'null' : 'application/json'
+
             const payloadMd5 = crypto
                 .createHash('md5')
-                .update(payload)
-                .digest('hex')
+                .update(wirePayload)
+                .digest('base64')
 
             const digestParts = new DigestParts(
                 requestParams.method,
                 requestParams.path,
-                payloadMd5
+                payloadMd5,
+                contentType
             )
 
             const digest = this.accessKeySigner.signRequest(digestParts)
@@ -42,6 +47,8 @@ export class AccessKeySigningInterceptor {
             requestParams.headers[AccessKeySigner.Headers.Date] = [digest.date]
             requestParams.headers[AccessKeySigner.Headers.Nonce] = [digest.nonce]
             requestParams.headers[AccessKeySigner.Headers.ContentMD5] = [payloadMd5]
+            requestParams.headers[AccessKeySigner.Headers.ContentType] = [contentType]
+            requestParams.data = wirePayload
         }
     }
 }
