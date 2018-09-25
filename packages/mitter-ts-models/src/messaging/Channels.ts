@@ -20,8 +20,8 @@ export class Channel implements IdentifiableEntity<Channel> {
   constructor(
     public channelId: string,
     public defaultRuleSet: string,
-    public timelineEvents: Array<TimelineEvent>,
     public participation: Array<ChannelParticipation>,
+    public timelineEvents: Array<TimelineEvent>,
     public systemChannel: boolean,
     public entityMetadata: EntityMetadata,
     public entityProfile: EntityProfile
