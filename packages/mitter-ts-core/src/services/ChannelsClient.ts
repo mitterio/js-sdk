@@ -42,7 +42,7 @@ export interface ChannelsApi {
         }
 
         POST: {
-            response: Identifiable<string>
+            response: Identifiable<string> | Channel
             body: Channel
         }
     }
@@ -57,9 +57,15 @@ export class ChannelsClient {
         this.channelsAxiosClient = channelsClientGenerator(mitterAxiosInterceptionHost)
     }
 
-    public newChannel(channel: Channel): Promise<Identifiable<string>> {
+    public newChannel(channel: Channel): Promise<Identifiable<string> | Channel> {
         return this.channelsAxiosClient
             .post<'/v1/channels'>('/v1/channels', channel)
+            .then(x => x.data)
+    }
+
+    public participatedChannels(): Promise<ParticipatedChannel[]> {
+        return this.channelsAxiosClient
+            .get<'/v1/users/me/channels'>('/v1/users/me/channels')
             .then(x => x.data)
     }
 }

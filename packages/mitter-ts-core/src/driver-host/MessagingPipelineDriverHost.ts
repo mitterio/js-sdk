@@ -87,7 +87,6 @@ export class MessagingPipelineDriverHost {
                     this.mitterContext
                 )
 
-                console.log('Pushing....')
                 driverInitialized = initialized
                 pipelineInits.push(driverInitialized)
                 driverSpec = pipelineDriverSpec

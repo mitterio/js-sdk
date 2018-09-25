@@ -56,4 +56,13 @@ export class MessagesClient {
     constructor(private mitterAxiosInterceptionHost: MitterAxiosInterceptionHost) {
         this.messagesAxiosClient = messagesClientGenerator(mitterAxiosInterceptionHost)
     }
+
+    sendMessage(channelId: string, message: Message): Promise<Message> {
+        return this.messagesAxiosClient
+            .post<'/v1/channels/:channelId/messages'>(
+                `/v1/channels/${encodeURIComponent(channelId)}/messages`,
+                message
+            )
+            .then(x => x.data)
+    }
 }

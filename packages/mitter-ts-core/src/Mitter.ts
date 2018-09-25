@@ -1,9 +1,10 @@
 import { KvStore } from './mitter-core'
 import { MitterAxiosApiInterceptor } from './MitterApiGateway'
 import { MitterClientSet } from './MitterClientSet'
+import { Identifiable } from './models/base-types'
 import MessagingPipelineDriver from './specs/MessagingPipelineDriver'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
-import { MessagingPipelinePayload } from '@mitter-io/models'
+import { MessagingPipelinePayload, User } from '@mitter-io/models'
 import { MitterConstants } from './services/constants'
 import { UserAuthorizationInterceptor } from './auth/user-interceptors'
 import MitterUser from './objects/Users'
@@ -68,6 +69,8 @@ export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
         globalHostObject: any
     ) {
         super()
+
+        /*
         this.getUserAuthorization()
             .then(authToken => (this.cachedUserAuthorization = authToken))
             .then(() => {
@@ -79,6 +82,7 @@ export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
             .catch((err: any) => {
                 throw new Error(`Error re-hydrating auth token ${err}`)
             })
+        */
 
         this.messagingPipelineDriverHost = new MessagingPipelineDriverHost(
             pipelineDrivers,
@@ -117,6 +121,10 @@ export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
     }
 
     setUserAuthorization(authorizationToken: string) {
+        if (authorizationToken.split('.').length === 3) {
+            this.cachedUserId = JSON.parse(atob(authorizationToken.split('.')[1]))['userId']
+        }
+
         if (this.cachedUserAuthorization === authorizationToken) {
             return
         }
@@ -152,7 +160,7 @@ export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
         } else {
             return this.kvStore.getItem<string>(Mitter.StoreKey.UserId).then(userId => {
                 if (userId === undefined) {
-                    return this.me().userId.then(fetchedUserId => {
+                    return this._me().userId.then(fetchedUserId => {
                         return this.setUserId(fetchedUserId).then(() => fetchedUserId)
                     })
                 } else {
@@ -168,7 +176,13 @@ export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
 
     // Smart-object values
 
-    me(): MitterUser {
+    me(): Identifiable<User> {
+        return {
+            identifier: this.cachedUserId!!
+        }
+    }
+
+    private _me(): MitterUser {
         return new MitterUser(this)
     }
 
