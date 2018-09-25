@@ -63,9 +63,6 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                             },
                             error => {
                                 reject(error)
-                            },
-                            closeEvent => {
-                                setTimeout(this.initialize.bind(this)(mitter), 1500)
                             }
                         )
                     }
