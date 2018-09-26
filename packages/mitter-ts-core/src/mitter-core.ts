@@ -7,6 +7,7 @@ export * from './models/auth/credentials-base'
 export * from './models/named-entities'
 export * from './services'
 export * from './utils'
+export * from './models/type-matchers/pipeline-payloads'
 
 export { default as MessagingPipelineDriver } from './specs/MessagingPipelineDriver'
 

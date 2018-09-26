@@ -70,20 +70,6 @@ export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
     ) {
         super()
 
-        /*
-        this.getUserAuthorization()
-            .then(authToken => (this.cachedUserAuthorization = authToken))
-            .then(() => {
-                if (this.cachedUserAuthorization !== undefined) {
-                    this.announceAuthorizationAvailable()
-                } else this.executeOnTokenExpireFunctions()
-            })
-            .then(mitterInstanceReady)
-            .catch((err: any) => {
-                throw new Error(`Error re-hydrating auth token ${err}`)
-            })
-        */
-
         this.messagingPipelineDriverHost = new MessagingPipelineDriverHost(
             pipelineDrivers,
             this,
