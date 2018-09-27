@@ -47,7 +47,11 @@ export class AccessKeySigningInterceptor {
             requestParams.headers[AccessKeySigner.Headers.Date] = [digest.date]
             requestParams.headers[AccessKeySigner.Headers.Nonce] = [digest.nonce]
             requestParams.headers[AccessKeySigner.Headers.ContentMD5] = [payloadMd5]
-            requestParams.headers[AccessKeySigner.Headers.ContentType] = [contentType]
+
+            if (!(contentType === null || contentType === undefined || contentType === 'null')) {
+                requestParams.headers[AccessKeySigner.Headers.ContentType] = [contentType]
+            }
+
             requestParams.data = wirePayload
         }
     }
