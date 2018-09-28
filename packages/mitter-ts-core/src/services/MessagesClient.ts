@@ -30,9 +30,9 @@ export interface MessagesApi {
             }
 
             query: {
-                after: string
-                before: string
-                limit: number
+                after?: string
+                before?: string
+                limit?: number
             }
 
             response: ChannelReferencingMessage[]
@@ -63,6 +63,24 @@ export class MessagesClient {
                 `/v1/channels/${encodeURIComponent(channelId)}/messages`,
                 message
             )
+            .then(x => x.data)
+    }
+
+    getMessages(
+        channelId: string,
+        before: string | undefined = undefined,
+        after: string | undefined = undefined,
+        limit: number = 45
+    ): Promise<ChannelReferencingMessage[]> {
+        return this.messagesAxiosClient
+            .get<'/v1/channels/:channelId/messages'>(`/v1/messages/${channelId}/messages`, {
+                params: Object.assign(
+                    {},
+                    after !== undefined ? { after } : {},
+                    before !== undefined ? { before } : {},
+                    limit !== undefined ? { limit } : {}
+                )
+            })
             .then(x => x.data)
     }
 }
