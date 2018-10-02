@@ -16,6 +16,7 @@ import { Message } from '@stomp/stompjs'
 export default class WebSocketPipelineDriver implements MessagingPipelineDriver {
     private activeSocket: Stomp.Client | undefined = undefined
     private pipelineSink: BasePipelineSink | undefined = undefined
+    private connectionTime: number = 0
 
     endpointRegistered(pipelineSink: PipelineSink, userDeliveryEndpoint: DeliveryEndpoint): void {
         // Do nothing. For a driver not handling endpoints, this method will never be called
@@ -50,6 +51,8 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                         if (mitter.applicationId !== undefined) {
                             authHeaders[StandardHeaders.ApplicationIdHeader] = mitter.applicationId
                         }
+
+                        this.activeSocket.reconnect_delay = 1000
 
                         this.activeSocket.connect(
                             authHeaders,
