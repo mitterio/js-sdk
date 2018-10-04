@@ -5,11 +5,11 @@ export class User implements IdentifiableEntity<User> {
   constructor(
     public userId: string,
     public userLocators: Array<UserLocator>,
-    public systemUser: boolean,
-    public synthetic: boolean = false,
     public screenName: {
       screenName: string
-    }
+    },
+    public systemUser: boolean = false,
+    public synthetic: boolean = false
   ) {}
 
   public identifier(): string {

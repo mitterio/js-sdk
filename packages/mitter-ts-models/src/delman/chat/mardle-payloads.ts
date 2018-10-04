@@ -26,7 +26,7 @@ export class NewChannelPayload extends MessagingPipelinePayload {
 export class NewMessagePayload extends MessagingPipelinePayload {
   constructor(
     public message: Message,
-    public channelId: string,
+    public channelId: { identifier: string },
     globalPipelinePayloadId: string,
     type: string
   ) {

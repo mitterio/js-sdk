@@ -5,6 +5,7 @@ import {
 } from './../mitter-models'
 
 import { MitterError, MitterErrorCodes } from './../wire/errors'
+import { getDiffieHellman } from 'crypto'
 
 export function fieldBasedPredicateGenerator<B, T extends B>(
   field: keyof B,
@@ -72,5 +73,13 @@ export class ErrorTypes {
     typeSpecifier: string
   ): (target: MitterError) => target is T {
     return fieldBasedPredicateGenerator<MitterError, T>('errorCode', typeSpecifier)
+  }
+}
+
+export function getId(input: { identifier: string } | string) {
+  if (typeof input === 'string') {
+    return input
+  } else {
+    return input.identifier
   }
 }

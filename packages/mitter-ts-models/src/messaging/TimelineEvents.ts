@@ -13,13 +13,13 @@ export const StandardTimeLineEventTypeNames = {
 
 export class TimelineEvent implements IdentifiableEntity<TimelineEvent> {
   constructor(
-    public eventId: string,
     public type: string,
     public eventTimeMs: number,
-    public subject: { identifier: string }
+    public subject: { identifier: string },
+    public eventId: string | null = null
   ) {}
 
   identifier(): string {
-    return this.eventId
+    return this.eventId!
   }
 }

@@ -63,3 +63,5 @@ export * from './wire/MessageWireObjects'
 export * from './wire/TimelineEventWireObjects'
 
 export * from './requests/IssuedTokens'
+
+export * from './utils/model-types'

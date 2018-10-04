@@ -28,18 +28,18 @@ export class MessageDatum {
 
 export class Message implements IdentifiableEntity<Message>, MetadataAttachable {
   constructor(
-    public messageId: string,
-    public messageType: StandardMessageType = StandardMessageType.Standard,
-    public payloadType: string = StandardPayloadTypeNames.TextMessage,
-    public senderId: { identifier: string },
+    public senderId: { identifier: string } | string,
     public textPayload: string,
-    public messageData: Array<MessageDatum> = [],
     public timelineEvents: Array<TimelineEvent>,
-    public entityMetaData: EntityMetadata
+    public payloadType: string = StandardPayloadTypeNames.TextMessage,
+    public messageId: string | null = null,
+    public messageData: Array<MessageDatum> = [],
+    public messageType: StandardMessageType = StandardMessageType.Standard,
+    public entityMetaData: EntityMetadata = { metadata: [] }
   ) {}
 
   identifier() {
-    return this.messageId
+    return this.messageId!
   }
 }
 
