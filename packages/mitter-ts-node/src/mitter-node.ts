@@ -46,3 +46,5 @@ export const Mitter = {
         return new MitterNode(applicationId, accessKey, mitterApiBaseUrl)
     }
 }
+
+export * from './auth/application-credentials'
