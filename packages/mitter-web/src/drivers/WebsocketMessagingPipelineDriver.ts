@@ -38,7 +38,6 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
     }
 
     initialize(mitter: Mitter): PipelineDriverInitialization {
-        // this.activeSocket.debug = noOp
         this.mitterContext = mitter
 
         return {
@@ -85,6 +84,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                     `${this.mitterContext!.mitterApiBaseUrl}/v1/socket/control/sockjs`
                 )
                 this.activeSocket = Stomp.over(sockJs)
+                this.activeSocket.debug = noOp
 
                 let reject: (err: Error | string) => void = noOp
                 let resolve: (result: boolean) => void = noOp
