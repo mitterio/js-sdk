@@ -31,9 +31,13 @@ export class Message implements IdentifiableEntity<Message>, MetadataAttachable 
     public senderId: { identifier: string } | string,
     public textPayload: string,
     public timelineEvents: Array<TimelineEvent>,
+    public messageData: Array<MessageDatum> = [],
+    public appliedAcls: {
+      plusAppliedAcl: string[]
+      minusAppliedAcl: string[]
+    },
     public payloadType: string = StandardPayloadTypeNames.TextMessage,
     public messageId: string | null = null,
-    public messageData: Array<MessageDatum> = [],
     public messageType: StandardMessageType = StandardMessageType.Standard,
     public entityMetaData: EntityMetadata = { metadata: [] }
   ) {}

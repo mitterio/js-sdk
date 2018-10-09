@@ -1,0 +1,24 @@
+image: node:carbon
+
+stages:
+  - build
+  - publish
+
+build:
+  stage: build
+  script: yarn build
+  artifacts:
+    paths:
+      - package.json
+      - README.md
+      - LICENSE
+      - dist/
+
+publish:
+  script:
+    - echo _auth = $NPM_AUTH_TOKEN >> ~/.npmrc
+    - echo email = $NPM_PUBLISH_EMAIL >> ~/.npmrc
+    - npm publish --access public
+  only:
+    - master
+
