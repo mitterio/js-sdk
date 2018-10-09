@@ -19,8 +19,7 @@ build:
 publish:
   stage: publish
   script:
-    - echo _auth = $NPM_AUTH_TOKEN >> ~/.npmrc
-    - echo email = $NPM_PUBLISH_EMAIL >> ~/.npmrc
+    - echo "//registry.npmjs.org/:_authTokne=${NPM_AUTH_TOKEN}" >> ~/.npmrc
     - npm publish --access public
   only:
     - master
