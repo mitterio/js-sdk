@@ -6,7 +6,9 @@ stages:
 
 build:
   stage: build
-  script: yarn build
+  script:
+    - yarn
+    - yarn build
   artifacts:
     paths:
       - package.json
