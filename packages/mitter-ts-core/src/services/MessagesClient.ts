@@ -73,7 +73,7 @@ export class MessagesClient {
         limit: number = 45
     ): Promise<ChannelReferencingMessage[]> {
         return this.messagesAxiosClient
-            .get<'/v1/channels/:channelId/messages'>(`/v1/messages/${channelId}/messages`, {
+            .get<'/v1/channels/:channelId/messages'>(`/v1/channels/${channelId}/messages`, {
                 params: Object.assign(
                     {},
                     after !== undefined ? { after } : {},
