@@ -18,12 +18,12 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
-"@mitter-io/core@^0.5.7":
-  version "0.5.7"
-  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.5.7.tgz#a36f558e49c8a810b6102ae03d1fbc27f5be0677"
-  integrity sha512-SU4Yqtm5mtMzbPZdbJh9DprkfBKoKPKkqyMbAfWPvTLRp0wURReP4JgfYIQeRoKvWMLuwWVjakanPXHyLGAeiA==
+"@mitter-io/core@^0.5.8-1":
+  version "0.5.8"
+  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.5.8.tgz#e77ec100172af66ed12e38668d1bd81b52ea6ee0"
+  integrity sha512-UDA67FMt6MhxlidpOMAC5sQKfq6t5iTZlfJ+9CkDILVothTiJbxAw5/LkYGQxi6Z6en3Wm45YVznAIBBgxsiCg==
   dependencies:
-    "@mitter-io/models" "^0.5.7"
+    "@mitter-io/models" "^0.5.8"
     "@stomp/stompjs" "^4.0.7"
     "@types/isomorphic-fetch" "^0.0.34"
     "@types/lodash.camelcase" "^4.3.4"
@@ -36,10 +36,10 @@
     urijs "^1.19.1"
     whatwg-fetch "^2.0.4"
 
-"@mitter-io/models@^0.5.7":
-  version "0.5.7"
-  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.5.7.tgz#857f1d12ef2b21d0a2e31212c878b5cf08287cbc"
-  integrity sha512-Neivmdj9MS0uwm3VWu9QXhGHn1f7FZbjkt9kx9P9MCyJMDwAaeaQkmYxhkngsLD9Mopyy49gkRuyR4nBrXO2xg==
+"@mitter-io/models@^0.5.8":
+  version "0.5.8"
+  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.5.8.tgz#940410de2d0256ffbb73b1bafec8e56cb796e58a"
+  integrity sha512-PEMf8Ay7stuw7ASkXLIMrXy3GnecG3jR44+aYLLlT/lewNYvoUEzUXh4ucXwKp2Jl3UezKwiyoRemZi3xfqRsQ==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
