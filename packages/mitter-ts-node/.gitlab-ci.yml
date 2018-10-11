@@ -28,6 +28,7 @@ publish:
 publish-docs:
   stage: publish
   script:
+    - yarn
     - ./ci-scripts/publish-tsdocs.sh sdk-node
   when: manual
   only:
