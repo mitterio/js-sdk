@@ -25,3 +25,10 @@ publish:
   only:
     - master
 
+publish-docs:
+  stage: publish
+  script:
+    - ./ci-scripts/publish-tsdocs.sh sdk-web
+  when: manual
+  only:
+    - master
