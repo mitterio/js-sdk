@@ -15,6 +15,7 @@ build:
       - README.md
       - LICENSE
       - dist/
+      - docs/
 
 publish:
   stage: publish
@@ -28,6 +29,7 @@ publish:
 publish-docs:
   stage: publish
   script:
+    - yarn
     - ./ci-scripts/publish-tsdocs.sh models
   when: manual
   only:
