@@ -107,5 +107,8 @@
     "typedoc": "^0.11.0",
     "typescript": "3.0.3",
     "validate-commit-msg": "^2.12.2"
+  },
+  "dependencies": {
+    "s3-publish": "^1.0.9"
   }
 }
