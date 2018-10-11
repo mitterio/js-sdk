@@ -28,7 +28,7 @@ publish:
 publish-docs:
   stage: publish
   script:
-    - ./ci-scripts/publish-tsdocs.sh
+    - ./ci-scripts/publish-tsdocs.sh core
   when: manual
   only:
     - master
