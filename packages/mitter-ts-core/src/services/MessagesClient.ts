@@ -1,8 +1,13 @@
+import {
+    ChannelReferencingMessage,
+    Message,
+    MessageTimelineEvent,
+    TimelineEvent
+} from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterAxiosInterceptionHost } from '../Mitter'
 import { clientGenerator } from './common'
 import { MitterConstants } from './constants'
-import { ChannelReferencingMessage, Message } from '@mitter-io/models'
 
 const base = `${MitterConstants.Api.VersionPrefix}/messages`
 
@@ -46,6 +51,35 @@ export interface MessagesApi {
             body: Message
         }
     }
+
+    '/v1/channels/:channelId/messages/:messageIds/timeline': {
+        GET: {
+            params: {
+                channelId: string
+                messageIds: string
+            }
+            response: MessageTimelineEvent[]
+        }
+
+        POST: {
+            params: {
+                channelId: string
+                messageIds: string
+            }
+            body: TimelineEvent
+
+            response: {}
+        }
+    }
+
+    '/v1/channels/:channelId/messages/:messageIds': {
+        DELETE: {
+            params: {
+                channelId: string
+                messageIds: string
+            }
+        }
+    }
 }
 
 export const messagesClientGenerator = clientGenerator<MessagesApi>()
@@ -57,7 +91,7 @@ export class MessagesClient {
         this.messagesAxiosClient = messagesClientGenerator(mitterAxiosInterceptionHost)
     }
 
-    sendMessage(channelId: string, message: Message): Promise<Message> {
+    public sendMessage(channelId: string, message: Message): Promise<Message> {
         return this.messagesAxiosClient
             .post<'/v1/channels/:channelId/messages'>(
                 `/v1/channels/${encodeURIComponent(channelId)}/messages`,
@@ -66,7 +100,13 @@ export class MessagesClient {
             .then(x => x.data)
     }
 
-    getMessages(
+    public getMessage(messageId: string): Promise<Message> {
+        return this.messagesAxiosClient
+            .get<'/v1/messages/:messageId'>(`/v1/messages/${messageId}`)
+            .then(x => x.data)
+    }
+
+    public getMessages(
         channelId: string,
         before: string | undefined = undefined,
         after: string | undefined = undefined,
@@ -81,6 +121,38 @@ export class MessagesClient {
                     limit !== undefined ? { limit } : {}
                 )
             })
+            .then(x => x.data)
+    }
+
+    public getMessageTimelineEvent(
+        channelId: string,
+        messageIds: string
+    ): Promise<MessageTimelineEvent[]> {
+        return this.messagesAxiosClient
+            .get<'/v1/channels/:channelId/messages/:messageIds/timeline'>(
+                `/v1/channels/${channelId}/messages/${messageIds}/timeline`
+            )
+            .then(x => x.data)
+    }
+
+    public addMessageTimelineEvent(
+        channelId: string,
+        messageIds: string,
+        timelineEvent: TimelineEvent
+    ) {
+        return this.messagesAxiosClient
+            .post<'/v1/channels/:channelId/messages/:messageIds/timeline'>(
+                `/v1/channels/${channelId}/messages/${messageIds}/timeline`,
+                timelineEvent
+            )
+            .then(x => x.data)
+    }
+
+    public deleteMessages(channelId: string, messageIds: string): Promise<void> {
+        return this.messagesAxiosClient
+            .delete<'/v1/channels/:channelId/messages/:messageIds'>(
+                `v1/channels/${channelId}/messages/${messageIds}`
+            )
             .then(x => x.data)
     }
 }

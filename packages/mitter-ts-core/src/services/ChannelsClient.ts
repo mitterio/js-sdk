@@ -3,7 +3,7 @@ import { Identifiable } from '../models/base-types'
 import { clientGenerator } from './common'
 import { MitterAxiosInterceptionHost } from '../Mitter'
 import { MitterConstants } from './constants'
-import { ParticipatedChannel, Channel } from '@mitter-io/models'
+import { ParticipatedChannel, Channel, ChannelParticipation } from '@mitter-io/models'
 
 const base = `${MitterConstants.Api.VersionPrefix}/channels`
 
@@ -18,6 +18,11 @@ export interface ChannelsApi {
     '/v1/users/me/channels': {
         GET: {
             response: ParticipatedChannel[]
+        }
+        query: {
+            after?: string
+            before?: string
+            limit?: number
         }
     }
 
@@ -34,6 +39,13 @@ export interface ChannelsApi {
             }
             response: Channel
         }
+
+        DELETE: {
+            params: {
+                channelId: string
+            }
+            response: {}
+        }
     }
 
     '/v1/channels': {
@@ -44,6 +56,39 @@ export interface ChannelsApi {
         POST: {
             response: Identifiable<string> | Channel
             body: Channel
+        }
+    }
+
+    '/v1/channels/:channelId/participants': {
+        GET: {
+            params: {
+                channelId: string
+            }
+        }
+        POST: {
+            params: {
+                channelId: string
+            }
+            response: {}
+        }
+    }
+
+    '/v1/channels/:channelId/participants/:participantId': {
+        DELETE: {
+            params: {
+                channelId: string
+                participantId: string
+            }
+            response: {}
+        }
+    }
+
+    '/v1/channels/:channelId/messages': {
+        DELETE: {
+            params: {
+                channelId: string
+            }
+            response: {}
         }
     }
 }
@@ -63,9 +108,70 @@ export class ChannelsClient {
             .then(x => x.data)
     }
 
+    public getAllChannels(
+        before: string | undefined = undefined,
+        after: string | undefined = undefined,
+        limit: number = 45
+    ): Promise<Channel[]> {
+        return this.channelsAxiosClient
+            .get<'/v1/channels'>('/v1/channels', {
+                params: Object.assign(
+                    {},
+                    after !== undefined ? { after } : {},
+                    before !== undefined ? { before } : {},
+                    limit !== undefined ? { limit } : {}
+                )
+            })
+            .then(x => x.data)
+    }
+
+    public getChannel(channelId: string): Promise<Channel> {
+        return this.channelsAxiosClient
+            .get<'/v1/channels/:channelId'>(`/v1/channels/${channelId}`)
+            .then(x => x.data)
+    }
+
     public participatedChannels(): Promise<ParticipatedChannel[]> {
         return this.channelsAxiosClient
             .get<'/v1/users/me/channels'>('/v1/users/me/channels')
+            .then(x => x.data)
+    }
+
+    public deleteChannel(channelId: string): Promise<{}> {
+        return this.channelsAxiosClient
+            .delete<'/v1/channels/:channelId'>(`/v1/channels/${channelId}`)
+            .then(x => x.data)
+    }
+
+    public getChannelParticipants(channelId: string): Promise<ChannelParticipation[]> {
+        return this.channelsAxiosClient
+            .get<'/v1/channels/:channelId/participants'>(`/v1/channels/${channelId}/participants`)
+            .then(x => x.data)
+    }
+
+    public addParticipantToChannel(
+        channelId: string,
+        channelParticipation: ChannelParticipation
+    ): Promise<{}> {
+        return this.channelsAxiosClient
+            .post<'/v1/channels/:channelId/participants'>(
+                `/v1/channels/${channelId}/participants`,
+                channelParticipation
+            )
+            .then(x => x.data)
+    }
+
+    public deleteParticipantFromChannel(channelId: string, participantId: string): Promise<{}> {
+        return this.channelsAxiosClient
+            .delete<'/v1/channels/:channelId/participants/:participantId'>(
+                `/v1/channels/${channelId}/participants/${participantId}`
+            )
+            .then(x => x.data)
+    }
+
+    public deleteAllMessages(channelId: string): Promise<{}> {
+        return this.channelsAxiosClient
+            .delete<'/v1/channels/:channelId/messages'>(`v1/channels/${channelId}/messages`)
             .then(x => x.data)
     }
 }
