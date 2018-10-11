@@ -7,5 +7,5 @@ export enum StandardUserPresenceTypeNames {
 }
 
 export class Presence {
-  constructor(public type: string, public timeToLiveL: number, public expiresTo: Presence) {}
+  constructor(public type: string, public timeToLive: number, public expiresTo: Presence) {}
 }

@@ -34,7 +34,7 @@ export class Channel implements IdentifiableEntity<Channel> {
 
 export class ChannelParticipation {
   constructor(
-    public participant: { identifier: string },
+    public participantId: { identifier: string },
     public participationStatus: ParticipationStatus = ParticipationStatus.Active,
     public channelId: string
   ) {}
