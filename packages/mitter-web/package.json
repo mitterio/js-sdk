@@ -119,6 +119,7 @@
     "@types/stompjs": "^2.3.3",
     "axios": "^0.18.0",
     "rollup-plugin-babel": "^3.0.7",
+    "s3-publish": "^1.0.9",
     "sockjs-client": "^1.1.5",
     "whatwg-fetch": "^2.0.4"
   }
