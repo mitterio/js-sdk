@@ -118,6 +118,7 @@
     "md5": "^2.2.1",
     "randomstring": "^1.1.5",
     "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-globals": "^1.4.0"
+    "rollup-plugin-node-globals": "^1.4.0",
+    "s3-publish": "^1.0.9"
   }
 }
