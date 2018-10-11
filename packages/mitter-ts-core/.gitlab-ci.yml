@@ -25,3 +25,11 @@ publish:
   only:
     - master
 
+publish-docs:
+  stage: publish
+  script:
+    - ./ci-scripts/publish-tsdocs.sh
+  when: manual
+  only:
+    - master
+

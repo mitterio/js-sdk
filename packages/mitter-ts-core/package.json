@@ -121,6 +121,7 @@
     "@types/urijs": "^1.15.38",
     "isomorphic-fetch": "^2.2.1",
     "restyped-axios": "^2.0.0",
+    "s3-publish": "^1.0.9",
     "typed-rest-client": "^1.0.9",
     "urijs": "^1.19.1",
     "whatwg-fetch": "^2.0.4"
