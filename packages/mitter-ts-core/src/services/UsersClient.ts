@@ -90,6 +90,10 @@ export class UsersClient {
         this.usersAxiosClient = usersClientGenerator(mitterAxiosInterceptionHost)
     }
 
+    createUser(user: User): Promise<{ identifier: string }> {
+        return this.usersAxiosClient.post<'/v1/users'>('/v1/users', user).then(x => x.data)
+    }
+
     getUsers(locators: string[] | undefined = undefined): Promise<User[]> {
         return this.usersAxiosClient
             .get<'/v1/users'>('/v1/users', {
