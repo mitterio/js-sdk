@@ -6,6 +6,7 @@ import crypto from 'crypto'
 
 export class AccessKeySigningInterceptor {
     private readonly accessKeySigner: AccessKeySigner
+    private static BodyContainingMethods = ['put', 'post', 'patch']
 
     constructor(private readonly accessKeyCredentials: AccessKeyApplicationCredentials) {
         this.accessKeySigner = new AccessKeySigner(
@@ -22,7 +23,14 @@ export class AccessKeySigningInterceptor {
                     : requestParams.data
 
             const wirePayload = typeof payload === 'object' ? JSON.stringify(payload) : payload
-            const contentType = payload == '' ? 'null' : 'application/json'
+            const contentType =
+                payload == ''
+                    ? AccessKeySigningInterceptor.BodyContainingMethods.indexOf(
+                          requestParams.method
+                      ) === -1
+                        ? 'null'
+                        : 'application/json'
+                    : 'application/json'
 
             const payloadMd5 = crypto
                 .createHash('md5')
