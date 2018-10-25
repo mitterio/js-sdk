@@ -116,7 +116,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                         authHeaders,
                         frame => {
                             this.activeSocket!!.subscribe(
-                                '/user/event-stream',
+                                '/user/queue/event-stream',
                                 this.processMessage.bind(this)
                             )
 
@@ -126,7 +126,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                             reject(error)
                         },
                         closeEvent => {
-                            setTimeout(this.connectToStream, 500)
+                            setTimeout(this.connectToStream, 3000)
                         }
                     )
                 }
