@@ -28,7 +28,7 @@ export const isNewChannelTimelineEventPayload = generatePipelinePayloadMatcher<
 
 export const isParticipantChangedEventPayload = generatePipelinePayloadMatcher<
     ParticipationChangedEventPayload
->('participant-changed-event-payload')
+>('participation-changed-event-payload')
 
 export const isChannelStreamData = generatePipelinePayloadMatcher('stream-data')
 
