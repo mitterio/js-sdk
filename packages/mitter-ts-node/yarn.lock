@@ -18,12 +18,12 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@mitter-io/core@^0.5.10":
-  version "0.5.10"
-  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.5.10.tgz#ec2cf7bc579e3abf65b04054c48ed6249ca26336"
-  integrity sha512-MeKoltDKv74Ybd6jL8IqRZRmNaLYQdS796vgqjeLb0WQJQuJbSVxQCS6tGxDY9ZRuWReuRDF2GXj9X2qYvw41Q==
+"@mitter-io/core@0.5.11-2":
+  version "0.5.11-2"
+  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.5.11-2.tgz#374a5e907186b4ae6752a7ef9f8f9f99d2b1403f"
+  integrity sha512-8cla0m5cqwgmO2wB9N0CPcg/cJw4iZsvDuwrwHlxprhzFqUnbjuKlc0TaWiu17DEl/PtCtI7w+ChJdxWAHYSyw==
   dependencies:
-    "@mitter-io/models" "^0.5.10"
+    "@mitter-io/models" "^0.5.11"
     "@stomp/stompjs" "^4.0.7"
     "@types/isomorphic-fetch" "^0.0.34"
     "@types/lodash.camelcase" "^4.3.4"
@@ -32,14 +32,17 @@
     "@types/urijs" "^1.15.38"
     isomorphic-fetch "^2.2.1"
     restyped-axios "^2.0.0"
+    s3-publish "^1.0.9"
     typed-rest-client "^1.0.9"
     urijs "^1.19.1"
     whatwg-fetch "^2.0.4"
 
-"@mitter-io/models@^0.5.10":
-  version "0.5.10"
-  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.5.10.tgz#6fe9bfd374d3b033eba917e35d24859d8c7279d5"
-  integrity sha512-IAHD6gRxXlNCwxZOY0FEHLx9u8Pm2V7CNwIoMZB3ForbHXu3CvnR9rbJzYIuHTEItm/ziUEmvqV/KAJ4m4A+1A==
+"@mitter-io/models@^0.5.11":
+  version "0.5.11"
+  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.5.11.tgz#69a59c8629a05060a027deac9b2dda0ba81bd0b2"
+  integrity sha512-MJ0FZ1NQMICtFVq2op0CcNTdvdpOM9rBnuOQDsCk2CA8QURa+70yxrGdRrByo4oUYoaNJ/nuyuWoOUJaAX8xCg==
+  dependencies:
+    s3-publish "^1.0.9"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
