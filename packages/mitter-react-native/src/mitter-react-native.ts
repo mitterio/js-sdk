@@ -4,6 +4,7 @@
 import { Mitter as  MitterCore, MitterConstants} from '@mitter-io/core'
 import NativeKvStore from './kv-store/kvStore'
 import MitterFcmPipelineDriver from './drivers/MitterFcmPipelineDriver'
+import { NativeFileUploader } from './NativeSpecificImplementations/NativeFileUploader'
 import { noOp } from './utils'
 
 type TokenExpireFunction = () => void
@@ -22,7 +23,10 @@ export const Mitter = {
       onTokenExpire,
       mitterInstanceReady,
       new MitterFcmPipelineDriver(),
-      global
+      global,
+      {
+        processMultipartRequest: NativeFileUploader
+      }
     )
   }
 }
