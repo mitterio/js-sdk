@@ -970,11 +970,6 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.5.6.tgz#9c03d3fed70a8d517c191b7734da2879b50ca26c"
   integrity sha512-ZBFR7TROLVzCkswA3Fmqq+IIJt62/T7aY/Dmz+QkU7CaW2QFqAitCE8Ups7IzmGhcN1YWMBT4Qcoc07jU9hOJQ==
 
-"@types/react-native-fetch-blob@^0.10.4":
-  version "0.10.4"
-  resolved "https://registry.yarnpkg.com/@types/react-native-fetch-blob/-/react-native-fetch-blob-0.10.4.tgz#48ce9c863416995339af06876edfb8c9caf14031"
-  integrity sha512-QVKPj5VmSP8t5dWhzQ3Sf+o2ZyGnm6CwzPQurJePZVed0+KtknZQQ+O5loFBCV/zuT/8zCczP/VSDc73Wk44MA==
-
 "@types/react-native@^0.57.7":
   version "0.57.7"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.57.7.tgz#4cbc81de4f0f54985b20dc25010744889176e775"
