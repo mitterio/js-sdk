@@ -6,7 +6,7 @@ declare module 'rn-fetch-blob' {
 
   interface RnFetchBlobType {
     wrap(path: string):  string
-    fetch(method: string, url: string, headers?: { [key: string]: string[] }, body?: any
+    fetch(method: string, url: string, headers?: { [key: string]: string }, body?: any
       | null): StatefulPromise<FetchBlobResponse>;
     base64: { encode(input: string): string; decode(input: string): string };
     config(options: RNFetchBlobConfig): RnFetchBlobType;
