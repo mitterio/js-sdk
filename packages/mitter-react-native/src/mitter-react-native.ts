@@ -7,7 +7,7 @@ import { noOp } from './utils'
 type TokenExpireFunction = () => void
 export { NativeKvStore }
 export const Mitter = {
-  forNative: function(
+  forReactNative: function(
     applicationId: string | undefined = undefined,
     onTokenExpire: TokenExpireFunction[] = [],
     mitterApiBaseUrl: string = MitterConstants.MitterApiUrl,

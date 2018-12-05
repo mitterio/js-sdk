@@ -1,5 +1,5 @@
 {
-  "name": "@mitter-io/native",
+  "name": "@mitter-io/react-native",
   "version": "0.5.11",
   "description": "",
   "keywords": [],
@@ -100,8 +100,8 @@
     "lodash.camelcase": "^4.3.0",
     "prettier": "^1.14.3",
     "prompt": "^1.0.0",
-    "react-native": "^0.57.3",
-    "react-native-firebase": "^5.0.0",
+    "react-native": "^0.57.7",
+    "react-native-firebase": "^5.1.1",
     "realm": "2.16.0",
     "replace-in-file": "^3.4.2",
     "rimraf": "^2.6.2",
