@@ -2,7 +2,7 @@ import { Mitter as MitterCore, MitterConstants } from '@mitter-io/core'
 import base64 from 'base-64'
 import MitterFcmPipelineDriver from './drivers/MitterFcmPipelineDriver'
 import NativeKvStore from './kv-store/kvStore'
-import { NativeFileUploader } from './NativeSpecificImplementations/NativeFileUploader'
+import { nativeFileUploader } from './nativeSpecificImplementations/nativeFileUploader'
 import { noOp } from './utils'
 
 type TokenExpireFunction = () => void
@@ -25,7 +25,7 @@ export const Mitter = {
       new MitterFcmPipelineDriver(),
       global,
       {
-        processMultipartRequest: NativeFileUploader,
+        processMultipartRequest: nativeFileUploader,
         base64Decoder: base64.decode
       }
     )

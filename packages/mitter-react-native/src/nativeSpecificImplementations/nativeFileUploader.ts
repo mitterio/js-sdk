@@ -10,7 +10,7 @@ import base64 from 'base-64'
 import RNFetchBlob, { FetchBlobResponse } from 'rn-fetch-blob'
 import { base64ValidationRegex } from '../utils'
 
-export function NativeFileUploader<T extends BlobConfig | UriConfig>(
+export function nativeFileUploader<T extends BlobConfig | UriConfig>(
   requestParams: GenericRequestParameters,
   channelId: string,
   message: Message,
