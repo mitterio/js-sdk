@@ -6,7 +6,7 @@ import {
 } from '@mitter-io/core'
 
 import firebase from 'react-native-firebase'
-import { DeliveryEndpoint,FcmDeliveryEndpoint } from '@mitter-io/models'
+import { DeliveryEndpoint, FcmDeliveryEndpoint } from '@mitter-io/models'
 import { noOp } from '../utils'
 
 // tslint:disable-next-line:variable-name
@@ -25,15 +25,15 @@ export default class MitterFcmPipelineDriver implements MessagingPipelineDriver 
   }
 
   async getDeliveryEndpoint(): Promise<DeliveryEndpoint> {
-    return firebase.messaging().getToken()
+    return firebase
+      .messaging()
+      .getToken()
       .then(fcmToken => {
-        console.info('fcm token: ss', fcmToken)
         return new FcmDeliveryEndpoint(fcmToken)
       })
   }
 
   endpointRegistered(pipelineSink: PipelineSink, deliveryEndpoint: DeliveryEndpoint): void {
-    console.info('registering listener',registerFirebaseListener)
     registerFirebaseListener(pipelineSink, deliveryEndpoint)
   }
 
@@ -42,9 +42,12 @@ export default class MitterFcmPipelineDriver implements MessagingPipelineDriver 
   }
 }
 
-function registerFirebaseListener(pipelineSink: PipelineSink, _deliveryEndpoint: DeliveryEndpoint): void {
+function registerFirebaseListener(
+  pipelineSink: PipelineSink,
+  _deliveryEndpoint: DeliveryEndpoint
+): void {
   console.log('registering firebase listener')
-  firebase.messaging().onMessage((message) => {
+  firebase.messaging().onMessage(message => {
     try {
       console.info('message recevied', message)
       const payload = JSON.parse(message._data.data)
