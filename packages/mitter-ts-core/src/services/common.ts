@@ -1,14 +1,15 @@
 import { AxiosInstance } from 'axios'
-import { Mitter, MitterAxiosInterceptionHost } from '../Mitter'
 import axios from 'restyped-axios'
+import { MitterApiConfiguration } from '../MitterApiConfiguration'
 
 export function clientGenerator<T>() {
-    return (mitterAxiosInterceptionHost: MitterAxiosInterceptionHost) => {
+    return (mitterApiConfiguration: MitterApiConfiguration) => {
         const client = axios.create<T>({
-            baseURL: mitterAxiosInterceptionHost.mitterApiBaseUrl
+            baseURL: mitterApiConfiguration.mitterApiBaseUrl
         })
 
-        mitterAxiosInterceptionHost.enableAxiosInterceptor(client as AxiosInstance)
+        mitterApiConfiguration.enableAxiosInterceptor(client as AxiosInstance)
+
         return client
     }
 }

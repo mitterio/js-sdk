@@ -1,6 +1,6 @@
 export interface GenericRequestParameters {
     data: any
-    headers: { [headers: string]: string[] }
+    headers: { [headers: string]: string }
     method: string
     path: string
 }

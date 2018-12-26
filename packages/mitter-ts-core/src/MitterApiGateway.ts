@@ -22,6 +22,7 @@ export class MitterAxiosApiInterceptor {
 
     requestInterceptor(config: AxiosRequestConfig) {
         if (this.interceptFilter(config!!.baseURL!!)) {
+            // if (this.interceptFilter(config!!.url!!)) {
             this.genericInterceptor({
                 data: config.data,
                 path: config.url!!,

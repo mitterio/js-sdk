@@ -1,8 +1,9 @@
+import { IssuedUserToken } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
-import { MitterAxiosInterceptionHost } from '../Mitter'
+import { MitterApiConfiguration } from '../MitterApiConfiguration'
+import { PlatformImplementedFeatures } from '../models/platformImplementedFeatures'
 import { clientGenerator } from './common'
 import { MitterConstants } from './constants'
-import { IssuedUserToken } from '@mitter-io/models'
 
 const base = `${MitterConstants.Api.VersionPrefix}/users/:userId/tokens`
 
@@ -30,8 +31,11 @@ export const userTokensClientGenerator = clientGenerator<UserTokensApi>()
 export class UserTokensClient {
     private userTokensAxiosClient: TypedAxiosInstance<UserTokensApi>
 
-    constructor(private mitterAxiosInterceptionHost: MitterAxiosInterceptionHost) {
-        this.userTokensAxiosClient = userTokensClientGenerator(mitterAxiosInterceptionHost)
+    constructor(
+        private mitterApiConfiguration: MitterApiConfiguration,
+        private platformImplementedFeatures: PlatformImplementedFeatures
+    ) {
+        this.userTokensAxiosClient = userTokensClientGenerator(mitterApiConfiguration)
     }
 
     getUserToken(userId: string): Promise<IssuedUserToken> {

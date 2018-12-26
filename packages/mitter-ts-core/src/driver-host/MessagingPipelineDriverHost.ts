@@ -4,8 +4,9 @@ import MessagingPipelineDriver, {
     PipelineDriverSpec,
     PipelineSink
 } from './../specs/MessagingPipelineDriver'
-import { KvStore, Mitter } from '../mitter-core'
+import { KvStore, Mitter, UsersClient } from '../mitter-core'
 import { noOp } from '../utils'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 
 export type MessageSink = (payload: MessagingPipelinePayload) => void
 
@@ -22,6 +23,7 @@ export class MessagingPipelineDriverHost {
     private savedDeliveryEndpoints: SavedDeliveryEndpoints = new SavedDeliveryEndpoints()
     private pipelineDrivers: Array<MessagingPipelineDriver>
     private subscriptions: Array<MessageSink> = []
+    private usersClient: UsersClient
 
     constructor(
         pipelineDrivers: Array<MessagingPipelineDriver> | MessagingPipelineDriver,
@@ -36,6 +38,7 @@ export class MessagingPipelineDriverHost {
         }
 
         this.mitterContext.userAuthorizationAvailable(() => this.refresh())
+        this.usersClient = this.mitterContext.clients().users()
     }
 
     public subscribe(messageSink: MessageSink) {
@@ -43,6 +46,14 @@ export class MessagingPipelineDriverHost {
     }
 
     public refresh() {
+        /*this.loadStoredEndpoints()
+            .then(() => this.initializeMessagingPipelines())
+            .then(() => {
+                this.onAllPipelinesInitialized()
+            })
+            .catch(e => {
+                this.onAllPipelinesInitialized(e)
+            })*/
         this.loadStoredEndpoints().then(() =>
             this.initializeMessagingPipelines()
                 .then(() => {
@@ -69,7 +80,7 @@ export class MessagingPipelineDriverHost {
         let savedDeliveryEndpoints = await this.kvStore.getItem<SavedDeliveryEndpoints>(
             MessagingPipelineDriverHost.StoreKeys.SavedDeliveryEndpoints
         )
-
+        console.log('stored delivery endpoints are ', savedDeliveryEndpoints)
         if (savedDeliveryEndpoints !== undefined) {
             this.savedDeliveryEndpoints = savedDeliveryEndpoints
         }
@@ -78,28 +89,30 @@ export class MessagingPipelineDriverHost {
     private async initializeMessagingPipelines(): Promise<any> {
         const pipelineInits: Promise<any>[] = []
 
-        await this.pipelineDrivers.forEach(async driver => {
+        this.pipelineDrivers.forEach(async driver => {
             let driverInitialized: Promise<boolean | void>
             let driverSpec: PipelineDriverSpec
-
             try {
                 let { initialized, pipelineDriverSpec } = await driver.initialize(
                     this.mitterContext
                 )
-
                 driverInitialized = initialized
                 pipelineInits.push(driverInitialized)
                 driverSpec = pipelineDriverSpec
             } catch (ex) {
-                console.log('Unable to initialize pipeline driver', ex)
-                throw ex
+                console.log('unable to initialize pipeline driver')
+                return
             }
-
             console.log(`Initializing pipeline driver '${driverSpec.name}'`)
 
-            let preProvisionPromise = Promise.resolve<DeliveryEndpoint | undefined>(undefined)
+            let preProvisionPromise = Promise.resolve<DeliveryEndpoint | void>(undefined)
 
             if (driverSpec.name in this.savedDeliveryEndpoints.deliveryEndpoints) {
+                console.log('driver', driverSpec.name)
+                console.log(
+                    'delivery Endpoint',
+                    this.savedDeliveryEndpoints.deliveryEndpoints[driverSpec.name]
+                )
                 preProvisionPromise = this.syncEndpoint(
                     this.savedDeliveryEndpoints.deliveryEndpoints[driverSpec.name]
                 )
@@ -111,7 +124,7 @@ export class MessagingPipelineDriverHost {
             }
 
             preProvisionPromise.then(syncedEndpoint => {
-                let operatingEndpoint: Promise<DeliveryEndpoint | undefined>
+                let operatingEndpoint: Promise<DeliveryEndpoint | void>
 
                 if (syncedEndpoint === undefined) {
                     console.log('The endpoint on sync was determined to be invalid, refreshing')
@@ -120,19 +133,22 @@ export class MessagingPipelineDriverHost {
                         .then(() => driver.getDeliveryEndpoint())
                         .then(deliveryEndpoint => {
                             if (deliveryEndpoint !== undefined) {
+                                console.log('delivery Endpoint is ', deliveryEndpoint)
                                 this.registerEndpoint(driverSpec, deliveryEndpoint).then(
                                     provisionedEndpoint => provisionedEndpoint
                                 )
                             } else {
-                                return undefined
+                                // return undefined
+                                throw new Error('no endpoint found')
+                                // return Promise.reject('no endpoint found')
                             }
                         })
-                        .catch(e => {
+                        .catch((e: any) => {
                             console.warn(
                                 `Could not instantiate pipeline driver ${driverSpec.name}`,
                                 e
                             )
-                            throw e
+                            // throw e
                         })
                 } else {
                     console.log(
@@ -174,38 +190,30 @@ export class MessagingPipelineDriverHost {
         }
     }
 
-    private async syncEndpoint(
-        deliveryEndpoint: DeliveryEndpoint
-    ): Promise<DeliveryEndpoint | undefined> {
-        return fetch(
-            `${this.mitterContext.mitterApiBaseUrl}/v1/users/me/delivery-endpoints/${
-                deliveryEndpoint.serializedEndpoint
-            }`
-        )
-            .then((resp: Response) => {
-                return resp.json
+    private syncEndpoint(deliveryEndpoint: DeliveryEndpoint): Promise<DeliveryEndpoint | void> {
+        return this.usersClient
+            .getUserDeliveryEndpoint(deliveryEndpoint.serializedEndpoint)
+            .then((resp: DeliveryEndpoint) => {
+                return resp
             })
-            .then((resp: any) => {
-                return resp as DeliveryEndpoint
-            })
-            .catch(() => {
-                return undefined
+            .catch((resp: AxiosError) => {
+                if (resp.response!.status === 409) {
+                    // return Promise.resolve(deliveryEndpoint)
+                    return deliveryEndpoint
+                } else {
+                    return undefined
+                    //  throw resp
+                }
             })
     }
 
     private registerEndpoint(
         driverSpec: PipelineDriverSpec,
         deliveryEndpoint: DeliveryEndpoint
-    ): Promise<DeliveryEndpoint> {
-        return fetch(`${this.mitterContext.mitterApiBaseUrl}/v1/users/me/delivery-endpoints`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(deliveryEndpoint)
-        })
-            .then(response => response.json)
-            .then((endpoint: any) => {
+    ): Promise<DeliveryEndpoint | void> {
+        return this.usersClient
+            .addUserDeliveryEndpoint(deliveryEndpoint)
+            .then((endpoint: DeliveryEndpoint) => {
                 this.savedDeliveryEndpoints = new SavedDeliveryEndpoints(
                     Object.assign({}, this.savedDeliveryEndpoints.deliveryEndpoints, {
                         [driverSpec.name]: endpoint
@@ -213,8 +221,20 @@ export class MessagingPipelineDriverHost {
                 )
 
                 this.syncEndpointsToStore()
-                console.log('returning endpoint', endpoint)
                 return endpoint
+            })
+            .catch((resp: AxiosError) => {
+                if (resp.response!.status === 409) {
+                    this.savedDeliveryEndpoints = new SavedDeliveryEndpoints(
+                        Object.assign({}, this.savedDeliveryEndpoints.deliveryEndpoints, {
+                            [driverSpec.name]: deliveryEndpoint
+                        })
+                    )
+                    this.syncEndpointsToStore()
+                    return deliveryEndpoint
+                } else {
+                    throw resp
+                }
             })
     }
 

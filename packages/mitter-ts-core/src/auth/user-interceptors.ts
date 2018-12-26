@@ -13,15 +13,13 @@ export class UserAuthorizationInterceptor {
                 const userAuthorization = this.userAuthorizationFetcher()
 
                 if (userAuthorization !== undefined) {
-                    requestParams.headers[StandardHeaders.UserAuthorizationHeader] = [
-                        userAuthorization
-                    ]
+                    requestParams.headers[
+                        StandardHeaders.UserAuthorizationHeader
+                    ] = userAuthorization
                 }
 
                 if (this.applicationId !== undefined) {
-                    requestParams.headers[StandardHeaders.ApplicationIdHeader] = [
-                        this.applicationId
-                    ]
+                    requestParams.headers[StandardHeaders.ApplicationIdHeader] = this.applicationId
                 }
             }
         }

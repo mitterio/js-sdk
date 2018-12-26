@@ -1,45 +1,68 @@
-import { KvStore } from './mitter-core'
+import { MessagingPipelinePayload, User } from '@mitter-io/models'
+import { AxiosInstance } from 'axios'
+import { UserAuthorizationInterceptor } from './auth/user-interceptors'
+import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
+import { KvStore, PlatformMitter } from './mitter-core'
+import { MitterApiConfiguration } from './MitterApiConfiguration'
 import { MitterAxiosApiInterceptor } from './MitterApiGateway'
 import { MitterClientSet } from './MitterClientSet'
 import { Identifiable } from './models/base-types'
-import MessagingPipelineDriver from './specs/MessagingPipelineDriver'
-import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
-import { MessagingPipelinePayload, User } from '@mitter-io/models'
-import { MitterConstants } from './services/constants'
-import { UserAuthorizationInterceptor } from './auth/user-interceptors'
+import { PlatformImplementedFeatures } from './models/platformImplementedFeatures'
 import MitterUser from './objects/Users'
-
-import { AxiosInstance } from 'axios'
+import { MitterConstants } from './services/constants'
+import MessagingPipelineDriver from './specs/MessagingPipelineDriver'
 import { statefulPromise } from './utils'
 
-export interface MitterAxiosInterceptionHost {
-    mitterApiBaseUrl: string
-    enableAxiosInterceptor(axiosInstance: AxiosInstance): void
-    disableAxiosInterceptor?(axiosInstance: AxiosInstance): void
+export interface PlatformMitter {
+    info?(): string
+
+    version(): string
+
+    platformImplementedFeaturesProvider(): PlatformImplementedFeatures
 }
 
-export abstract class MitterBase implements MitterAxiosInterceptionHost {
-    abstract mitterApiBaseUrl: string
-    abstract enableAxiosInterceptor(axiosInstance: AxiosInstance): void
+export interface MitterApiConfigurationProvider {
+    mitterApiConfigurationProvider(): MitterApiConfiguration
+}
+
+export abstract class MitterBase implements PlatformMitter, MitterApiConfigurationProvider {
+    clients = (): MitterClientSet => {
+        return new MitterClientSet(
+            this.mitterApiConfigurationProvider(),
+            this.platformImplementedFeaturesProvider()
+        )
+    }
+
+    abstract mitterApiConfigurationProvider(): MitterApiConfiguration
+
+    abstract platformImplementedFeaturesProvider(): PlatformImplementedFeatures
 
     version(): string {
         return '0.5.0'
     }
-
-    clients(): MitterClientSet {
-        return new MitterClientSet(this)
-    }
 }
 
-export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
+export class Mitter extends MitterBase {
     // tslint:disable-next-line:variable-name
     private static readonly StoreKey = {
         UserAuthorizationToken: 'userAuthorizationToken',
         UserId: 'userId'
     }
+    mitterApiConfigurationProvider = () => {
+        return new MitterApiConfiguration(
+            new UserAuthorizationInterceptor(
+                () => this.cachedUserAuthorization,
+                this.applicationId
+            ).getInterceptor(),
+            this.mitterApiBaseUrl,
+            this.enableAxiosInterceptor
+        )
+    }
+    enableAxiosInterceptor = (axiosInstance: AxiosInstance) => {
+        this.mitterAxiosInterceptor.enable(axiosInstance)
+    }
     private cachedUserAuthorization: string | undefined = undefined
     private cachedUserId: string | undefined = undefined
-
     private mitterAxiosInterceptor: MitterAxiosApiInterceptor = new MitterAxiosApiInterceptor(
         /* the application if */
         this.applicationId,
@@ -53,7 +76,6 @@ export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
         /* The base url for mitter apis */
         this.mitterApiBaseUrl
     )
-
     private messagingPipelineDriverHost: MessagingPipelineDriverHost
     private subscriptions: ((payload: MessagingPipelinePayload) => void)[] = []
     private onAuthAvailableSubscribers: (() => void)[] = []
@@ -66,7 +88,8 @@ export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
         private onTokenExpireFunctions: (() => void)[],
         mitterInstanceReady: () => void,
         pipelineDrivers: MessagingPipelineDriver[] | MessagingPipelineDriver,
-        globalHostObject: any
+        globalHostObject: any,
+        private platformImplementedFeatures: PlatformImplementedFeatures
     ) {
         super()
 
@@ -90,6 +113,10 @@ export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
         globalHostObject._mitter_context = this
     }
 
+    platformImplementedFeaturesProvider() {
+        return this.platformImplementedFeatures
+    }
+
     userAuthorizationAvailable(onAuthAvailable: () => void) {
         this.onAuthAvailableSubscribers.push(onAuthAvailable)
     }
@@ -98,17 +125,20 @@ export class Mitter extends MitterBase implements MitterAxiosInterceptionHost {
         this.subscriptions.push(subscription)
     }
 
-    enableAxiosInterceptor(axiosInstance: AxiosInstance) {
-        this.mitterAxiosInterceptor.enable(axiosInstance)
-    }
-
     disableAxiosInterceptor(axiosInstance: AxiosInstance) {
         this.mitterAxiosInterceptor.disable(axiosInstance)
     }
 
     setUserAuthorization(authorizationToken: string) {
         if (authorizationToken.split('.').length === 3) {
-            this.cachedUserId = JSON.parse(atob(authorizationToken.split('.')[1]))['userId']
+            if (typeof atob !== 'undefined') {
+                this.cachedUserId = JSON.parse(atob(authorizationToken.split('.')[1]))['userId']
+            } else if (this.platformImplementedFeatures.base64Decoder !== undefined) {
+                const base64decoder = this.platformImplementedFeatures.base64Decoder
+                this.cachedUserId = JSON.parse(base64decoder(authorizationToken.split('.')[1]))[
+                    'userId'
+                ]
+            }
         }
 
         if (this.cachedUserAuthorization === authorizationToken) {

@@ -30,7 +30,7 @@ export default {
     // Allow json resolution
     json(),
     commonjs({
-        ignoreGlobals: true
+      ignoreGlobals: true
     }),
     globals(),
     builtins(),
