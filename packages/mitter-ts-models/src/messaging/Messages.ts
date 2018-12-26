@@ -2,6 +2,8 @@ import { TimelineEvent } from './TimelineEvents'
 import { EntityMetadata, MetadataAttachable } from '../entity/EntityMetadata'
 import IdentifiableEntity from '../annotations/IdentifiableEntity'
 import { AppliedAclList } from '../acolyte/AppliedAclList'
+import { Identifier } from '../annotations/Identifier'
+import { PickedPartial } from '../utils/PickedPartial'
 
 export enum StandardPayloadTypeNames {
     TextMessage = 'mitter.mt.Text',
@@ -29,7 +31,7 @@ export class MessageDatum {
 
 export class Message implements IdentifiableEntity<Message>, MetadataAttachable {
     constructor(
-        public senderId: { identifier: string } | string,
+        public senderId: Identifier | string,
         public textPayload: string,
         public timelineEvents: Array<TimelineEvent>,
         public messageData: Array<MessageDatum> = [],
@@ -45,13 +47,16 @@ export class Message implements IdentifiableEntity<Message>, MetadataAttachable 
     }
 }
 
+type RequiredMessageParams = 'senderId' | 'textPayload' | 'timelineEvents'
+export type RequestMessage = PickedPartial<Message, RequiredMessageParams>
+
 export class ChannelReferencingMessage implements IdentifiableEntity<Message>, MetadataAttachable {
     constructor(
         public channelId: string,
         public messageId: string,
         public messageType: StandardMessageType = StandardMessageType.Standard,
         public payloadType: string = StandardPayloadTypeNames.TextMessage,
-        public senderId: { identifier: string },
+        public senderId: Identifier,
         public textPayload: string,
         public messageData: Array<MessageDatum> = [],
         public timelineEvents: Array<TimelineEvent>,

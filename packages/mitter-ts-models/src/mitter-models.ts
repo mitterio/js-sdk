@@ -34,6 +34,7 @@ export * from './fcm/fcm'
 export * from './events/media-management'
 
 export * from './messaging/Channels'
+export * from './messaging/ChannelProfile'
 export * from './messaging/Commons'
 export * from './messaging/ContextFreeMessage'
 export * from './messaging/Messages'
