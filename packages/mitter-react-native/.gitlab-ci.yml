@@ -34,3 +34,4 @@ publish-docs:
   when: manual
   only:
     - master
+
