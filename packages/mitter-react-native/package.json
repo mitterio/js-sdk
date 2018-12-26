@@ -125,6 +125,8 @@
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
+    "@mitter-io/core": "^0.5.11-2",
+    "@mitter-io/models": "^0.5.11",
     "axios": "^0.18.0",
     "base-64": "^0.1.0",
     "rollup-plugin-babel": "^3.0.7",
