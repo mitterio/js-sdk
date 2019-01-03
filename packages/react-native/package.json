@@ -32,7 +32,7 @@
     "semantic-release": "semantic-release",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "precommit": "lint-staged",
-    "prepare": "build"
+    "prepare": "yarn run build"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [
@@ -134,5 +134,6 @@
   },
   "peerDependencies": {
     "rn-fetch-blob": "0.10.13"
-  }
+  },
+  "gitHead": "22589312118f9c486bbd8a7007182a2f2826ef34"
 }

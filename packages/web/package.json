@@ -32,7 +32,7 @@
     "semantic-release": "semantic-release",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "precommit": "lint-staged",
-    "prepare": "build"
+    "prepare": "yarn run build"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [
@@ -123,5 +123,6 @@
     "s3-publish": "^1.0.9",
     "sockjs-client": "^1.1.5",
     "whatwg-fetch": "^2.0.4"
-  }
+  },
+  "gitHead": "22589312118f9c486bbd8a7007182a2f2826ef34"
 }

@@ -32,7 +32,7 @@
     "semantic-release": "semantic-release",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "precommit": "lint-staged",
-    "prepare": "build"
+    "prepare": "yarn run build"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [
@@ -121,5 +121,6 @@
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.4.0",
     "s3-publish": "^1.0.9"
-  }
+  },
+  "gitHead": "22589312118f9c486bbd8a7007182a2f2826ef34"
 }
