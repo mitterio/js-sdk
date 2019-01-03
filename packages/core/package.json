@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/core",
-  "version": "0.6.1-alpha.1",
+  "version": "0.6.1-alpha.2",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-core.umd.js",
@@ -32,7 +32,6 @@
     "semantic-release": "semantic-release",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "precommit": "npm run lint-staged",
-
     "prepare": "build"
   },
   "lint-staged": {
@@ -114,7 +113,7 @@
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
-    "@mitter-io/models": "^0.6.1-alpha.1",
+    "@mitter-io/models": "^0.6.1-alpha.2",
     "@stomp/stompjs": "^4.0.7",
     "@types/isomorphic-fetch": "^0.0.34",
     "@types/lodash.camelcase": "^4.3.4",
