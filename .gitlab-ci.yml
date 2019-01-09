@@ -15,17 +15,12 @@ publish:
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
     - lerna bootstrap
-    - npm publish --access public
+    - lerna publish
   when: manual
   only:
-    - master
-
-publish-docs:
-  stage: publish
-  script:
-    - lerna bootstrap
-    - ./ci-scripts/publish-tsdocs.sh sdk-core
-  when: manual
-  only:
-    - master
+    # Run only on tags with semantic versioning
+    - ^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$
+  except:
+    # And never run on branches
+    - branches
 
