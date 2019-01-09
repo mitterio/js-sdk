@@ -1,0 +1,31 @@
+image: node:carbon
+
+stages:
+  - build
+  - publish
+
+build:
+  stage: build
+  script:
+    - lerna bootstrap
+    - yarn build
+
+publish:
+  stage: publish
+  script:
+    - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
+    - lerna bootstrap
+    - npm publish --access public
+  when: manual
+  only:
+    - master
+
+publish-docs:
+  stage: publish
+  script:
+    - lerna bootstrap
+    - ./ci-scripts/publish-tsdocs.sh sdk-core
+  when: manual
+  only:
+    - master
+
