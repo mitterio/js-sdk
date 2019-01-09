@@ -8,7 +8,7 @@ build:
   stage: build
   script:
     - lerna bootstrap
-    - yarn build
+    - lerna run build
 
 publish:
   stage: publish
@@ -16,7 +16,6 @@ publish:
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
     - lerna bootstrap
     - lerna publish
-  when: manual
   only:
     # Run only on tags with semantic versioning
     - ^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$
