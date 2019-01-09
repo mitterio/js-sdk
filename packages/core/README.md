@@ -1,6 +1,6 @@
 # mitter-core
 
-**Author**
+**Authors**
 Vineeth George (vineeth@mitter.io)
 Rohan Prabhu (rohan@mitter.io)
 

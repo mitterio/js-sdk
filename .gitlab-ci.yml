@@ -14,6 +14,7 @@ build:
 publish:
   stage: publish
   script:
+    - npm install -g lerna
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
     - lerna bootstrap
     - lerna publish
