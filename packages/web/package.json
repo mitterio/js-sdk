@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/web",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-web.umd.js",
@@ -31,7 +31,6 @@
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
-
     "precommit": "lint-staged",
     "prepare": "yarn run build",
     "prepublishOnly": "./../../ci-scripts/publish-tsdocs.sh"
@@ -116,7 +115,7 @@
   },
   "dependencies": {
     "@mitter-io/core": "0.5.11-2",
-    "@mitter-io/models": "^0.6.1",
+    "@mitter-io/models": "^0.6.2",
     "@stomp/stompjs": "^4.0.7",
     "@types/sockjs-client": "^1.1.0",
     "@types/stompjs": "^2.3.3",
