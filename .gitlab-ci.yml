@@ -5,7 +5,7 @@ stages:
   - publish
 
 before_script:
-  - ls -al ~/.nvm
+  - source ~/.nvm/nvm.sh
   - nvm use 8
   - lerna bootstrap
 
