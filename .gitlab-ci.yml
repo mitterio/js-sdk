@@ -22,10 +22,9 @@ publish:
     GIT_STRATEGY: clone
     GIT_CHECKOUT: "false"
   script:
-    - git checkout master
     - lerna bootstrap
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
-    - lerna publish --no-push --no-git-tag-version --no-git-reset
+    - lerna publish --force-publish
   only:
     # Run only on tags with semantic versioning
     - /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/
