@@ -23,7 +23,6 @@ publish:
     GIT_CHECKOUT: "false"
   script:
     - git checkout master
-    - lerna bootstrap
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
     - lerna publish from-git --no-git-tag-version --no-git-reset
   only:
