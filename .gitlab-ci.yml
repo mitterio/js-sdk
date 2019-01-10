@@ -16,6 +16,8 @@ build:
 
 publish:
   stage: publish
+  variables:
+    GIT_STRATEGY: clone
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
     - lerna publish --no-push --no-git-tag-version --no-git-reset
