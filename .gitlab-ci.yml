@@ -7,11 +7,11 @@ stages:
 before_script:
   - source ~/.nvm/nvm.sh
   - nvm use 8
-  - lerna bootstrap
 
 build:
   stage: build
   script:
+    - lerna bootstrap
     - lerna run build
   except:
     - tags
@@ -23,6 +23,7 @@ publish:
     GIT_CHECKOUT: "false"
   script:
     - git checkout master
+    - lerna bootstrap
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
     - lerna publish --no-push --no-git-tag-version --no-git-reset
   only:
