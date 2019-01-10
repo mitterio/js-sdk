@@ -26,6 +26,7 @@ publish:
     - lerna bootstrap
     - git reset --hard
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
+    - echo "unsafe-perm = true" >> ~/.npmrc
     - lerna publish from-package --yes --no-verify-access
   only:
     # Run only on tags with semantic versioning
