@@ -4,18 +4,19 @@ stages:
   - build
   - publish
 
+before_script:
+  - nvm use 8
+  - lerna bootstrap
+
 build:
   stage: build
   script:
-    - nvm use 8
-    - lerna bootstrap
     - lerna run build
 
 publish:
   stage: publish
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
-    - lerna bootstrap
     - lerna publish --no-push --no-git-tag-version --no-git-reset
   only:
     # Run only on tags with semantic versioning
