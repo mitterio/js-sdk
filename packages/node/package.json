@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/node",
-  "version": "0.6.16",
+  "version": "0.6.18",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-node.umd.js",
