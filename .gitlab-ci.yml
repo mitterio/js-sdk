@@ -24,7 +24,7 @@ publish:
   script:
     - git checkout master
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
-    - lerna publish from-git --no-git-tag-version --no-git-reset
+    - lerna publish from-git --yes --no-git-tag-version --no-git-reset
   only:
     # Run only on tags with semantic versioning
     - /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/
