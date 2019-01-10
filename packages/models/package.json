@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/models",
-  "version": "0.6.2",
+  "version": "0.6.6",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-models.umd.js",
@@ -32,7 +32,6 @@
     "semantic-release": "semantic-release",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "precommit": "lint-staged",
-
     "prepare": "yarn run build",
     "prepublishOnly": "./../../ci-scripts/publish-tsdocs.sh"
   },
