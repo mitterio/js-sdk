@@ -22,6 +22,7 @@ publish:
     GIT_STRATEGY: clone
     GIT_CHECKOUT: "false"
   script:
+    - git checkout master
     - lerna bootstrap
     - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" >> ~/.npmrc
     - lerna publish --force-publish
