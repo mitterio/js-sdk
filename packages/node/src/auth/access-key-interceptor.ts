@@ -46,18 +46,14 @@ export class AccessKeySigningInterceptor {
 
             const digest = this.accessKeySigner.signRequest(digestParts)
 
-            requestParams.headers[StandardHeaders.AccessKeyHeader] = [
-                this.accessKeyCredentials.accessKey
-            ]
-            requestParams.headers[StandardHeaders.AccessKeyAuthorizationHeader] = [
-                digest.authorizationHeader
-            ]
-            requestParams.headers[AccessKeySigner.Headers.Date] = [digest.date]
-            requestParams.headers[AccessKeySigner.Headers.Nonce] = [digest.nonce]
-            requestParams.headers[AccessKeySigner.Headers.ContentMD5] = [payloadMd5]
+            requestParams.headers[StandardHeaders.AccessKeyHeader] = this.accessKeyCredentials.accessKey
+            requestParams.headers[StandardHeaders.AccessKeyAuthorizationHeader] = digest.authorizationHeader
+            requestParams.headers[AccessKeySigner.Headers.Date] = digest.date
+            requestParams.headers[AccessKeySigner.Headers.Nonce] = digest.nonce
+            requestParams.headers[AccessKeySigner.Headers.ContentMD5] = payloadMd5
 
             if (!(contentType === null || contentType === undefined || contentType === 'null')) {
-                requestParams.headers[AccessKeySigner.Headers.ContentType] = [contentType]
+                requestParams.headers[AccessKeySigner.Headers.ContentType] = contentType
             }
 
             requestParams.data = wirePayload
