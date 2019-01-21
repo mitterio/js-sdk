@@ -1,4 +1,4 @@
-import { Mitter as MitterCore, MitterConstants } from '@mitter-io/core'
+import { Mitter as MitterCore, MitterConstants, PlatformImplementedFeatures } from '@mitter-io/core'
 import WebKvStore from './kv-store/KvStore'
 import WebSocketPipelineDriver from './drivers/WebsocketMessagingPipelineDriver'
 
@@ -23,7 +23,8 @@ export const Mitter = {
 
             mitterInstanceReady,
             new WebSocketPipelineDriver(),
-            window
+            window,
+            {} as PlatformImplementedFeatures
         )
     }
 }
