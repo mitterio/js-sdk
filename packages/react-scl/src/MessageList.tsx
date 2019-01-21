@@ -3,25 +3,6 @@ import React, { CSSProperties, ReactElement, ReactNode } from 'react'
 import { AutoSizer, IndexRange, InfiniteLoader, List } from 'react-virtualized'
 import { MeasuredCellParent } from 'react-virtualized/dist/es/CellMeasurer'
 
-const randText = () => {
-  const text = [
-    'Lorem ipsum dolor sit amet.',
-    'Consectetur adipisicing elit.',
-    'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
-    'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    'Ut enim ad minim veniam.',
-    'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-    'Excepteur sint occaecat cupidatat non proident.',
-    'Sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
-  ]
-
-  return text[Math.floor(Math.random() * text.length)]
-}
-
-
 interface MessageListProps {
   messages: ChannelReferencingMessage[]
   onEndCallback: () => void
@@ -108,7 +89,6 @@ class MessageList extends React.PureComponent<MessageListProps> {
   }
 
   _loadMoreRows(params: IndexRange) {
-    // && params.startIndex !== params.stopIndex
     if (!this.props.isLoading && this.scrollTop > 0) {
       this.props.onEndCallback()
     }
@@ -120,8 +100,6 @@ class MessageList extends React.PureComponent<MessageListProps> {
   }
 
   render() {
-    // const { rowCount, scrollToIndex } = this.state
-   // console.log('b;ah',rowCount, scrollToIndex)
     return (
       <React.Fragment>
         {
@@ -157,9 +135,6 @@ class MessageList extends React.PureComponent<MessageListProps> {
                       rowHeight={ this._getRowHeight }
                       rowRenderer={ this._rowRenderer }
                       onScroll={this._onScroll}
-                      /*isScrolling={true}
-                      onScroll={onChildScroll}
-                      scrollTop={scrollTop}*/
                       scrollToIndex={ this.props.scrollToIndex}
                       scrollToAlignment="start"
                     />

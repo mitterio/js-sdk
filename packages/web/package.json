@@ -117,7 +117,7 @@
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
-    "@mitter-io/core": "0.5.11-2",
+    "@mitter-io/core": "^0.6.28",
     "@mitter-io/models": "^0.6.28",
     "@stomp/stompjs": "^4.0.7",
     "@types/sockjs-client": "^1.1.0",
