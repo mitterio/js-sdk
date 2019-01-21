@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/node",
-  "version": "0.6.28",
+  "version": "0.6.29",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-node.umd.js",
@@ -114,7 +114,7 @@
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
-    "@mitter-io/core": "^0.6.28",
+    "@mitter-io/core": "^0.6.29",
     "@types/md5": "^2.1.32",
     "@types/randomstring": "^1.1.6",
     "axios": "^0.18.0",

@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/web",
-  "version": "0.6.28",
+  "version": "0.6.29",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-web.umd.js",
@@ -117,8 +117,8 @@
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
-    "@mitter-io/core": "^0.6.28",
-    "@mitter-io/models": "^0.6.28",
+    "@mitter-io/core": "^0.6.29",
+    "@mitter-io/models": "^0.6.29",
     "@stomp/stompjs": "^4.0.7",
     "@types/sockjs-client": "^1.1.0",
     "@types/stompjs": "^2.3.3",
