@@ -22,15 +22,22 @@ interface MessageListManagerState {
 }
 
 export class MessageListManager extends React.PureComponent<MessageListManagerProps>   {
-
   private scrollToIndex: number = -1
+  private _internalMessageList: React.RefObject<MessageList>
+
   constructor(props: MessageListManagerProps) {
     super(props)
     this.getViewFromProducer = this.getViewFromProducer.bind(this)
+    this._internalMessageList = React.createRef()
+  }
+
+  scrollToBottom() {
+    if (this._internalMessageList.current) {
+      this._internalMessageList.current.scrollToBottom()
+    }
   }
 
   componentWillUpdate(nextProps:MessageListManagerProps) {
-
     this.scrollToIndex = nextProps.messages.length - this.props.messages.length - 1
     console.log('%c scroll to index'+ this.scrollToIndex, 'color:pink')
 
@@ -60,6 +67,7 @@ export class MessageListManager extends React.PureComponent<MessageListManagerPr
   render() {
     return  (
       <MessageList
+        ref={this._internalMessageList}
         onEndCallback={this.props.onEndCallback}
         messages = {this.props.messages}
         getViewFromProducer={this.getViewFromProducer}

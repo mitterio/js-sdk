@@ -22,6 +22,7 @@ class MessageList extends React.PureComponent<MessageListProps> {
   private done: any
   private scrollTop: number = 0
   private _cache: CellMeasurerCache
+  private _internalList: List | null = null
 
   constructor(props: MessageListProps) {
     super(props)
@@ -40,6 +41,12 @@ class MessageList extends React.PureComponent<MessageListProps> {
       fixedWidth: true,
       minHeight: this._getRowHeight()
     })
+  }
+
+  scrollToBottom() {
+    if (this._internalList) {
+      this._internalList.scrollToRow(this.props.messages.length)
+    }
   }
 
   _onScroll({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }): void {
@@ -119,7 +126,7 @@ class MessageList extends React.PureComponent<MessageListProps> {
                     <List
                       width={ width }
                       height={ height }
-                      ref={ registerChild }
+                      ref={ (_ref) => { this._internalList = _ref; registerChild(_ref); } }
                       onRowsRendered={ onRowsRendered }
                       rowCount={ this.props.messages.length }
                       rowHeight={ this._cache.rowHeight }
