@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/react-scl",
-  "version": "0.6.33",
+  "version": "0.6.34-scl-ht-fix.0",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-react-component-library.umd.js",
