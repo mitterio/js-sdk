@@ -132,5 +132,6 @@
   "dependencies": {
     "@mitter-io/models": "^0.6.33",
     "react-virtualized": "^9.21.0"
-  }
+  },
+  "gitHead": "628cf55461ca910ec3b1d6268fbd079193d85d6b"
 }

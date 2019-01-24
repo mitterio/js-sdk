@@ -1,5 +1,7 @@
 #!/bin/bash
 
+exit 0
+
 rm -Rfv ~/.aws
 mkdir ~/.aws
 echo "[default]" >> ~/.aws/credentials
