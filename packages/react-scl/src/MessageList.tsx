@@ -96,7 +96,7 @@ class MessageList extends React.PureComponent<MessageListProps> {
   }
 
   _getRowHeight({ index }: { index: number }) {
-    return 50
+    return 100
   }
 
   render() {
