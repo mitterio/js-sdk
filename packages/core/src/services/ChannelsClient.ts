@@ -74,6 +74,7 @@ export interface ChannelsApi {
             params: {
                 channelId: string
             }
+            response: ChannelParticipation[]
         }
         POST: {
             params: {
@@ -128,9 +129,8 @@ export interface ChannelsApi {
                 channelId: string
                 key: string
             }
+            response: EntityProfileAttribute[]
         }
-
-        response: EntityProfileAttribute[]
     }
 
     '/v1/channels/attribute-def/channels': {
@@ -279,9 +279,18 @@ export class ChannelsClient {
      * under @mitter-io/models.
      * More details on participants can be found in our docs under the Channels section
      */
-    public getChannelParticipants(channelId: string): Promise<ChannelParticipation[]> {
+    public getChannelParticipants(
+        channelId: string,
+        expandParticipants: boolean | undefined = undefined,
+        withParticipantsProfileAttributes: string | undefined = undefined
+    ): Promise<ChannelParticipation[]> {
         return this.channelsAxiosClient
-            .get<'/v1/channels/:channelId/participants'>(`/v1/channels/${channelId}/participants`)
+            .get<'/v1/channels/:channelId/participants'>(`/v1/channels/${channelId}/participants`, {
+                params: Object.assign({},
+                    expandParticipants !== undefined ? { expandParticipants } : {},
+                    withParticipantsProfileAttributes !== undefined ? { withParticipantsProfileAttributes } : {}
+                )
+            })
             .then(x => x.data)
     }
 
