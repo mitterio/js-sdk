@@ -1,7 +1,7 @@
 import { ChannelReferencingMessage } from '@mitter-io/models'
 import React, { CSSProperties, ReactElement, ReactNode } from 'react'
 import { AutoSizer, IndexRange, InfiniteLoader, List } from 'react-virtualized'
-import { MeasuredCellParent } from 'react-virtualized/dist/es/CellMeasurer'
+import { MeasuredCellParent, CellMeasurer, CellMeasurerCache } from 'react-virtualized/dist/es/CellMeasurer'
 
 interface MessageListProps {
   messages: ChannelReferencingMessage[]
@@ -19,9 +19,10 @@ interface MessageListState {
 }
 
 class MessageList extends React.PureComponent<MessageListProps> {
-
   private done: any
   private scrollTop: number = 0
+  private _cache: CellMeasurerCache
+
   constructor(props: MessageListProps) {
     super(props)
     this.state = {
@@ -34,32 +35,18 @@ class MessageList extends React.PureComponent<MessageListProps> {
     this._getRowHeight = this._getRowHeight.bind(this)
     this._rowRenderer = this._rowRenderer.bind(this)
     this._onScroll = this._onScroll.bind(this)
-  }
 
-  componentWillUpdate(nextProps: MessageListProps) {
-    /*if (this.props.isLoading !== prevProps.isLoading && prevProps.isLoading !== undefined) {
-      console.log('%c is loading' + this.props.isLoading, 'color: red')
-    }*/
-
-    if(nextProps.messages.length !== this.props.messages.length) {
-      // this.done()
-      /*this.setState({
-        rowCount:  nextProps.messages.length,
-        scrollToIndex:nextProps.messages.length - this.props.messages.length - 1,
-      },this.done)*/
-    }
-
+    this._cache = new CellMeasurerCache({
+      fixedWidth: true,
+      minHeight: this._getRowHeight()
+    })
   }
 
   _onScroll({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }): void {
-    console.log('%c clientHeight' + clientHeight, 'color:red')
-    console.log('%c scrollHeight' + scrollHeight, 'color:blue')
-    console.log('%c scrollTop' + scrollTop, 'color:green')
     this.scrollTop = scrollTop
   }
 
   _isRowLoaded({ index }: { index: number }) {
-    // const { rowCount } = this.state
     return index > 0
   }
 
@@ -67,24 +54,28 @@ class MessageList extends React.PureComponent<MessageListProps> {
     let content: ReactNode
     const messages = this.props.messages
 
-    /*if (index === 0) {
-      content = <div>Loading... { index }</div>
-    }*/
-    // else {
-
-      content = (
-        <React.Fragment>
-          {
-            this.props.getViewFromProducer(messages[index])
-          }
-        </React.Fragment>
-      )
-   // }
+    content = (
+      <React.Fragment>
+        {
+          this.props.getViewFromProducer(messages[index])
+        }
+      </React.Fragment>
+    )
 
     return (
-      <div key={ key } style={ style }>
-        { content }
-      </div>
+      <CellMeasurer
+        cache={this._cache}
+        columnIndex={0}
+        key={key}
+        rowIndex={index}
+        parent={parent}
+      >
+        {({ measure }) => (
+          <div key={key} style={style} onLoad={measure}>
+            { content }
+          </div>
+        )}
+      </CellMeasurer>
     )
   }
 
@@ -95,8 +86,8 @@ class MessageList extends React.PureComponent<MessageListProps> {
     return new Promise(resolve => this.done = resolve)
   }
 
-  _getRowHeight({ index }: { index: number }) {
-    return 100
+  _getRowHeight({ index }: { index: number | undefined } = { index: undefined }) {
+    return 0
   }
 
   render() {
@@ -124,7 +115,6 @@ class MessageList extends React.PureComponent<MessageListProps> {
               <AutoSizer
               >
                 { ({ height, width }) => {
-                  console.log('height is', height)
                   return (
                     <List
                       width={ width }
@@ -132,7 +122,7 @@ class MessageList extends React.PureComponent<MessageListProps> {
                       ref={ registerChild }
                       onRowsRendered={ onRowsRendered }
                       rowCount={ this.props.messages.length }
-                      rowHeight={ this._getRowHeight }
+                      rowHeight={ this._cache.rowHeight }
                       rowRenderer={ this._rowRenderer }
                       onScroll={this._onScroll}
                       scrollToIndex={ this.props.scrollToIndex}

@@ -13,6 +13,7 @@ interface MessageListManagerProps {
   onEndCallback: () => void
   loader: () => ReactElement<any>
   isLoading: boolean
+  scrolloIndex?: number
 }
 
 
@@ -30,7 +31,7 @@ export class MessageListManager extends React.PureComponent<MessageListManagerPr
 
   componentWillUpdate(nextProps:MessageListManagerProps) {
 
-    this.scrollToIndex = nextProps.messages.length - this.props.messages.length -2
+    this.scrollToIndex = nextProps.messages.length - this.props.messages.length - 1
     console.log('%c scroll to index'+ this.scrollToIndex, 'color:pink')
 
   }

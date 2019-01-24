@@ -126,8 +126,8 @@
     "typescript": "^3.0.3"
   },
   "peerDependencies": {
-    "react": "^16.6.1",
-    "react-dom": "^16.6.1"
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0"
   },
   "dependencies": {
     "@mitter-io/models": "^0.6.33",
