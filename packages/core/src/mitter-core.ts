@@ -12,6 +12,7 @@ export * from './models/platformImplementedFeatures'
 export * from './utils/profileBuilder/ChannelProfileBuilder'
 export * from './utils/profileBuilder/UserProfileBuilder'
 export * from './constants'
+export * from './MitterApiConfiguration'
 
 export { default as MessagingPipelineDriver } from './specs/MessagingPipelineDriver'
 export { PlatformMitter } from './Mitter'
