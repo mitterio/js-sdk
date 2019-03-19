@@ -3,10 +3,10 @@ import {
     DeliveryEndpoint,
     EntityProfile,
     EntityProfileAttribute,
+    Presence,
     User,
     UserLocator
 } from '@mitter-io/models'
-import { Presence } from '@mitter-io/models/dist/types/user/Presence'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
 import { PlatformImplementedFeatures } from '../models/platformImplementedFeatures'
@@ -44,6 +44,8 @@ export interface UsersApi {
             query: {
                 sandboxed?: boolean | undefined
                 locators?: string[] | undefined
+                shouldFetchMetadata?: boolean
+                withProfileAttributes?: string
             }
             response: User[]
         }
@@ -185,17 +187,20 @@ export class UsersClient {
     /***
      *
      * @param {string[] | undefined} locators - User locators can be email Id or phone no. or both
-     *
-     * @returns {Promise<User[]>} -  Returns a promisified list of  users filtered by the locators
+     * @param {boolean} shouldFetchMetadata - To fetch the metadata of the user
+     * @param {string} withProfileAttributes - string query to get the profile attributes of the user
+     * @returns {Promise<User[]>} - Returns a promisified list of  users filtered by the locators
      * If no locators are given it will return the entire list
      */
-    getUsers(locators: string[] | undefined = undefined): Promise<User[]> {
+    getUsers(locators: string[] | undefined = undefined, shouldFetchMetadata: boolean = false, withProfileAttributes?: string): Promise<User[]> {
         return this.usersAxiosClient
             .get<'/v1/users'>('/v1/users', {
                 params: Object.assign(
                     {},
-                    locators === undefined ? { sandboxed: true } : {},
-                    locators !== undefined ? { locators } : {}
+                    locators === undefined ? { sandboxed: false } : {},
+                    locators !== undefined ? { locators } : {},
+                    { shouldFetchMetadata: shouldFetchMetadata },
+                    withProfileAttributes === undefined ? {} : { withProfileAttributes: withProfileAttributes }
                 )
             })
             .then(x => x.data)
@@ -204,12 +209,19 @@ export class UsersClient {
     /***
      *
      * @param {string} userId - The  unique identifier  of the user
-     *
+     * @param {boolean} shouldFetchMetadata - To fetch the metadata of the user
+     * @param {string} withProfileAttributes - string query to get the profile attributes of the user
      * @returns {Promise<User>} - Returns a promisified user object
      */
-    getUser(userId: string): Promise<User> {
+    getUser(userId: string, shouldFetchMetadata: boolean = false, withProfileAttributes?: string): Promise<User> {
         return this.usersAxiosClient
-            .get<'/v1/users/:userId'>(`/v1/users/${userId}`)
+            .get<'/v1/users/:userId'>(`/v1/users/${userId}`, {
+                params: Object.assign(
+                    {},
+                    { shouldFetchMetadata: shouldFetchMetadata },
+                    withProfileAttributes === undefined ? {} : { withProfileAttributes: withProfileAttributes }
+                )
+            })
             .then(x => x.data)
     }
 

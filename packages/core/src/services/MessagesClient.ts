@@ -147,6 +147,23 @@ export class MessagesClient {
             .then(x => x.data)
     }
 
+    /***
+     *
+     * @param {string} channelId - The  unique identifier for the channel from which messages
+     * have to be fetched
+     * @param {number} limit - number of messages to be fetched
+     * @returns {MessagePaginationManager} - returns a pagination manager for messages for that channel
+     */
+    public getPaginatedMessagesManager(
+        channelId: string,
+        limit: number = MAX_MESSAGE_LIST_LENGTH
+    ): MessagePaginationManager {
+        if (limit > MAX_MESSAGE_LIST_LENGTH) {
+            limit = MAX_MESSAGE_LIST_LENGTH
+        }
+        return new MessagePaginationManager(channelId, limit, this)
+    }
+
     /**
      *
      * @param {string} channelId - The  unique identifier for the channel from which messages
@@ -164,15 +181,6 @@ export class MessagesClient {
      * @returns {Promise<ChannelReferencingMessage[]>} - Returns a Promisified list of messages
      * filtered by the query params
      */
-    public getPaginatedMessagesManager(
-        channelId: string,
-        limit: number = MAX_MESSAGE_LIST_LENGTH
-    ): MessagePaginationManager {
-        if (limit > MAX_MESSAGE_LIST_LENGTH) {
-            limit = MAX_MESSAGE_LIST_LENGTH
-        }
-        return new MessagePaginationManager(channelId, limit, this)
-    }
 
     public getMessages(
         channelId: string,
