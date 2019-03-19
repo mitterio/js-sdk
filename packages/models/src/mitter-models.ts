@@ -66,3 +66,5 @@ export * from './wire/TimelineEventWireObjects'
 export * from './requests/IssuedTokens'
 
 export * from './utils/model-types'
+
+export * from './annotations/Identifier'
