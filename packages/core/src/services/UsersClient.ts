@@ -132,7 +132,7 @@ export interface UsersApi {
         response: EntityProfileAttribute[]
     }
 
-    '/v1/users/attribute-def/users': {
+    '/v1/attribute-def/users': {
         GET: {
             params: {
                 userId: string
@@ -147,7 +147,7 @@ export interface UsersApi {
         }
     }
 
-    '/v1/users/attribute-def/users/:key': {
+    '/v1/attribute-def/users/:key': {
         GET: {
             params: {
                 key: string
@@ -377,7 +377,7 @@ export class UsersClient {
 
     getAttributeDefs(): Promise<AttributeDef[]> {
         return this.usersAxiosClient
-            .get<'/v1/users/attribute-def/users'>(`/v1/users/attribute-def/users`)
+            .get<'/v1/attribute-def/users'>(`/v1/attribute-def/users`)
             .then(x => x.data)
     }
 
@@ -390,7 +390,7 @@ export class UsersClient {
 
     getAttributeDef(key: string): Promise<AttributeDef> {
         return this.usersAxiosClient
-            .get<'/v1/users/attribute-def/users/:key'>(`/v1/users/attribute-def/users/${key}`)
+            .get<'/v1/attribute-def/users/:key'>(`/v1/attribute-def/users/${key}`)
             .then(x => x.data)
     }
 
@@ -403,7 +403,7 @@ export class UsersClient {
 
     addAttributeDef(attributeDef: AttributeDef): Promise<void> {
         return this.usersAxiosClient
-            .post<'/v1/users/attribute-def/users'>(`/v1/users/attribute-def/users`, attributeDef)
+            .post<'/v1/attribute-def/users'>(`/v1/attribute-def/users`, attributeDef)
             .then(x => x.data)
     }
 }

@@ -31,16 +31,17 @@ export const standardUserProfileAttributes: StandardUserProfileAttributes = {
 
 export class AttributeDef {
     constructor(
-        public type: string,
+        public key: string,
         public allowedContentTypes: Array<string>,
         public allowedContentEncodings: Array<string>,
-        public canBeEmpty: boolean
+        public canBeEmpty: boolean,
+        public entityType: string // users or channels
     ) {}
 }
 
 class Attribute {
     constructor(
-        public type: string,
+        public key: string,
         public contentType: string,
         public contentEncoding: string,
         public value: string
