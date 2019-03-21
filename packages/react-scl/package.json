@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/react-scl",
-  "version": "0.6.36",
+  "version": "0.6.38",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-react-component-library.umd.js",
@@ -130,7 +130,7 @@
     "react-dom": "^16.7.0"
   },
   "dependencies": {
-    "@mitter-io/models": "^0.6.36",
+    "@mitter-io/models": "^0.6.38",
     "react-virtualized": "^9.21.0"
   },
   "gitHead": "628cf55461ca910ec3b1d6268fbd079193d85d6b"
