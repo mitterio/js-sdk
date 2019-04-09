@@ -10,7 +10,9 @@ import {
     ChannelParticipation,
     EntityProfileAttribute,
     AttributeDef,
-    EntityProfile
+    EntityProfile,
+    AttachedEntityMetadata,
+    EntityMetadata
 } from '@mitter-io/models'
 import ChannelPaginationManager from '../utils/pagination/ChannelPaginationManager'
 import { MAX_CHANNEL_LIST_LENGTH } from '../constants'
@@ -157,6 +159,26 @@ export interface ChannelsApi {
             response: AttributeDef
         }
     }
+
+    '/v1/channels/:entityId/metadata': {
+        POST: {
+            params: {
+                entityId: string
+            }
+            body: EntityMetadata
+            response: void
+        }
+    },
+    '/v1/channels/:entityId/metadata/:key': {
+        GET: {
+            params: {
+                entityId: string
+                key: string
+            }
+
+            response: AttachedEntityMetadata
+        }
+    }
 }
 
 export const channelsClientGenerator = clientGenerator<ChannelsApi>()
@@ -202,7 +224,6 @@ export class ChannelsClient {
     }
 
     /***
-     * CHANGED
      * @param {string | undefined} before - Fetch all channels that were created before
      * this channel id. The returned list is sorted in a descending order (newest first).
      *
@@ -244,7 +265,6 @@ export class ChannelsClient {
 
 
     /***
-     * CHANGED
      * @param {string} channelId - The  unique identifier of the channel to query for
      * @param {boolean} shouldFetchMetadata - To fetch the metadata of the channel
      * @returns {Promise<Channel>} - Returns a promisified channel object
@@ -263,7 +283,6 @@ export class ChannelsClient {
     }
 
     /***
-     * CHANGED
      * @param {boolean} shouldFetchMetadata - To fetch the metadata of the channels
      * @returns {Promise<ParticipatedChannel[]>} - Promisified list of channels in which the
      * user is a participant of .
@@ -292,7 +311,6 @@ export class ChannelsClient {
     }
 
     /***
-     * CHANGED
      * @param {string} channelId - The  unique identifier of the querying channel
      * @param {boolean} expandParticipants -  defaults to true . fetches the user data of the participant
      * @param {string | undefined} withParticipantsProfileAttributes -  fetch with participants profile attributes
@@ -477,6 +495,38 @@ export class ChannelsClient {
                 `/v1/channels/attribute-def/channels`,
                 attributeDef
             )
+            .then(x => x.data)
+    }
+
+    /***
+     *
+     * @param {string} channelId - The  unique identifier  of the channel
+     * @param {EntityMetadata} metadata - Metadata for the channel
+     * The shape of Metadata object can be found in our tsdocs section
+     * under @mitter-io/models.
+     * @returns {Promise<void>}
+     */
+
+    addMetadataToChannel(channelId: string, metadata: EntityMetadata):Promise<void> {
+        return this.channelsAxiosClient
+            .post<'/v1/channels/:entityId/metadata'>(`/v1/channels/${channelId}/metadata`,
+                metadata
+            )
+            .then(x => x.data)
+    }
+
+    /***
+     *
+     * @param {string} channelId - The  unique identifier  of the channel
+     * @param {string} key - key against which the metadata should be fetched
+     * The shape of Metadata object can be found in our tsdocs section
+     * under @mitter-io/models.
+     * @returns {Promise<AttachedEntityMetadata>}
+     */
+
+    getMetadataForChannel(channelId: string, key: string):Promise<AttachedEntityMetadata> {
+        return this.channelsAxiosClient
+            .get<'/v1/channels/:entityId/metadata/:key'>(`/v1/channels/${channelId}/metadata/${key}`)
             .then(x => x.data)
     }
 }

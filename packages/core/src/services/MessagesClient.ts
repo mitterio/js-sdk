@@ -2,7 +2,9 @@ import {
     ChannelReferencingMessage,
     Message,
     MessageTimelineEvent,
-    TimelineEvent
+    TimelineEvent,
+    AttachedEntityMetadata,
+    EntityMetadata
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -99,6 +101,28 @@ export interface MessagesApi {
             }
         }
     }
+
+    '/v1/messages/:entityId/metadata': {
+        POST: {
+            params: {
+                entityId: string
+            }
+            body: EntityMetadata
+            response: void
+        }
+    },
+    '/v1/messages/:entityId/metadata/:key': {
+        GET: {
+            params: {
+                entityId: string
+                key: string
+            }
+
+            response: AttachedEntityMetadata
+        }
+    }
+
+
 }
 
 export const messagesClientGenerator = clientGenerator<MessagesApi>()
@@ -326,5 +350,37 @@ export class MessagesClient {
                 )
                 .then(x => x.data)
         }
+    }
+
+    /***
+     *
+     * @param {string} messageId - The  unique identifier  of the message
+     * @param {EntityMetadata} metadata - Metadata for the message
+     * The shape of Metadata object can be found in our tsdocs section
+     * under @mitter-io/models.
+     * @returns {Promise<void>}
+     */
+
+    addMetadataToMessage(messageId: string, metadata: EntityMetadata):Promise<void> {
+        return this.messagesAxiosClient
+            .post<'/v1/messages/:entityId/metadata'>(`/v1/messages/${messageId}/metadata`,
+                metadata
+            )
+            .then(x => x.data)
+    }
+
+    /***
+     *
+     * @param {string} messageId - The  unique identifier  of the message
+     * @param {string} key - key against which the metadata should be fetched
+     * The shape of Metadata object can be found in our tsdocs section
+     * under @mitter-io/models.
+     * @returns {Promise<AttachedEntityMetadata>}
+     */
+
+    getMetadataForMessage(messageId: string, key: string): Promise<AttachedEntityMetadata> {
+        return this.messagesAxiosClient
+            .get<'/v1/messages/:entityId/metadata/:key'>(`/v1/messages/${messageId}/metadata/${key}`)
+            .then(x => x.data)
     }
 }

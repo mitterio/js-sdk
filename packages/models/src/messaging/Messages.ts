@@ -52,6 +52,7 @@ export class Message implements IdentifiableEntity<Message>, MetadataAttachable 
 type RequiredMessageParams = 'senderId' | 'textPayload' | 'timelineEvents'
 export type RequestMessage = PickedPartial<Message, RequiredMessageParams>
 
+
 export class ChannelReferencingMessage implements IdentifiableEntity<Message>, MetadataAttachable {
     constructor(
         public channelId: string,

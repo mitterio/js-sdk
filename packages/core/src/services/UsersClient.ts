@@ -5,7 +5,9 @@ import {
     EntityProfileAttribute,
     Presence,
     User,
-    UserLocator
+    UserLocator,
+    AttachedEntityMetadata,
+    EntityMetadata
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -157,7 +159,29 @@ export interface UsersApi {
 
             response: AttributeDef
         }
+    },
+
+    '/v1/users/:entityId/metadata': {
+        POST: {
+            params: {
+                entityId: string
+            }
+            body: EntityMetadata
+            response: void
+        }
+    },
+
+    '/v1/users/:entityId/metadata/:key': {
+        GET: {
+            params: {
+                entityId: string
+                key: string
+            }
+
+            response: AttachedEntityMetadata
+        }
     }
+
 }
 
 export const usersClientGenerator = clientGenerator<UsersApi>()
@@ -416,6 +440,38 @@ export class UsersClient {
     addAttributeDef(attributeDef: AttributeDef): Promise<void> {
         return this.usersAxiosClient
             .post<'/v1/users/attribute-def/users'>(`/v1/users/attribute-def/users`, attributeDef)
+            .then(x => x.data)
+    }
+
+    /***
+     *
+     * @param {string} userId - The  unique identifier  of the user
+     * @param {EntityMetadata} metadata - Metadata for the user
+     * The shape of Metadata object can be found in our tsdocs section
+     * under @mitter-io/models.
+     * @returns {Promise<void>}
+     */
+
+    addMetadataToUser(userId: string, metadata: EntityMetadata):Promise<void> {
+        return this.usersAxiosClient
+            .post<'/v1/users/:entityId/metadata'>(`/v1/users/${userId}/metadata`,
+                metadata
+            )
+            .then(x => x.data)
+    }
+
+    /***
+     *
+     * @param {string} userId - The  unique identifier  of the user
+     * @param {string} key - key against which the metadata should be fetched
+     * The shape of Metadata object can be found in our tsdocs section
+     * under @mitter-io/models.
+     * @returns {Promise<AttachedEntityMetadata>}
+     */
+
+    getMetadataForUser(userId: string, key: string):Promise<AttachedEntityMetadata> {
+        return this.usersAxiosClient
+            .get<'/v1/users/:entityId/metadata/:key'>(`/v1/users/${userId}/metadata/${key}`)
             .then(x => x.data)
     }
 }
