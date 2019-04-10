@@ -1,11 +1,13 @@
-export class MetadataEntry {
-  constructor(public payload: string, public systemEntry: boolean) {}
+export type EntityMetadata = {
+    [key: string]: any
 }
 
-type metadataType = { [propname: string]: MetadataEntry }
-
-export class EntityMetadata {
-  constructor(public metadata: metadataType[]) {}
+export type AttachedEntityMetadata = {
+    key: string,
+    value: {
+        "@type": any,
+        text: any
+    }
 }
 
 export interface MetadataAttachable {

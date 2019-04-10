@@ -1,0 +1,385 @@
+0 silly argv { _: [ 'version' ], lernaVersion: '3.13.1', '$0': 'lerna' }
+1 notice cli v3.13.1
+2 verbose rootPath /home/vineeth/work/mitter-js-sdk
+3 info current version 0.6.36
+4 silly isAnythingCommitted
+5 verbose isAnythingCommitted 1
+6 silly currentBranch
+7 verbose currentBranch adding-metadata
+8 silly remoteBranchExists
+9 silly isBehindUpstream
+10 silly isBehindUpstream adding-metadata is behind origin/adding-metadata by 0 commit(s) and ahead by 2
+11 silly hasTags
+12 verbose hasTags true
+13 silly git-describe.sync "v0.6.36-5-g967eaeb" => {"lastTagName":"v0.6.36","lastVersion":"v0.6.36","refCount":"5","sha":"967eaeb","isDirty":false}
+14 info Looking for changed packages since v0.6.36
+15 silly checking diff packages/core
+16 silly found diff in packages/core/src/services/ChannelsClient.ts
+16 silly found diff in packages/core/src/services/MessagesClient.ts
+16 silly found diff in packages/core/src/services/UsersClient.ts
+16 silly found diff in packages/core/src/utils/presenceBuilder/StandardUserPresenceTypes.ts
+16 silly found diff in packages/core/src/utils/presenceBuilder/UserPresenceBuilder.ts
+16 silly found diff in packages/core/yarn.lock
+17 verbose filtered diff [ 'packages/core/src/services/ChannelsClient.ts',
+17 verbose filtered diff   'packages/core/src/services/MessagesClient.ts',
+17 verbose filtered diff   'packages/core/src/services/UsersClient.ts',
+17 verbose filtered diff   'packages/core/src/utils/presenceBuilder/StandardUserPresenceTypes.ts',
+17 verbose filtered diff   'packages/core/src/utils/presenceBuilder/UserPresenceBuilder.ts',
+17 verbose filtered diff   'packages/core/yarn.lock' ]
+18 silly checking diff packages/models
+19 silly found diff in packages/models/src/entity/EntityMetadata.ts
+19 silly found diff in packages/models/src/messaging/Messages.ts
+19 silly found diff in packages/models/src/mitter-models.ts
+19 silly found diff in packages/models/src/user/Presence.ts
+20 verbose filtered diff [ 'packages/models/src/entity/EntityMetadata.ts',
+20 verbose filtered diff   'packages/models/src/messaging/Messages.ts',
+20 verbose filtered diff   'packages/models/src/mitter-models.ts',
+20 verbose filtered diff   'packages/models/src/user/Presence.ts' ]
+21 silly checking diff packages/node
+22 silly found diff in packages/node/yarn.lock
+23 verbose filtered diff [ 'packages/node/yarn.lock' ]
+24 silly checking diff packages/react-native
+25 silly no diff found in @mitter-io/react-native
+26 silly checking diff packages/react-scl
+27 silly found diff in packages/react-scl/yarn.lock
+28 verbose filtered diff [ 'packages/react-scl/yarn.lock' ]
+29 silly checking diff packages/web
+30 silly found diff in packages/web/yarn.lock
+31 verbose filtered diff [ 'packages/web/yarn.lock' ]
+32 verbose updated @mitter-io/core
+33 verbose updated @mitter-io/models
+34 verbose updated @mitter-io/node
+35 verbose updated @mitter-io/react-native
+36 verbose updated @mitter-io/react-scl
+37 verbose updated @mitter-io/web
+38 verbose git-describe undefined => "v0.6.36-5-g967eaeb"
+39 silly git-describe parsed => {"lastTagName":"v0.6.36","lastVersion":"v0.6.36","refCount":"5","sha":"967eaeb","isDirty":false}
+40 silly batched [ PackageGraphNode {
+40 silly batched     name: '@mitter-io/models',
+40 silly batched     externalDependencies:
+40 silly batched      Map {
+40 silly batched        '@types/jest' => [Object],
+40 silly batched        '@types/node' => [Object],
+40 silly batched        'colors' => [Object],
+40 silly batched        'commitizen' => [Object],
+40 silly batched        'coveralls' => [Object],
+40 silly batched        'cross-env' => [Object],
+40 silly batched        'cz-conventional-changelog' => [Object],
+40 silly batched        'husky' => [Object],
+40 silly batched        'jest' => [Object],
+40 silly batched        'lint-staged' => [Object],
+40 silly batched        'lodash.camelcase' => [Object],
+40 silly batched        'prettier' => [Object],
+40 silly batched        'prompt' => [Object],
+40 silly batched        'replace-in-file' => [Object],
+40 silly batched        'rimraf' => [Object],
+40 silly batched        'rollup' => [Object],
+40 silly batched        'rollup-plugin-commonjs' => [Object],
+40 silly batched        'rollup-plugin-json' => [Object],
+40 silly batched        'rollup-plugin-node-resolve' => [Object],
+40 silly batched        'rollup-plugin-sourcemaps' => [Object],
+40 silly batched        'rollup-plugin-typescript2' => [Object],
+40 silly batched        'semantic-release' => [Object],
+40 silly batched        'ts-jest' => [Object],
+40 silly batched        'ts-node' => [Object],
+40 silly batched        'tslint' => [Object],
+40 silly batched        'tslint-config-prettier' => [Object],
+40 silly batched        'tslint-config-standard' => [Object],
+40 silly batched        'typedoc' => [Object],
+40 silly batched        'typescript' => [Object],
+40 silly batched        'validate-commit-msg' => [Object],
+40 silly batched        's3-publish' => [Object] },
+40 silly batched     localDependencies: Map {},
+40 silly batched     localDependents:
+40 silly batched      Map {
+40 silly batched        '@mitter-io/core' => [PackageGraphNode],
+40 silly batched        '@mitter-io/react-native' => [PackageGraphNode],
+40 silly batched        '@mitter-io/react-scl' => [PackageGraphNode],
+40 silly batched        '@mitter-io/web' => [PackageGraphNode] } } ]
+41 silly batched [ PackageGraphNode {
+41 silly batched     name: '@mitter-io/core',
+41 silly batched     externalDependencies:
+41 silly batched      Map {
+41 silly batched        '@types/jest' => [Object],
+41 silly batched        '@types/node' => [Object],
+41 silly batched        'axios' => [Object],
+41 silly batched        'colors' => [Object],
+41 silly batched        'commitizen' => [Object],
+41 silly batched        'coveralls' => [Object],
+41 silly batched        'cross-env' => [Object],
+41 silly batched        'cz-conventional-changelog' => [Object],
+41 silly batched        'husky' => [Object],
+41 silly batched        'jest' => [Object],
+41 silly batched        'lint-staged' => [Object],
+41 silly batched        'lodash.camelcase' => [Object],
+41 silly batched        'prettier' => [Object],
+41 silly batched        'prompt' => [Object],
+41 silly batched        'replace-in-file' => [Object],
+41 silly batched        'rimraf' => [Object],
+41 silly batched        'rollup' => [Object],
+41 silly batched        'rollup-plugin-commonjs' => [Object],
+41 silly batched        'rollup-plugin-json' => [Object],
+41 silly batched        'rollup-plugin-node-builtins' => [Object],
+41 silly batched        'rollup-plugin-node-globals' => [Object],
+41 silly batched        'rollup-plugin-node-resolve' => [Object],
+41 silly batched        'rollup-plugin-sourcemaps' => [Object],
+41 silly batched        'rollup-plugin-typescript2' => [Object],
+41 silly batched        'semantic-release' => [Object],
+41 silly batched        'ts-jest' => [Object],
+41 silly batched        'ts-node' => [Object],
+41 silly batched        'tslint' => [Object],
+41 silly batched        'tslint-config-prettier' => [Object],
+41 silly batched        'tslint-config-standard' => [Object],
+41 silly batched        'typedoc' => [Object],
+41 silly batched        'typescript' => [Object],
+41 silly batched        'validate-commit-msg' => [Object],
+41 silly batched        '@stomp/stompjs' => [Object],
+41 silly batched        '@types/isomorphic-fetch' => [Object],
+41 silly batched        '@types/lodash.camelcase' => [Object],
+41 silly batched        '@types/sockjs-client' => [Object],
+41 silly batched        '@types/stompjs' => [Object],
+41 silly batched        '@types/urijs' => [Object],
+41 silly batched        'isomorphic-fetch' => [Object],
+41 silly batched        'restyped-axios' => [Object],
+41 silly batched        's3-publish' => [Object],
+41 silly batched        'typed-rest-client' => [Object],
+41 silly batched        'urijs' => [Object],
+41 silly batched        'whatwg-fetch' => [Object] },
+41 silly batched     localDependencies: Map {},
+41 silly batched     localDependents:
+41 silly batched      Map {
+41 silly batched        '@mitter-io/node' => [PackageGraphNode],
+41 silly batched        '@mitter-io/react-native' => [PackageGraphNode],
+41 silly batched        '@mitter-io/web' => [PackageGraphNode] } },
+41 silly batched   PackageGraphNode {
+41 silly batched     name: '@mitter-io/react-scl',
+41 silly batched     externalDependencies:
+41 silly batched      Map {
+41 silly batched        '@commitlint/cli' => [Object],
+41 silly batched        '@commitlint/config-conventional' => [Object],
+41 silly batched        '@types/jest' => [Object],
+41 silly batched        '@types/node' => [Object],
+41 silly batched        '@types/react' => [Object],
+41 silly batched        '@types/react-dom' => [Object],
+41 silly batched        '@types/react-virtualized' => [Object],
+41 silly batched        'colors' => [Object],
+41 silly batched        'commitizen' => [Object],
+41 silly batched        'coveralls' => [Object],
+41 silly batched        'cross-env' => [Object],
+41 silly batched        'cz-conventional-changelog' => [Object],
+41 silly batched        'husky' => [Object],
+41 silly batched        'jest' => [Object],
+41 silly batched        'jest-config' => [Object],
+41 silly batched        'lint-staged' => [Object],
+41 silly batched        'lodash.camelcase' => [Object],
+41 silly batched        'prettier' => [Object],
+41 silly batched        'prompt' => [Object],
+41 silly batched        'replace-in-file' => [Object],
+41 silly batched        'rimraf' => [Object],
+41 silly batched        'rollup' => [Object],
+41 silly batched        'rollup-plugin-commonjs' => [Object],
+41 silly batched        'rollup-plugin-json' => [Object],
+41 silly batched        'rollup-plugin-node-globals' => [Object],
+41 silly batched        'rollup-plugin-node-resolve' => [Object],
+41 silly batched        'rollup-plugin-sourcemaps' => [Object],
+41 silly batched        'rollup-plugin-typescript2' => [Object],
+41 silly batched        's3-publish' => [Object],
+41 silly batched        'semantic-release' => [Object],
+41 silly batched        'ts-jest' => [Object],
+41 silly batched        'ts-node' => [Object],
+41 silly batched        'tslint' => [Object],
+41 silly batched        'tslint-config-prettier' => [Object],
+41 silly batched        'tslint-config-standard' => [Object],
+41 silly batched        'typedoc' => [Object],
+41 silly batched        'typescript' => [Object],
+41 silly batched        'react-virtualized' => [Object] },
+41 silly batched     localDependencies: Map {},
+41 silly batched     localDependents: Map {} } ]
+42 silly batched [ PackageGraphNode {
+42 silly batched     name: '@mitter-io/node',
+42 silly batched     externalDependencies:
+42 silly batched      Map {
+42 silly batched        '@types/jest' => [Object],
+42 silly batched        '@types/node' => [Object],
+42 silly batched        'colors' => [Object],
+42 silly batched        'commitizen' => [Object],
+42 silly batched        'coveralls' => [Object],
+42 silly batched        'cross-env' => [Object],
+42 silly batched        'cz-conventional-changelog' => [Object],
+42 silly batched        'husky' => [Object],
+42 silly batched        'jest' => [Object],
+42 silly batched        'lint-staged' => [Object],
+42 silly batched        'lodash.camelcase' => [Object],
+42 silly batched        'prettier' => [Object],
+42 silly batched        'prompt' => [Object],
+42 silly batched        'replace-in-file' => [Object],
+42 silly batched        'rimraf' => [Object],
+42 silly batched        'rollup' => [Object],
+42 silly batched        'rollup-plugin-commonjs' => [Object],
+42 silly batched        'rollup-plugin-json' => [Object],
+42 silly batched        'rollup-plugin-node-resolve' => [Object],
+42 silly batched        'rollup-plugin-sourcemaps' => [Object],
+42 silly batched        'rollup-plugin-typescript2' => [Object],
+42 silly batched        'semantic-release' => [Object],
+42 silly batched        'ts-jest' => [Object],
+42 silly batched        'ts-node' => [Object],
+42 silly batched        'tslint' => [Object],
+42 silly batched        'tslint-config-prettier' => [Object],
+42 silly batched        'tslint-config-standard' => [Object],
+42 silly batched        'typedoc' => [Object],
+42 silly batched        'typescript' => [Object],
+42 silly batched        'validate-commit-msg' => [Object],
+42 silly batched        '@types/md5' => [Object],
+42 silly batched        '@types/randomstring' => [Object],
+42 silly batched        'axios' => [Object],
+42 silly batched        'crypto' => [Object],
+42 silly batched        'http' => [Object],
+42 silly batched        'md5' => [Object],
+42 silly batched        'randomstring' => [Object],
+42 silly batched        'rollup-plugin-node-builtins' => [Object],
+42 silly batched        'rollup-plugin-node-globals' => [Object],
+42 silly batched        's3-publish' => [Object] },
+42 silly batched     localDependencies: Map {},
+42 silly batched     localDependents: Map {} },
+42 silly batched   PackageGraphNode {
+42 silly batched     name: '@mitter-io/react-native',
+42 silly batched     externalDependencies:
+42 silly batched      Map {
+42 silly batched        '@commitlint/cli' => [Object],
+42 silly batched        '@commitlint/config-conventional' => [Object],
+42 silly batched        '@types/base-64' => [Object],
+42 silly batched        '@types/jest' => [Object],
+42 silly batched        '@types/react-native' => [Object],
+42 silly batched        'colors' => [Object],
+42 silly batched        'commitizen' => [Object],
+42 silly batched        'coveralls' => [Object],
+42 silly batched        'cross-env' => [Object],
+42 silly batched        'cz-conventional-changelog' => [Object],
+42 silly batched        'husky' => [Object],
+42 silly batched        'jest' => [Object],
+42 silly batched        'jest-config' => [Object],
+42 silly batched        'lint-staged' => [Object],
+42 silly batched        'lodash.camelcase' => [Object],
+42 silly batched        'prettier' => [Object],
+42 silly batched        'prompt' => [Object],
+42 silly batched        'react-native' => [Object],
+42 silly batched        'react-native-firebase' => [Object],
+42 silly batched        'realm' => [Object],
+42 silly batched        'replace-in-file' => [Object],
+42 silly batched        'rimraf' => [Object],
+42 silly batched        'rollup' => [Object],
+42 silly batched        'rollup-plugin-commonjs' => [Object],
+42 silly batched        'rollup-plugin-json' => [Object],
+42 silly batched        'rollup-plugin-node-builtins' => [Object],
+42 silly batched        'rollup-plugin-node-globals' => [Object],
+42 silly batched        'rollup-plugin-node-resolve' => [Object],
+42 silly batched        'rollup-plugin-replace' => [Object],
+42 silly batched        'rollup-plugin-sourcemaps' => [Object],
+42 silly batched        'rollup-plugin-typescript2' => [Object],
+42 silly batched        's3-publish' => [Object],
+42 silly batched        'semantic-release' => [Object],
+42 silly batched        'ts-jest' => [Object],
+42 silly batched        'ts-node' => [Object],
+42 silly batched        'tslint' => [Object],
+42 silly batched        'tslint-config-prettier' => [Object],
+42 silly batched        'tslint-config-standard' => [Object],
+42 silly batched        'typedoc' => [Object],
+42 silly batched        'typescript' => [Object],
+42 silly batched        'validate-commit-msg' => [Object],
+42 silly batched        'axios' => [Object],
+42 silly batched        'base-64' => [Object],
+42 silly batched        'rollup-plugin-babel' => [Object],
+42 silly batched        'whatwg-fetch' => [Object] },
+42 silly batched     localDependencies: Map {},
+42 silly batched     localDependents: Map {} },
+42 silly batched   PackageGraphNode {
+42 silly batched     name: '@mitter-io/web',
+42 silly batched     externalDependencies:
+42 silly batched      Map {
+42 silly batched        '@types/jest' => [Object],
+42 silly batched        '@types/node' => [Object],
+42 silly batched        'commitizen' => [Object],
+42 silly batched        'coveralls' => [Object],
+42 silly batched        'cross-env' => [Object],
+42 silly batched        'cz-conventional-changelog' => [Object],
+42 silly batched        'husky' => [Object],
+42 silly batched        'jest' => [Object],
+42 silly batched        'lint-staged' => [Object],
+42 silly batched        'lodash.camelcase' => [Object],
+42 silly batched        'prettier' => [Object],
+42 silly batched        'prompt' => [Object],
+42 silly batched        'replace-in-file' => [Object],
+42 silly batched        'rimraf' => [Object],
+42 silly batched        'rollup' => [Object],
+42 silly batched        'rollup-plugin-commonjs' => [Object],
+42 silly batched        'rollup-plugin-json' => [Object],
+42 silly batched        'rollup-plugin-node-builtins' => [Object],
+42 silly batched        'rollup-plugin-node-globals' => [Object],
+42 silly batched        'rollup-plugin-node-resolve' => [Object],
+42 silly batched        'rollup-plugin-replace' => [Object],
+42 silly batched        'rollup-plugin-sourcemaps' => [Object],
+42 silly batched        'rollup-plugin-typescript2' => [Object],
+42 silly batched        'semantic-release' => [Object],
+42 silly batched        'ts-jest' => [Object],
+42 silly batched        'ts-jsdoc' => [Object],
+42 silly batched        'ts-node' => [Object],
+42 silly batched        'tslint' => [Object],
+42 silly batched        'tslint-config-prettier' => [Object],
+42 silly batched        'tslint-config-standard' => [Object],
+42 silly batched        'typedoc' => [Object],
+42 silly batched        'typescript' => [Object],
+42 silly batched        'validate-commit-msg' => [Object],
+42 silly batched        '@stomp/stompjs' => [Object],
+42 silly batched        '@types/sockjs-client' => [Object],
+42 silly batched        '@types/stompjs' => [Object],
+42 silly batched        'axios' => [Object],
+42 silly batched        'rollup-plugin-babel' => [Object],
+42 silly batched        's3-publish' => [Object],
+42 silly batched        'sockjs-client' => [Object],
+42 silly batched        'whatwg-fetch' => [Object] },
+42 silly batched     localDependencies: Map {},
+42 silly batched     localDependents: Map {} } ]
+43 info execute Skipping GitHub releases
+44 silly lifecycle No script for "preversion" in "root", continuing
+45 silly lifecycle No script for "preversion" in "@mitter-io/models", continuing
+46 silly lifecycle No script for "version" in "@mitter-io/models", continuing
+47 silly lifecycle No script for "preversion" in "@mitter-io/core", continuing
+48 silly lifecycle No script for "preversion" in "@mitter-io/react-scl", continuing
+49 silly lifecycle No script for "version" in "@mitter-io/react-scl", continuing
+50 silly lifecycle No script for "version" in "@mitter-io/core", continuing
+51 silly lifecycle No script for "preversion" in "@mitter-io/node", continuing
+52 silly lifecycle No script for "preversion" in "@mitter-io/react-native", continuing
+53 silly lifecycle No script for "preversion" in "@mitter-io/web", continuing
+54 silly lifecycle No script for "version" in "@mitter-io/node", continuing
+55 silly lifecycle No script for "version" in "@mitter-io/web", continuing
+56 silly lifecycle No script for "version" in "@mitter-io/react-native", continuing
+57 silly lifecycle No script for "version" in "root", continuing
+58 silly gitAdd [ '/home/vineeth/work/mitter-js-sdk/packages/models/package.json',
+58 silly gitAdd   '/home/vineeth/work/mitter-js-sdk/packages/react-scl/package.json',
+58 silly gitAdd   '/home/vineeth/work/mitter-js-sdk/packages/core/package.json',
+58 silly gitAdd   '/home/vineeth/work/mitter-js-sdk/packages/node/package.json',
+58 silly gitAdd   '/home/vineeth/work/mitter-js-sdk/packages/web/package.json',
+58 silly gitAdd   '/home/vineeth/work/mitter-js-sdk/packages/react-native/package.json',
+58 silly gitAdd   '/home/vineeth/work/mitter-js-sdk/lerna.json' ]
+59 silly gitCommit v0.6.40
+60 verbose git [ 'commit', '-m', 'v0.6.40' ]
+61 silly gitTag v0.6.40
+62 verbose git [ 'tag', 'v0.6.40', '-m', 'v0.6.40' ]
+63 silly lifecycle No script for "postversion" in "@mitter-io/core", continuing
+64 silly lifecycle No script for "postversion" in "@mitter-io/models", continuing
+65 silly lifecycle No script for "postversion" in "@mitter-io/node", continuing
+66 silly lifecycle No script for "postversion" in "@mitter-io/react-native", continuing
+67 silly lifecycle No script for "postversion" in "@mitter-io/react-scl", continuing
+68 silly lifecycle No script for "postversion" in "@mitter-io/web", continuing
+69 silly lifecycle No script for "postversion" in "root", continuing
+70 info git Pushing tags...
+71 silly gitPush origin adding-metadata
+72 error Error: Command failed: git push --follow-tags --no-verify origin adding-metadata
+72 error remote: GitLab: File name node_modules/agent-base/test/ssl-cert-snakeoil.key was blacklisted by the pattern \.(pem|key)$.
+72 error To git@git.mitter.io:mitter-io/mitter-js-sdk.git
+72 error  ! [remote rejected] adding-metadata -> adding-metadata (pre-receive hook declined)
+72 error  ! [remote rejected] v0.6.40 -> v0.6.40 (pre-receive hook declined)
+72 error error: failed to push some refs to 'git@git.mitter.io:mitter-io/mitter-js-sdk.git'
+72 error
+72 error     at makeError (/home/vineeth/.nvm/versions/node/v10.13.0/lib/node_modules/lerna/node_modules/execa/index.js:174:9)
+72 error     at Promise.all.then.arr (/home/vineeth/.nvm/versions/node/v10.13.0/lib/node_modules/lerna/node_modules/execa/index.js:278:16)
