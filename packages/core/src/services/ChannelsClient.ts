@@ -135,7 +135,7 @@ export interface ChannelsApi {
         }
     }
 
-    '/v1/channels/attribute-def/channels': {
+    '/v1/attribute-def/channels': {
         GET: {
             params: {
                 channelId: string
@@ -150,7 +150,7 @@ export interface ChannelsApi {
         }
     }
 
-    '/v1/channels/attribute-def/channels/:key': {
+    '/v1/attribute-def/channels/:key': {
         GET: {
             params: {
                 key: string
@@ -462,7 +462,7 @@ export class ChannelsClient {
 
     getAttributeDefs(): Promise<AttributeDef[]> {
         return this.channelsAxiosClient
-            .get<'/v1/channels/attribute-def/channels'>(`/v1/channels/attribute-def/channels`)
+            .get<'/v1/attribute-def/channels'>(`/v1/attribute-def/channels`)
             .then(x => x.data)
     }
 
@@ -476,8 +476,8 @@ export class ChannelsClient {
 
     getAttributeDef(key: string): Promise<AttributeDef> {
         return this.channelsAxiosClient
-            .get<'/v1/channels/attribute-def/channels/:key'>(
-                `/v1/channels/attribute-def/channels/${key}`
+            .get<'/v1/attribute-def/channels/:key'>(
+                `/v1/attribute-def/channels/${key}`
             )
             .then(x => x.data)
     }
@@ -491,8 +491,8 @@ export class ChannelsClient {
 
     addAttributeDef(attributeDef: AttributeDef): Promise<void> {
         return this.channelsAxiosClient
-            .post<'/v1/channels/attribute-def/channels'>(
-                `/v1/channels/attribute-def/channels`,
+            .post<'/v1/attribute-def/channels'>(
+                `/v1/attribute-def/channels`,
                 attributeDef
             )
             .then(x => x.data)
