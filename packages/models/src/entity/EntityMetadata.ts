@@ -11,5 +11,5 @@ export type AttachedEntityMetadata = {
 }
 
 export interface MetadataAttachable {
-  entityMetaData: EntityMetadata
+  entityMetadata: EntityMetadata
 }

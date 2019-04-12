@@ -28,7 +28,7 @@ export class Channel implements IdentifiableEntity<Channel> {
         public timelineEvents: Array<TimelineEvent> = [],
         public appliedAcls: AppliedAclList = { plusAppliedAcls: [], minusAppliedAcls: [] },
         public systemChannel: boolean = false,
-        public entityMetadata: EntityMetadata = { metadata: [] }
+        public entityMetadata: EntityMetadata = {}
     ) {}
 
     identifier(): string {
