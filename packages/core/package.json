@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/core",
-  "version": "0.6.43",
+  "version": "0.6.44",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-core.umd.js",
@@ -117,7 +117,7 @@
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
-    "@mitter-io/models": "^0.6.43",
+    "@mitter-io/models": "^0.6.44",
     "@stomp/stompjs": "^4.0.7",
     "@types/isomorphic-fetch": "^0.0.34",
     "@types/lodash.camelcase": "^4.3.4",

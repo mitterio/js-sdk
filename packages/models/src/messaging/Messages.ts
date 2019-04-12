@@ -40,7 +40,7 @@ export class Message implements IdentifiableEntity<Message>, MetadataAttachable 
         public payloadType: string = StandardPayloadTypeNames.TextMessage,
         public messageId: string | null = null,
         public messageType: StandardMessageType = StandardMessageType.Standard,
-        public entityMetaData: EntityMetadata = {}
+        public entityMetadata: EntityMetadata = {}
     ) {
     }
 
@@ -63,7 +63,7 @@ export class ChannelReferencingMessage implements IdentifiableEntity<Message>, M
         public textPayload: string,
         public messageData: Array<MessageDatum> = [],
         public timelineEvents: Array<TimelineEvent>,
-        public entityMetaData: EntityMetadata
+        public entityMetadata: EntityMetadata
     ) {
     }
 
