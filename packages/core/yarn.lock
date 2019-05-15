@@ -18,13 +18,6 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@mitter-io/models@^0.6.36":
-  version "0.6.36"
-  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.6.36.tgz#e3afd4e6725dab3eb734a6d27f3d48db8b3fb420"
-  integrity sha512-0L9hQsxYePZxb3tPfWF7GOkjMXxmrz6LX8jluKbb8QvPkdqwANiDh+7P9rCyUNO9x5dmQPwiNmm7oDgu+J2G/w==
-  dependencies:
-    s3-publish "^1.0.9"
-
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"

@@ -1,4 +1,5 @@
 import IdentifiableEntity from '../annotations/IdentifiableEntity'
+import { AuditInfo } from '../commons/common-models'
 import { TimelineEvent } from './TimelineEvents'
 import { EntityMetadata } from '../entity/EntityMetadata'
 import { EntityProfile } from '../entity/EntityProfile'
@@ -28,7 +29,8 @@ export class Channel implements IdentifiableEntity<Channel> {
         public timelineEvents: Array<TimelineEvent> = [],
         public appliedAcls: AppliedAclList = { plusAppliedAcls: [], minusAppliedAcls: [] },
         public systemChannel: boolean = false,
-        public entityMetadata: EntityMetadata = {}
+        public entityMetadata: EntityMetadata = {},
+        public auditInfo?: AuditInfo
     ) {}
 
     identifier(): string {
