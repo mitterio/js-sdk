@@ -215,12 +215,16 @@ export class ChannelsClient {
      * @returns {ChannelListPaginationManager} - returns a pagination manager for channels
      */
     public getPaginatedChannelsManager(
-        limit: number = MAX_CHANNEL_LIST_LENGTH
+        limit: number = MAX_CHANNEL_LIST_LENGTH,
+        shouldFetchMetadata: boolean = false,
+        withProfileAttributes?: string
     ): ChannelPaginationManager {
         if (limit > MAX_CHANNEL_LIST_LENGTH) {
             limit = MAX_CHANNEL_LIST_LENGTH
         }
-        return new ChannelPaginationManager(limit, this)
+        return new ChannelPaginationManager(
+            (before: string | undefined, after: string | undefined) => this.getAllChannels(before, after, limit, shouldFetchMetadata, withProfileAttributes)
+        )
     }
 
     /***

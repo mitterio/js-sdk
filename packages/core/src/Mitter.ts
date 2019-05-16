@@ -186,6 +186,10 @@ export class Mitter extends MitterBase {
         }
     }
 
+    initializePipelinesAnonymously() {
+        this.messagingPipelineDriverHost.refresh()
+    }
+
     onPipelinesInit(): Promise<void> {
         return this.onPipelinesInitialized
     }

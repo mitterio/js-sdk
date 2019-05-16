@@ -4,7 +4,8 @@ import {
     MessageTimelineEvent,
     TimelineEvent,
     AttachedEntityMetadata,
-    EntityMetadata
+    EntityMetadata,
+    QueriableMetadata
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -17,7 +18,7 @@ import {
     MULTIPART_MESSAGE_FILE_NAME
 } from '../constants'
 import MessagePaginationManager from '../utils/pagination/MessagePaginationManager'
-
+import queryString from 'query-string'
 const base = `${MitterConstants.Api.VersionPrefix}/messages`
 
 export const MessagesPaths = {
@@ -46,6 +47,18 @@ export interface MessagesApi {
             }
 
             response: Message
+        }
+    }
+
+    '/v1/messages': {
+        GET: {
+            params: {
+                shouldFetchMetadata: boolean,
+                metadata: string,
+                channelIds: string,
+                senderIds: string
+            }
+            response: ChannelReferencingMessage[]
         }
     }
 
@@ -173,6 +186,92 @@ export class MessagesClient {
 
     /***
      *
+     * @param {QueriableMetadata} metadata - the metadata to query for , the shape of the object
+     * can be found in our tsdocs section under @mitter-io/models
+     *
+     * @param {string} channelIds - the channelIds against which to query for
+     *
+     * @param {string} senderIds - the senderIds against which to query for
+     *
+     * @param {boolean} shouldFetchMetadata - to fetch metadata for the message
+     *
+     *  @param {string | undefined} before - Fetch all messages that were sent before this
+     * message id. The returned list is sorted in a descending order (newest first).
+     *
+     * @param {string | undefined} after -  Fetch all messages that were sent after this message id.
+     * The returned list is sorted in an ascending order (oldest first)
+     *
+     * @param {number} limit - The maximum number of messages to be returned in this query. Please
+     * refer to limits for the maximum allowed value on this parameter
+     *
+     * @returns {Promise<ChannelReferencingMessage[]>} - Returns a Promisified list of messages
+     * filtered by the query params
+     */
+    public getQueriedMessages(metadata: QueriableMetadata | undefined = undefined,
+                              channelIds: string | undefined = undefined,
+                              senderIds: string | undefined = undefined,
+                              shouldFetchMetadata: boolean = false,
+                              before: string | undefined = undefined,
+                              after: string | undefined = undefined,
+                              limit: number = MAX_MESSAGE_LIST_LENGTH
+                              ): Promise<ChannelReferencingMessage[]> {
+
+
+        return this.messagesAxiosClient
+            .get<'/v1/messages'>('/v1/messages', {
+                params: Object.assign(
+                    {},
+                    {shouldFetchMetadata: shouldFetchMetadata},
+                    metadata !== undefined ? { metadata: metadata } : {},
+                    channelIds !== undefined ? { channelIds } : {},
+                    senderIds !== undefined ? { senderIds } : {},
+                    after !== undefined ? { after } : {},
+                    before !== undefined ? { before } : {},
+                    limit !== undefined ? { limit } : {}
+                ),
+                paramsSerializer: (params) => {
+                    params.metadata = JSON.stringify(metadata)
+                    return queryString.stringify(params, {encode: true})
+                }
+            }).then(x => x.data)
+
+    }
+
+    /***
+     *
+     * @param {QueriableMetadata} metadata - the metadata to query for , the shape of the object
+     * can be found in our tsdocs section under @mitter-io/models
+     *
+     * @param {string} channelIds - the channelIds against which to query for
+     *
+     * @param {string} senderIds - the senderIds against which to query for
+     *
+     * @param {boolean} shouldFetchMetadata - to fetch metadata for the message
+     *
+     * @param {number} limit - The maximum number of messages to be returned in this query. Please
+     * refer to limits for the maximum allowed value on this parameter
+     *
+     * @returns {MessagePaginationManager} - returns a pagination manager for messages for that channel
+     */
+
+    public getPaginatedQueriedMessagesManager(
+        metadata?: QueriableMetadata,
+        channelIds?: string,
+        senderIds?: string,
+        shouldFetchMetadata: boolean = false,
+        limit: number = MAX_MESSAGE_LIST_LENGTH
+    ): MessagePaginationManager {
+        if (limit > MAX_MESSAGE_LIST_LENGTH) {
+            limit = MAX_MESSAGE_LIST_LENGTH
+        }
+        return new MessagePaginationManager(
+            (before: string | undefined, after: string | undefined) =>
+            this.getQueriedMessages(metadata, channelIds, senderIds, shouldFetchMetadata, before, after, limit)
+        )
+    }
+
+    /***
+     *
      * @param {string} channelId - The  unique identifier for the channel from which messages
      * have to be fetched
      * @param {number} limit - number of messages to be fetched
@@ -185,7 +284,7 @@ export class MessagesClient {
         if (limit > MAX_MESSAGE_LIST_LENGTH) {
             limit = MAX_MESSAGE_LIST_LENGTH
         }
-        return new MessagePaginationManager(channelId, limit, this)
+        return new MessagePaginationManager((before: string | undefined, after: string | undefined) => this.getMessages(channelId,before,after,limit))
     }
 
     /**
