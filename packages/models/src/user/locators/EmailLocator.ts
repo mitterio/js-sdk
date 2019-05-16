@@ -1,19 +1,15 @@
-import {VerificationStatus} from "../VerificationStatus";
-import {LOCATOR_SERIALIZED_PREFIX, LocatorsType, UserLocator} from "./UserLocator";
+import {LOCATOR_SERIALIZED_PREFIX, LocatorsType, UserLocator} from "./UserLocator"
 
+export class EmailUserLocator extends UserLocator {
 
-export interface EmailUserLocator extends UserLocator {
-    '@type': LocatorsType.Email
-    email: string
-}
+    constructor(public email: string, userLocatorId?: string) {
+        super(
+            LocatorsType.Email,
+            LOCATOR_SERIALIZED_PREFIX.Email,
+            email,
+            userLocatorId,
 
-export const RequestEmailUserLocator = (email: string, userLocatorId: string): EmailUserLocator => {
-    return( {
-        '@type': LocatorsType.Email,
-        email: email,
-        verificationStatus: VerificationStatus.StatusNotProvided,
-        identifier: userLocatorId,
-        userLocatorId: userLocatorId,
-        locator: LOCATOR_SERIALIZED_PREFIX.Email + email
-    })
+        )
+
+    }
 }

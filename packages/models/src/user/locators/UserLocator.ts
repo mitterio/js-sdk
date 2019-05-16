@@ -6,20 +6,27 @@ export enum LocatorsType {
 }
 
 export enum LOCATOR_SERIALIZED_PREFIX {
-    Email =  'email',
+    Email = 'email',
     PhoneNumber = 'tele'
 }
 
-export interface UserLocator {
-    '@type': LocatorsType
-    verificationStatus: VerificationStatus
-     identifier: string
-     userLocatorId: string
-     locator: string
+export abstract class UserLocator {
+    public verificationStatus: VerificationStatus
+    public identifier: string | undefined
+    public locator: string
+    protected constructor(
+        type: LocatorsType,
+        public locatorSerializationPrefix: string,
+        serializedLocator: string,
+        public userLocatorId?: string,
+    ) {
+        (<any>this)['@type'] = type
+        this.locatorSerializationPrefix = locatorSerializationPrefix
+        this.verificationStatus = VerificationStatus.StatusNotProvided
+        this.locator = `${this.locatorSerializationPrefix}:${serializedLocator}`
+        this.identifier = this.userLocatorId
+    }
 }
-
-
-
 
 
 

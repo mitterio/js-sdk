@@ -3,6 +3,9 @@ import { TypedAxiosInstance } from 'restyped-axios'
 import { Mitter } from '../Mitter'
 import { ChannelsApi, channelsClientGenerator, UsersApi, usersClientGenerator } from '../services'
 import { MitterObject } from './mitter-objects'
+import {AttachedProfile} from "../../../models/src/entity/EntityProfile";
+import {EntityMetadata} from "../../../models/src/entity/EntityMetadata";
+import {AuditInfo} from "../../../models/src/commons/common-models";
 
 export default class MitterUser extends MitterObject<MitterUser, User> {
     private readonly _userId: string
@@ -50,6 +53,18 @@ export default class MitterUser extends MitterObject<MitterUser, User> {
 
     get userLocators(): Promise<UserLocator[]> {
         return super.proxy('userLocators')
+    }
+
+    get entityProfile(): Promise<AttachedProfile | null> {
+        return super.proxy('entityProfile')
+    }
+
+    get entityMetadata(): Promise<EntityMetadata> {
+        return super.proxy('entityMetadata')
+    }
+
+    get auditInfo(): Promise<AuditInfo> {
+        return super.proxy('auditInfo')
     }
 
     channels() {

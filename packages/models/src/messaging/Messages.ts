@@ -1,3 +1,5 @@
+import { AuditInfo } from '../commons/common-models'
+import { User } from '../user/User'
 import {TimelineEvent} from './TimelineEvents'
 import {EntityMetadata, MetadataAttachable} from '../entity/EntityMetadata'
 import IdentifiableEntity from '../annotations/IdentifiableEntity'
@@ -40,7 +42,9 @@ export class Message implements IdentifiableEntity<Message>, MetadataAttachable 
         public payloadType: string = StandardPayloadTypeNames.TextMessage,
         public messageId: string | null = null,
         public messageType: StandardMessageType = StandardMessageType.Standard,
-        public entityMetadata: EntityMetadata = {}
+        public entityMetadata: EntityMetadata = {},
+        public auditInfo?: AuditInfo,
+        public sender?: User
     ) {
     }
 
@@ -63,7 +67,9 @@ export class ChannelReferencingMessage implements IdentifiableEntity<Message>, M
         public textPayload: string,
         public messageData: Array<MessageDatum> = [],
         public timelineEvents: Array<TimelineEvent>,
-        public entityMetadata: EntityMetadata
+        public entityMetadata: EntityMetadata,
+        public auditInfo?: AuditInfo,
+        public sender?: User
     ) {
     }
 
