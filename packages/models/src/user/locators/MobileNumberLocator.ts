@@ -1,13 +1,19 @@
-import { UserLocator } from './UserLocator'
+import {LOCATOR_SERIALIZED_PREFIX, LocatorsType, UserLocator} from "./UserLocator";
+import {VerificationStatus} from "../VerificationStatus";
 
-export class MobileNumberLocator extends UserLocator {
-  public static LOCATOR_SERIALIZED_PREFIX: string = 'tele'
-
-  constructor(public phoneNumber: string, userLocatorId: string) {
-    super(MobileNumberLocator.LOCATOR_SERIALIZED_PREFIX, userLocatorId)
-  }
-
-  protected serializedLocator(): string {
-    return this.phoneNumber
-  }
+export interface MobileNumberLocator extends UserLocator {
+    '@type':  LocatorsType.PhoneNumber
+    phoneNumber: string
 }
+
+export const RequestMobileNumberLocator = (phoneNumber: string, userLocatorId: string): MobileNumberLocator => {
+    return {
+        '@type': LocatorsType.PhoneNumber,
+        phoneNumber: phoneNumber,
+        verificationStatus: VerificationStatus.StatusNotProvided,
+        identifier: userLocatorId,
+        userLocatorId: userLocatorId,
+        locator: LOCATOR_SERIALIZED_PREFIX.PhoneNumber + phoneNumber
+    }
+}
+

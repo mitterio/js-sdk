@@ -1,13 +1,19 @@
-import { UserLocator } from './UserLocator'
+import {VerificationStatus} from "../VerificationStatus";
+import {LOCATOR_SERIALIZED_PREFIX, LocatorsType, UserLocator} from "./UserLocator";
 
-export class EmailUserLocator extends UserLocator {
-  public static LOCATOR_SERIALIZED_PREFIX: string = 'email'
 
-  constructor(public email: string, userLocatorId: string) {
-    super(EmailUserLocator.LOCATOR_SERIALIZED_PREFIX, userLocatorId)
-  }
+export interface EmailUserLocator extends UserLocator {
+    '@type': LocatorsType.Email
+    email: string
+}
 
-  protected serializedLocator(): string {
-    return this.email
-  }
+export const RequestEmailUserLocator = (email: string, userLocatorId: string): EmailUserLocator => {
+    return( {
+        '@type': LocatorsType.Email,
+        email: email,
+        verificationStatus: VerificationStatus.StatusNotProvided,
+        identifier: userLocatorId,
+        userLocatorId: userLocatorId,
+        locator: LOCATOR_SERIALIZED_PREFIX.Email + email
+    })
 }
