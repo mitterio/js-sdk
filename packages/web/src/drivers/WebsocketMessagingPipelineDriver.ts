@@ -13,6 +13,8 @@ import { DeliveryEndpoint } from '@mitter-io/models'
 import * as Stomp from '@stomp/stompjs'
 import { Message } from '@stomp/stompjs'
 import { noOp } from '../utils'
+import WebSocketStandardHeaders from './WebSocketStandardHeaders'
+import nanoid from 'nanoid'
 
 
 export default class WebSocketPipelineDriver implements MessagingPipelineDriver {
@@ -47,9 +49,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
             },
 
             initialized: new Promise((resolve, reject) => {
-                mitter.getUserAuthorization().then(userAuthorization => {
-                    this.connectToStream(resolve, reject)
-                })
+                  this.connectToStream(resolve, reject)
             })
         }
     }
@@ -81,11 +81,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
             }
         } else {
             this.mitterContext.getUserAuthorization().then(userAuthorization => {
-                /*const sockJs = new SockJs(
-                    `${this.mitterContext!.mitterApiBaseUrl}/v1/socket/control/sockjs`
-                )*/
-                // Stomp.over(sockJs)
-                this.activeSocket = Stomp.over(new WebSocket('ws://172.16.92.52:7180/'))
+                this.activeSocket = Stomp.over(new WebSocket('ws://dev-box-bom1-a0.internal.mitter.io:7180'))
                 this.activeSocket.debug = noOp
 
                 let reject: (err: Error | string) => void = noOp
@@ -106,24 +102,31 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                         [StandardHeaders.UserAuthorizationHeader]: userAuthorization
                     }*/
                     // 'x-mitter-user-authorization':'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtaXR0ZXItaW8iLCJ1c2VyVG9rZW5JZCI6Im44YTVoV2QybHVJWTJOVUkiLCJ1c2VydG9rZW4iOiJwb25kZW5sMzByYWNkNjU2MzV0YnU3ZDZnciIsImFwcGxpY2F0aW9uSWQiOiJ3akptby10dFRLeS1rWTh3RC1yTE5rdiIsInVzZXJJZCI6IktnZTBhLWk3WVdiLTVGRHhmLXBXTEtpIn0.e1YpwZ28Nj76y7GFEDIOl6LAlN9B-j6rqTkz3IXTbaGuQ3rKyDvTtAGu3w6PGY_B1n4RVuaG0gucefaM_Qc3Pg'
-                    const headers: any = {
-                      'accept-version': '1.2',
-                      'init-subscriptions': '/channels/open/e2zeT-Wosx8-ec2Gx-n2KvD',
+                    //'init-subscriptions': '/channels/open/e2zeT-Wosx8-ec2Gx-n2KvD',
 
+                    const headers: any = {
+                      [WebSocketStandardHeaders.DeliveryTargetId]: nanoid()
                     }
+
                     if (this.mitterContext!.applicationId !== undefined) {
                       headers[
-                            StandardHeaders.ApplicationIdHeader.toLowerCase()
+                            WebSocketStandardHeaders.MitterApplicationId
                         ] = this.mitterContext!.applicationId
                     }
-
-                    /*if(userAuthorization !== undefined) {
+                    debugger
+                   if(userAuthorization) {
                       headers[
-                        StandardHeaders.UserAuthorizationHeader
+                        WebSocketStandardHeaders.MitterUserAuthorization
                         ] = userAuthorization
-                    }*/
+                    }
 
-                    // headers['x-mitter-user-authorization'] = 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtaXR0ZXItaW8iLCJ1c2VyVG9rZW5JZCI6Im44YTVoV2QybHVJWTJOVUkiLCJ1c2VydG9rZW4iOiJwb25kZW5sMzByYWNkNjU2MzV0YnU3ZDZnciIsImFwcGxpY2F0aW9uSWQiOiJ3akptby10dFRLeS1rWTh3RC1yTE5rdiIsInVzZXJJZCI6IktnZTBhLWk3WVdiLTVGRHhmLXBXTEtpIn0.e1YpwZ28Nj76y7GFEDIOl6LAlN9B-j6rqTkz3IXTbaGuQ3rKyDvTtAGu3w6PGY_B1n4RVuaG0gucefaM_Qc3Pg'
+                    const initSubscriptions = this.mitterContext!.getInitMessagingPipelineSubscriptions()
+
+                    if(initSubscriptions.length > 0) {
+                      headers[
+                        WebSocketStandardHeaders.InitSubscriptions
+                        ] = initSubscriptions.toString()
+                    }
 
                     // this.activeSocket.reconnect_delay = 1000
 
@@ -148,10 +151,6 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                             setTimeout(this.connectToStream, 3000)
                         }
                     )
-                    this.activeSocket.onreceive = (message => {
-                      console.log('ws message1',message)
-                      this.processMessage(message)
-                    })
                 }
             })
         }

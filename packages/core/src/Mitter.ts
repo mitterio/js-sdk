@@ -80,6 +80,7 @@ export class Mitter extends MitterBase {
     private subscriptions: ((payload: MessagingPipelinePayload) => void)[] = []
     private onAuthAvailableSubscribers: (() => void)[] = []
     private onPipelinesInitialized = statefulPromise<void>()
+    private initMessagingPipelineSubscriptions: Array<string>
 
     constructor(
         public readonly kvStore: KvStore,
@@ -110,6 +111,8 @@ export class Mitter extends MitterBase {
             this.subscriptions.forEach(subscription => subscription(messagingPayload))
         )
 
+        this.initMessagingPipelineSubscriptions = []
+
         globalHostObject._mitter_context = this
     }
 
@@ -129,7 +132,7 @@ export class Mitter extends MitterBase {
         this.mitterAxiosInterceptor.disable(axiosInstance)
     }
 
-    setUserAuthorization(authorizationToken: string) {
+    setUserAuthorization(authorizationToken: string, initMessagingPipelineSubscriptions: Array<string>) {
         if (authorizationToken.split('.').length === 3) {
             if (typeof atob !== 'undefined') {
                 this.cachedUserId = JSON.parse(atob(authorizationToken.split('.')[1]))['userId']
@@ -146,6 +149,7 @@ export class Mitter extends MitterBase {
         }
 
         this.cachedUserAuthorization = authorizationToken
+        this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions
         this.announceAuthorizationAvailable()
         this.kvStore
             .setItem(Mitter.StoreKey.UserAuthorizationToken, authorizationToken)
@@ -154,7 +158,17 @@ export class Mitter extends MitterBase {
             })
     }
 
+    startMessagingPipelineAnonymously(initMessagingPipelineSubscriptions: Array<string>): void {
+        this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions
+        this.messagingPipelineDriverHost.refresh()
+    }
+
+    getInitMessagingPipelineSubscriptions(): Array<string> {
+        return this.initMessagingPipelineSubscriptions
+    }
+
     getUserAuthorization(): Promise<string | undefined> {
+        debugger
         if (this.cachedUserAuthorization !== undefined) {
             return Promise.resolve(this.cachedUserAuthorization)
         } else {

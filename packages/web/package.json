@@ -83,6 +83,7 @@
   },
   "devDependencies": {
     "@types/jest": "^22.0.0",
+    "@types/nanoid": "^2.0.0",
     "@types/node": "^10.0.3",
     "commitizen": "^2.9.6",
     "coveralls": "^3.0.0",
@@ -123,6 +124,7 @@
     "@types/sockjs-client": "^1.1.0",
     "@types/stompjs": "^2.3.3",
     "axios": "^0.18.0",
+    "nanoid": "^2.0.2",
     "rollup-plugin-babel": "^3.0.7",
     "s3-publish": "^1.0.9",
     "sockjs-client": "^1.1.5",

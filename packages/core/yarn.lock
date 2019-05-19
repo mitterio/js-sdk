@@ -18,10 +18,10 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@mitter-io/models@^0.6.36":
-  version "0.6.36"
-  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.6.36.tgz#e3afd4e6725dab3eb734a6d27f3d48db8b3fb420"
-  integrity sha512-0L9hQsxYePZxb3tPfWF7GOkjMXxmrz6LX8jluKbb8QvPkdqwANiDh+7P9rCyUNO9x5dmQPwiNmm7oDgu+J2G/w==
+"@mitter-io/models@^0.6.45":
+  version "0.6.45"
+  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.6.45.tgz#12530306a2507a0489fb07c76b3294b1a84059fe"
+  integrity sha512-0WBTDU5+gcD+tDfpUHN3lGyVEJl+EBO35RS3HSDUtkjfky1Lqu8EoZONRpuue0+lZV7L/vGf3e/o5mK10rQySw==
   dependencies:
     s3-publish "^1.0.9"
 
