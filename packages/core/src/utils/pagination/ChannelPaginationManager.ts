@@ -1,12 +1,11 @@
 import { Channel } from '@mitter-io/models'
-import { ChannelsClient } from '../../services'
 import { Pagination } from './PaginationInterface'
 
 export default class ChannelListPaginationManager implements Pagination<Channel> {
     before: string | undefined
     after: string | undefined
 
-    constructor(public limit: number, private channelsClient: ChannelsClient) {}
+    constructor( private getChannelFn: (before: string | undefined, after: string | undefined) => Promise<Channel[]> ) {}
 
     private updatePageDetails(channelList: Channel[]) {
         if (channelList.length > 0) {
@@ -16,20 +15,18 @@ export default class ChannelListPaginationManager implements Pagination<Channel>
     }
 
     async nextPage(): Promise<Channel[]> {
-        const channelList = await (this.channelsClient.getAllChannels(
+        const channelList = await (this.getChannelFn(
             undefined,
             this.after,
-            this.limit
         ) as Promise<Channel[]>)
         this.updatePageDetails(channelList)
         return channelList
     }
 
     async prevPage(): Promise<Channel[]> {
-        const channelList = await (this.channelsClient.getAllChannels(
+        const channelList = await (this.getChannelFn(
             this.before,
             undefined,
-            this.limit
         ) as Promise<Channel[]>)
         this.updatePageDetails(channelList)
         return channelList

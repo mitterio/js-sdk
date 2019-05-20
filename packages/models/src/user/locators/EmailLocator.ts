@@ -1,13 +1,15 @@
-import { UserLocator } from './UserLocator'
+import {LOCATOR_SERIALIZED_PREFIX, LocatorsType, UserLocator} from "./UserLocator"
 
 export class EmailUserLocator extends UserLocator {
-  public static LOCATOR_SERIALIZED_PREFIX: string = 'email'
 
-  constructor(public email: string, userLocatorId: string) {
-    super(EmailUserLocator.LOCATOR_SERIALIZED_PREFIX, userLocatorId)
-  }
+    constructor(public email: string, userLocatorId?: string) {
+        super(
+            LocatorsType.Email,
+            LOCATOR_SERIALIZED_PREFIX.Email,
+            email,
+            userLocatorId,
 
-  protected serializedLocator(): string {
-    return this.email
-  }
+        )
+
+    }
 }

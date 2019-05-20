@@ -7,9 +7,7 @@ export default class MessagePaginationManager implements Pagination<ChannelRefer
     after: string | undefined
 
     constructor(
-        private channelId: string,
-        public limit: number | undefined,
-        private messageClient: MessagesClient
+        private getMessages: (before: string | undefined, after: string | undefined) => Promise<ChannelReferencingMessage[]>
     ) {}
 
     private updatePageDetails(messageList: ChannelReferencingMessage[]) {
@@ -20,22 +18,18 @@ export default class MessagePaginationManager implements Pagination<ChannelRefer
     }
 
     async nextPage(): Promise<ChannelReferencingMessage[]> {
-        const messageList = await (this.messageClient.getMessages(
-            this.channelId,
+        const messageList = await (this.getMessages(
             undefined,
             this.after,
-            this.limit
         ) as Promise<ChannelReferencingMessage[]>)
         this.updatePageDetails(messageList)
         return messageList
     }
 
     async prevPage(): Promise<ChannelReferencingMessage[]> {
-        const messageList = await (this.messageClient.getMessages(
-            this.channelId,
+        const messageList = await (this.getMessages(
             this.before,
             undefined,
-            this.limit
         ) as Promise<ChannelReferencingMessage[]>)
         this.updatePageDetails(messageList)
         return messageList
