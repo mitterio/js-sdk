@@ -151,7 +151,7 @@ export class Mitter extends MitterBase {
         this.cachedUserAuthorization = authorizationToken
         this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions
         this.announceAuthorizationAvailable()
-        if(disableTokenCaching) {
+        if(!disableTokenCaching) {
             this.kvStore
                 .setItem(Mitter.StoreKey.UserAuthorizationToken, authorizationToken)
                 .catch((err: any) => {

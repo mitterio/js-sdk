@@ -137,6 +137,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                                 '/',
                               (message) => {
                                   console.log('ws message',message)
+                                  this.processMessage(message)
                                   message.ack()
                               },
                               {ack: 'client'}

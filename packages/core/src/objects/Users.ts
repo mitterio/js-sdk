@@ -1,11 +1,8 @@
-import { User, UserLocator } from '@mitter-io/models'
+import { User, UserLocator, AttachedProfile, EntityMetadata, AuditInfo } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { Mitter } from '../Mitter'
 import { ChannelsApi, channelsClientGenerator, UsersApi, usersClientGenerator } from '../services'
 import { MitterObject } from './mitter-objects'
-import {AttachedProfile} from "../../../models/src/entity/EntityProfile";
-import {EntityMetadata} from "../../../models/src/entity/EntityMetadata";
-import {AuditInfo} from "../../../models/src/commons/common-models";
 
 export default class MitterUser extends MitterObject<MitterUser, User> {
     private readonly _userId: string
