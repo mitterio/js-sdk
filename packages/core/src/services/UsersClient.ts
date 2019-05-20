@@ -7,13 +7,15 @@ import {
     User,
     UserLocator,
     AttachedEntityMetadata,
-    EntityMetadata
+    EntityMetadata,
+    QueriableMetadata
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
 import { PlatformImplementedFeatures } from '../models/platformImplementedFeatures'
 import { clientGenerator } from './common'
 import { MitterConstants } from './constants'
+import queryString from 'query-string'
 
 const base = `${MitterConstants.Api.VersionPrefix}/users`
 
@@ -216,16 +218,25 @@ export class UsersClient {
      * @returns {Promise<User[]>} - Returns a promisified list of  users filtered by the locators
      * If no locators are given it will return the entire list
      */
-    getUsers(locators: string[] | undefined = undefined, shouldFetchMetadata: boolean = false, withProfileAttributes?: string): Promise<User[]> {
+    getUsers(locators: string[] | undefined = undefined,
+             shouldFetchMetadata: boolean = false,
+             withProfileAttributes: string | undefined = undefined,
+             metadata: QueriableMetadata | undefined = undefined,
+    ): Promise<User[]> {
         return this.usersAxiosClient
             .get<'/v1/users'>('/v1/users', {
                 params: Object.assign(
                     {},
+                    metadata !== undefined ? { metadata: metadata } : {},
                     locators === undefined ? { sandboxed: false } : {},
                     locators !== undefined ? { locators } : {},
                     { shouldFetchMetadata: shouldFetchMetadata },
                     withProfileAttributes === undefined ? {} : { withProfileAttributes: withProfileAttributes }
-                )
+                ),
+                paramsSerializer: (params) => {
+                    params.metadata = JSON.stringify(metadata)
+                    return queryString.stringify(params, {encode: true})
+                }
             })
             .then(x => x.data)
     }

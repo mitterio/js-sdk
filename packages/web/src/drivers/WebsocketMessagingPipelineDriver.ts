@@ -113,7 +113,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                             WebSocketStandardHeaders.MitterApplicationId
                         ] = this.mitterContext!.applicationId
                     }
-                    debugger
+
                    if(userAuthorization) {
                       headers[
                         WebSocketStandardHeaders.MitterUserAuthorization
@@ -136,7 +136,6 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                             this.activeSocket!!.subscribe(
                                 '/',
                               (message) => {
-                                  console.log('ws message',message)
                                   this.processMessage(message)
                                   message.ack()
                               },

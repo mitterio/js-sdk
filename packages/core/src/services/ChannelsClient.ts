@@ -12,10 +12,12 @@ import {
     AttributeDef,
     EntityProfile,
     AttachedEntityMetadata,
-    EntityMetadata
+    EntityMetadata,
+    QueriableMetadata
 } from '@mitter-io/models'
 import ChannelPaginationManager from '../utils/pagination/ChannelPaginationManager'
 import { MAX_CHANNEL_LIST_LENGTH } from '../constants'
+import queryString from 'query-string'
 
 const base = `${MitterConstants.Api.VersionPrefix}/channels`
 
@@ -248,7 +250,8 @@ export class ChannelsClient {
         after: string | undefined = undefined,
         limit: number = MAX_CHANNEL_LIST_LENGTH,
         shouldFetchMetadata: boolean = false,
-        withProfileAttributes?: string
+        withProfileAttributes: string | undefined = undefined,
+        metadata: QueriableMetadata | undefined = undefined,
     ): Promise<Channel[]> {
         if (limit > MAX_CHANNEL_LIST_LENGTH) {
             limit = MAX_CHANNEL_LIST_LENGTH
@@ -262,7 +265,11 @@ export class ChannelsClient {
                     limit !== undefined ? { limit } : {},
                     {shouldFetchMetadata: shouldFetchMetadata},
                     withProfileAttributes === undefined ? {}: {withProfileAttributes: withProfileAttributes}
-                )
+                ),
+                paramsSerializer: (params) => {
+                    params.metadata = JSON.stringify(metadata)
+                    return queryString.stringify(params, {encode: true})
+                }
             })
             .then(x => x.data)
     }
