@@ -132,7 +132,7 @@ export class Mitter extends MitterBase {
         this.mitterAxiosInterceptor.disable(axiosInstance)
     }
 
-    setUserAuthorization(authorizationToken: string, initMessagingPipelineSubscriptions: Array<string>) {
+    setUserAuthorization(authorizationToken: string, disableTokenCaching: boolean = false, initMessagingPipelineSubscriptions: Array<string>) {
         if (authorizationToken.split('.').length === 3) {
             if (typeof atob !== 'undefined') {
                 this.cachedUserId = JSON.parse(atob(authorizationToken.split('.')[1]))['userId']
@@ -151,11 +151,13 @@ export class Mitter extends MitterBase {
         this.cachedUserAuthorization = authorizationToken
         this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions
         this.announceAuthorizationAvailable()
-        this.kvStore
-            .setItem(Mitter.StoreKey.UserAuthorizationToken, authorizationToken)
-            .catch((err: any) => {
-                throw new Error(`Error storing key ${err}`)
-            })
+        if(disableTokenCaching) {
+            this.kvStore
+                .setItem(Mitter.StoreKey.UserAuthorizationToken, authorizationToken)
+                .catch((err: any) => {
+                    throw new Error(`Error storing key ${err}`)
+                })
+        }
     }
 
     startMessagingPipelineAnonymously(initMessagingPipelineSubscriptions: Array<string>): void {
@@ -168,7 +170,6 @@ export class Mitter extends MitterBase {
     }
 
     getUserAuthorization(): Promise<string | undefined> {
-        debugger
         if (this.cachedUserAuthorization !== undefined) {
             return Promise.resolve(this.cachedUserAuthorization)
         } else {
