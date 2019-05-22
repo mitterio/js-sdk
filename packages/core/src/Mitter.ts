@@ -81,6 +81,7 @@ export class Mitter extends MitterBase {
     private onAuthAvailableSubscribers: (() => void)[] = []
     private onPipelinesInitialized = statefulPromise<void>()
     private initMessagingPipelineSubscriptions: Array<string>
+    private weaverUrl: string
 
     constructor(
         public readonly kvStore: KvStore,
@@ -93,7 +94,7 @@ export class Mitter extends MitterBase {
         private platformImplementedFeatures: PlatformImplementedFeatures
     ) {
         super()
-
+        this.weaverUrl = this.mitterApiBaseUrl
         this.messagingPipelineDriverHost = new MessagingPipelineDriverHost(
             pipelineDrivers,
             this,
@@ -132,7 +133,7 @@ export class Mitter extends MitterBase {
         this.mitterAxiosInterceptor.disable(axiosInstance)
     }
 
-    setUserAuthorization(authorizationToken: string, disableTokenCaching: boolean = false, initMessagingPipelineSubscriptions: Array<string>) {
+    setUserAuthorization(authorizationToken: string, disableTokenCaching: boolean = false, weaverUrl?: string, initMessagingPipelineSubscriptions?: Array<string>) {
         if (authorizationToken.split('.').length === 3) {
             if (typeof atob !== 'undefined') {
                 this.cachedUserId = JSON.parse(atob(authorizationToken.split('.')[1]))['userId']
@@ -149,7 +150,10 @@ export class Mitter extends MitterBase {
         }
 
         this.cachedUserAuthorization = authorizationToken
-        this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions
+        if(weaverUrl) {
+            this.weaverUrl = weaverUrl
+        }
+        this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions || []
         this.announceAuthorizationAvailable()
         if(!disableTokenCaching) {
             this.kvStore
@@ -160,13 +164,20 @@ export class Mitter extends MitterBase {
         }
     }
 
-    startMessagingPipelineAnonymously(initMessagingPipelineSubscriptions: Array<string>): void {
-        this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions
+    startMessagingPipelineAnonymously(weaverUrl?: string, initMessagingPipelineSubscriptions?: Array<string>): void {
+        this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions || []
+        if(weaverUrl) {
+            this.weaverUrl = weaverUrl
+        }
         this.messagingPipelineDriverHost.refresh()
     }
 
     getInitMessagingPipelineSubscriptions(): Array<string> {
         return this.initMessagingPipelineSubscriptions
+    }
+
+    getWeaverUrl(): string {
+        return this.weaverUrl
     }
 
     getUserAuthorization(): Promise<string | undefined> {

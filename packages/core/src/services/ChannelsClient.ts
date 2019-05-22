@@ -18,6 +18,8 @@ import {
 import ChannelPaginationManager from '../utils/pagination/ChannelPaginationManager'
 import { MAX_CHANNEL_LIST_LENGTH } from '../constants'
 import queryString from 'query-string'
+import ParticipatedChannelsPaginationManager
+    from "../utils/pagination/ParticipatedChannelsPaginationManager";
 
 const base = `${MitterConstants.Api.VersionPrefix}/channels`
 
@@ -229,6 +231,7 @@ export class ChannelsClient {
         )
     }
 
+
     /***
      * @param {string | undefined} before - Fetch all channels that were created before
      * this channel id. The returned list is sorted in a descending order (newest first).
@@ -240,10 +243,16 @@ export class ChannelsClient {
      * Please refer to limits for the maximum allowed value on this parameter
      *
      * @param {boolean} shouldFetchMetadata - To fetch the metadata of the channel
+     *
      * @param {string} withProfileAttributes - fetch profile attributes of the channel
+     *
+     * @param {QueriableMetadata | undefined} - he metadata to query for , the shape of the object
+     * can be found in our tsdocs section under @mitter-io/models
+     *
      * @returns {Promise<Channel[]>}  - Returns a Promisified list of channels filtered by the
      * query params
      */
+
 
     public getAllChannels(
         before: string | undefined = undefined,
@@ -260,6 +269,7 @@ export class ChannelsClient {
             .get<'/v1/channels'>('/v1/channels', {
                 params: Object.assign(
                     {},
+                    metadata !== undefined ? { metadata: metadata } : {},
                     after !== undefined ? { after } : {},
                     before !== undefined ? { before } : {},
                     limit !== undefined ? { limit } : {},
@@ -298,14 +308,35 @@ export class ChannelsClient {
      * @returns {Promise<ParticipatedChannel[]>} - Promisified list of channels in which the
      * user is a participant of .
      */
-    public participatedChannels(shouldFetchMetadata: boolean = false,): Promise<ParticipatedChannel[]> {
+    public participatedChannels(
+        before: string | undefined = undefined,
+        after: string | undefined = undefined,
+        limit: number = MAX_CHANNEL_LIST_LENGTH,
+        shouldFetchMetadata: boolean = false
+    ): Promise<ParticipatedChannel[]> {
         return this.channelsAxiosClient
             .get<'/v1/users/me/channels'>('/v1/users/me/channels', {
-                params: {
-                    shouldFetchMetadata: shouldFetchMetadata,
-                }
+                params: Object.assign(
+                    {},
+                    after !== undefined ? { after } : {},
+                    before !== undefined ? { before } : {},
+                    limit !== undefined ? { limit } : {},
+                    {shouldFetchMetadata: shouldFetchMetadata},
+                ),
             })
             .then(x => x.data)
+    }
+
+    public getPaginatedParticipatedChannelsManager(
+        limit: number = MAX_CHANNEL_LIST_LENGTH,
+        shouldFetchMetadata: boolean = false,
+    ): ParticipatedChannelsPaginationManager {
+        if (limit > MAX_CHANNEL_LIST_LENGTH) {
+            limit = MAX_CHANNEL_LIST_LENGTH
+        }
+        return new ParticipatedChannelsPaginationManager(
+            (before: string | undefined, after: string | undefined) => this.participatedChannels(before, after, limit, shouldFetchMetadata)
+        )
     }
 
     /***

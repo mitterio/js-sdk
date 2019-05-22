@@ -215,6 +215,8 @@ export class UsersClient {
      * @param {string[] | undefined} locators - User locators can be email Id or phone no. or both
      * @param {boolean} shouldFetchMetadata - To fetch the metadata of the user
      * @param {string} withProfileAttributes - string query to get the profile attributes of the user
+     * @param {QueriableMetadata | undefined} - he metadata to query for , the shape of the object
+     * can be found in our tsdocs section under @mitter-io/models
      * @returns {Promise<User[]>} - Returns a promisified list of  users filtered by the locators
      * If no locators are given it will return the entire list
      */
