@@ -82,7 +82,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
         } else {
             this.mitterContext.getUserAuthorization().then(userAuthorization => {
                 // dev-box-bom1-a0.internal.mitter.io:7180
-                this.activeSocket = Stomp.over(new WebSocket(`ws://${this.mitterContext!.getWeaverUrl()}`))
+                this.activeSocket = Stomp.over(new WebSocket(`${this.mitterContext!.getWeaverUrl()}`))
                 this.activeSocket.debug = noOp
 
                 let reject: (err: Error | string) => void = noOp
