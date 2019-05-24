@@ -24,7 +24,7 @@ export class NewMessageListManager extends React.Component<NewMessageListManager
     super(props)
   }
 
-  getViewFromProducer(item: ChannelReferencingMessage) {
+  getViewFromProducer = (item: ChannelReferencingMessage) =>  {
     return getViewFromProducer<ChannelReferencingMessage>(this.props.producers,item,this.props.defaultView)
   }
 

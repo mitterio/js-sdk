@@ -38,14 +38,14 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
 
     this.internalList =  React.createRef<List>()
     this.virtualizedListId = 'mitter-virtualized-list' + Date.now()
-    this.fetchTillScrollable = false
+    this.fetchTillScrollable = true
   }
 
-  getRowHeight({index}: { index: number | undefined } = {index: undefined}) {
+  getRowHeight = ({index}: { index: number | undefined } = {index: undefined}) => {
     return 0
   }
 
-  rowRenderer({key, index, parent, style}: { key: string, index: number, parent: MeasuredCellParent, style: CSSProperties }) {
+  rowRenderer = ({key, index, parent, style}: { key: string, index: number, parent: MeasuredCellParent, style: CSSProperties }) =>  {
     let content: ReactNode
     const messages = this.props.messages
 
@@ -74,23 +74,26 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
     )
   }
 
-  onScroll({clientHeight, scrollHeight, scrollTop}: { clientHeight: number, scrollHeight: number, scrollTop: number }): void {
+  onScroll = ({clientHeight, scrollHeight, scrollTop}: { clientHeight: number, scrollHeight: number, scrollTop: number }): void => {
     const messages = this.props.messages
     if(messages && messages.length > 0) {
       if(scrollTop === 0) {
+        console.log('fetching oldermessages from onScroll')
         this.props.fetchOlderMessages(messages[0].messageId)
       }
       if(scrollHeight - scrollTop === clientHeight) {
-        this.props.fetchNewerMessages(messages[messages.length - 1].messageId)
+        console.log('fetching new messages from onScroll')
+        // this.props.fetchNewerMessages(messages[messages.length - 1].messageId)
       }
     }
   }
 
   componentDidMount() {
+    console.log('fetching oldermessages from component did mount')
     this.props.fetchOlderMessages()
   }
 
-  isScrollable= (): boolean  => {
+  isScrollable = (): boolean  => {
     const virtualizedList = document.getElementById(this.virtualizedListId)
     const scrollHeight = virtualizedList!.scrollHeight
     const clientHeight = virtualizedList!.clientHeight
@@ -98,6 +101,12 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
       return true
     }
     return false
+  }
+
+  getScrollHeight = (): number => {
+    const virtualizedList = document.getElementById(this.virtualizedListId)
+    const scrollHeight = virtualizedList!.scrollHeight
+    return scrollHeight
   }
 
   componentDidUpdate(prevProps: NewMessageListProps) {
@@ -111,12 +120,12 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
       if(this.props.messages.length > prevProps.messages.length) {
         if (!this.isScrollable() && this.fetchTillScrollable) {
           const messageList = this.props.messages
+          console.log('fetching oldermessages from component did update')
           this.props.fetchOlderMessages(messageList[0].messageId)
         }
+        this.internalList.current!.scrollToPosition(this.getScrollHeight()) // scrolling to bottom
       }
-
     }
-    this.internalList.current!.scrollToRow(this.props.messages.length -1)
   }
 
   render() {
