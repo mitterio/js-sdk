@@ -7,6 +7,7 @@ import {
   MeasuredCellParent
 } from 'react-virtualized/dist/es/CellMeasurer'
 import debounce from 'lodash/debounce'
+import ScrollHelper from "./ScrollHelper";
 
 type NewMessageListProps = {
   messages: ChannelReferencingMessage[]
@@ -20,6 +21,7 @@ type NewMessageListProps = {
 type NewMessageListState = {
   scrollAlignment: 'start' | 'end' | 'center'
   showScrollHelper: boolean
+  unreadCount: number
 }
 
 type IndexRangeMonitor = {
@@ -45,7 +47,8 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
     })
     this.state = {
       scrollAlignment:  'end',
-      showScrollHelper: false
+      showScrollHelper: false,
+      unreadCount:  0
     }
 
     this.internalList =  React.createRef<List>()
@@ -150,6 +153,9 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
           this.props.fetchOlderMessages(messageList[0].messageId)
         }
         this.scrollToPosition(this.props.messages, prevProps.messages)
+        if(this.state.showScrollHelper){
+          this.setState({unreadCount: this.props.messages.length - prevProps.messages.length})
+        }
 
       }
     }
@@ -167,13 +173,17 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
     }
   }
 
+  onScrollHelperClick  = () => {
+    this.internalList.current!.scrollToPosition(this.getScrollHeight()) // scrolling to bottom
+  }
+
   showScrollHelper = () => {
     const totalMessages =  this.props.messages.length
-    if(this.indexRangeMonitor.stopIndex < totalMessages - 5) {
+    if(this.indexRangeMonitor.stopIndex < totalMessages - 3 && !this.state.showScrollHelper) {
       this.setState({showScrollHelper: true})
     }
-    else {
-      this.setState({showScrollHelper: false})
+    else if(this.indexRangeMonitor.stopIndex >= totalMessages - this.state.unreadCount && this.state.showScrollHelper) {
+      this.setState({showScrollHelper: false, unreadCount: 0})
     }
   }
 
@@ -191,6 +201,10 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
             <React.Fragment/>
 
         }
+        {
+          this.state.showScrollHelper &&
+            <ScrollHelper unreadCount={this.state.unreadCount} onScrollHelperClick={this.onScrollHelperClick}/>
+        }
         <AutoSizer
         >
           {({height, width}) => {
@@ -202,13 +216,17 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
                 ref={this.internalList}
                 onRowsRendered={(
                   { overscanStartIndex, overscanStopIndex, startIndex, stopIndex}) => {
-                  onRowsRendered({startIndex, stopIndex})
-                  this.monitorIndexRange({startIndex, stopIndex})
                   console.log('overscanStartIndex',overscanStartIndex)
                   console.log('overscanStopIndex',overscanStopIndex)
                   console.log('startIndex',startIndex)
                   console.log('stopIndex',stopIndex)
                   console.log('-------------------------')
+                  this.indexRangeMonitor = {
+                    overscanStartIndex: overscanStartIndex,
+                    overscanStopIndex: overscanStopIndex,
+                    startIndex: startIndex,
+                    stopIndex: stopIndex
+                  }
                 }
                 }
                 rowCount={this.props.messages.length}
