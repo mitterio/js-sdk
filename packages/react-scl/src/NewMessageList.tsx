@@ -19,6 +19,14 @@ type NewMessageListProps = {
 
 type NewMessageListState = {
   scrollAlignment: 'start' | 'end' | 'center'
+  showScrollHelper: boolean
+}
+
+type IndexRangeMonitor = {
+  overscanStartIndex: number
+  overscanStopIndex: number
+  startIndex: number
+  stopIndex: number
 }
 
 export class NewMessageList extends React.Component<NewMessageListProps, NewMessageListState> {
@@ -27,6 +35,7 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
   private virtualizedListId: string
   private fetchTillScrollable: boolean
   private debouncedFetchNewerMessages: () => void
+  private indexRangeMonitor: IndexRangeMonitor
 
     constructor(props: NewMessageListProps) {
     super(props)
@@ -35,13 +44,20 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
       minHeight: this.getRowHeight()
     })
     this.state = {
-      scrollAlignment:  'end'
+      scrollAlignment:  'end',
+      showScrollHelper: false
     }
 
     this.internalList =  React.createRef<List>()
     this.virtualizedListId = 'mitter-virtualized-list' + Date.now()
     this.fetchTillScrollable = true
     this.debouncedFetchNewerMessages = debounce(this.fetchNewerMessages, 2000)
+      this.indexRangeMonitor = {
+        overscanStartIndex: 0,
+        overscanStopIndex: 0,
+        startIndex: 0,
+        stopIndex: 0
+      }
   }
 
   getRowHeight = ({index}: { index: number | undefined } = {index: undefined}) => {
@@ -89,6 +105,7 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
         this.debouncedFetchNewerMessages()
       }
     }
+    this.showScrollHelper()
   }
 
   fetchNewerMessages = () => {
@@ -117,6 +134,7 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
     return scrollHeight
   }
 
+
   componentDidUpdate(prevProps: NewMessageListProps) {
     // add checks for loading
     if(prevProps.messages && this.props.messages) {
@@ -131,8 +149,31 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
           console.log('fetching oldermessages from component did update')
           this.props.fetchOlderMessages(messageList[0].messageId)
         }
-        this.internalList.current!.scrollToPosition(this.getScrollHeight()) // scrolling to bottom
+        this.scrollToPosition(this.props.messages, prevProps.messages)
+
       }
+    }
+  }
+
+  scrollToPosition = (currMessageList: ChannelReferencingMessage[], prevMessageList: ChannelReferencingMessage[]) => {
+    if(this.fetchTillScrollable ||
+      (currMessageList[currMessageList.length -1 ].messageId !== prevMessageList[prevMessageList.length -1 ].messageId)
+    ) {
+      this.internalList.current!.scrollToPosition(this.getScrollHeight()) // scrolling to bottom
+    }
+    else if(currMessageList[0].messageId !== prevMessageList[0].messageId) {
+      const scrollToRow = currMessageList.length - prevMessageList.length
+      this.internalList.current!.scrollToRow(scrollToRow)
+    }
+  }
+
+  showScrollHelper = () => {
+    const totalMessages =  this.props.messages.length
+    if(this.indexRangeMonitor.stopIndex < totalMessages - 5) {
+      this.setState({showScrollHelper: true})
+    }
+    else {
+      this.setState({showScrollHelper: false})
     }
   }
 
@@ -159,6 +200,17 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
                 id={this.virtualizedListId}
                 height={height}
                 ref={this.internalList}
+                onRowsRendered={(
+                  { overscanStartIndex, overscanStopIndex, startIndex, stopIndex}) => {
+                  onRowsRendered({startIndex, stopIndex})
+                  this.monitorIndexRange({startIndex, stopIndex})
+                  console.log('overscanStartIndex',overscanStartIndex)
+                  console.log('overscanStopIndex',overscanStopIndex)
+                  console.log('startIndex',startIndex)
+                  console.log('stopIndex',stopIndex)
+                  console.log('-------------------------')
+                }
+                }
                 rowCount={this.props.messages.length}
                 rowHeight={this.cache.rowHeight}
                 rowRenderer={this.rowRenderer}
