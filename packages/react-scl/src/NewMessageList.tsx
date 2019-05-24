@@ -6,6 +6,7 @@ import {
   CellMeasurerCache,
   MeasuredCellParent
 } from 'react-virtualized/dist/es/CellMeasurer'
+import debounce from 'lodash/debounce'
 
 type NewMessageListProps = {
   messages: ChannelReferencingMessage[]
@@ -25,8 +26,9 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
   private internalList: RefObject<List>
   private virtualizedListId: string
   private fetchTillScrollable: boolean
+  private debouncedFetchNewerMessages: () => void
 
-  constructor(props: NewMessageListProps) {
+    constructor(props: NewMessageListProps) {
     super(props)
     this.cache = new CellMeasurerCache({
       fixedWidth: true,
@@ -39,6 +41,7 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
     this.internalList =  React.createRef<List>()
     this.virtualizedListId = 'mitter-virtualized-list' + Date.now()
     this.fetchTillScrollable = true
+    this.debouncedFetchNewerMessages = debounce(this.fetchNewerMessages, 2000)
   }
 
   getRowHeight = ({index}: { index: number | undefined } = {index: undefined}) => {
@@ -83,9 +86,14 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
       }
       if(scrollHeight - scrollTop === clientHeight) {
         console.log('fetching new messages from onScroll')
-        // this.props.fetchNewerMessages(messages[messages.length - 1].messageId)
+        this.debouncedFetchNewerMessages()
       }
     }
+  }
+
+  fetchNewerMessages = () => {
+    const messages = this.props.messages
+    this.props.fetchNewerMessages(messages[messages.length - 1].messageId)
   }
 
   componentDidMount() {
