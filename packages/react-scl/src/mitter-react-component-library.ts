@@ -4,3 +4,5 @@
 export * from './ViewProducers/channelViewProducer'
 export * from './ViewProducers/messageViewProducer'
 export * from './MessageListManager'
+export * from './NewMessageList'
+export * from './NewMessageListManager'
