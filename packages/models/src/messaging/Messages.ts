@@ -32,7 +32,7 @@ export class MessageDatum {
     }
 }
 
-export class Message implements IdentifiableEntity<Message>, MetadataAttachable {
+export class Message implements MetadataAttachable {
     constructor(
         public senderId: Identifier | string,
         public textPayload: string,
@@ -47,17 +47,13 @@ export class Message implements IdentifiableEntity<Message>, MetadataAttachable 
         public sender?: User
     ) {
     }
-
-    identifier() {
-        return this.messageId!
-    }
 }
 
 type RequiredMessageParams = 'senderId' | 'textPayload' | 'timelineEvents'
 export type RequestMessage = PickedPartial<Message, RequiredMessageParams>
 
 
-export class ChannelReferencingMessage implements IdentifiableEntity<Message>, MetadataAttachable {
+export class ChannelReferencingMessage implements MetadataAttachable {
     constructor(
         public channelId: string,
         public messageId: string,
@@ -71,9 +67,5 @@ export class ChannelReferencingMessage implements IdentifiableEntity<Message>, M
         public auditInfo?: AuditInfo,
         public sender?: User
     ) {
-    }
-
-    identifier() {
-        return this.messageId
     }
 }

@@ -8,6 +8,7 @@ import {
 } from 'react-virtualized/dist/es/CellMeasurer'
 import ScrollHelper from "./ScrollHelper";
 import uniqBy from 'lodash/uniqBy'
+import differenceBy from 'lodash/differenceBy'
 
 type NewMessageListProps = {
   initialMessages: ChannelReferencingMessage[]
@@ -35,12 +36,12 @@ type IndexRangeMonitor = {
 
 export class NewMessageList extends React.Component<NewMessageListProps, NewMessageListState> {
 
-  onNewMessagePayload = (message: ChannelReferencingMessage) => {
+  onNewMessagePayload = (messages: ChannelReferencingMessage[]) => {
     const clonedMessageList = this.getMessageListClone()
-    clonedMessageList.push(message)
-    const dedupedMessageList  = this.getDedupedMessageList(clonedMessageList)
+    const uniqueMessages = differenceBy(messages, clonedMessageList, 'messageId')
+    clonedMessageList.push(...uniqueMessages)
     this.setState({
-      messages: dedupedMessageList
+      messages: clonedMessageList
     }, () => {
       this.internalList.current!.scrollToPosition(this.getScrollHeight())
     })
@@ -234,9 +235,12 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
   }
 
   componentDidMount() {
-
+    let before = undefined
+    if(this.props.initialMessages.length > 0) {
+      before =  this.props.initialMessages[this.props.initialMessages.length -1].messageId
+    }
     console.log('fetching older messages from component did mount')
-    this.fetchOlderMessages()
+    this.fetchOlderMessages(before )
   }
 
   componentDidUpdate(prevProps: NewMessageListProps, prevState: NewMessageListState) {

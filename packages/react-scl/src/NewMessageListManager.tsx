@@ -11,11 +11,10 @@ type NewMessageListManagerProps = {
   messages: ChannelReferencingMessage[]
   producers: Producer<ChannelReferencingMessage>[]
   defaultView: (item: ChannelReferencingMessage) => ReactElement<any>
-  fetchNewerMessages: (after?: string) => Promise<ChannelReferencingMessage[]>
-  fetchOlderMessages: (before?: string) => Promise<ChannelReferencingMessage[]>
+  fetchNewerMessages: (channelId: string, after?: string) => Promise<ChannelReferencingMessage[]>
+  fetchOlderMessages: (channelId: string, before?: string) => Promise<ChannelReferencingMessage[]>
   loader: ReactElement<any>
-  isFetching: boolean
-  mitter: Mitter
+  mitter?: Mitter
   channelId: string
   newMessagePayloadHook?: (message: ChannelReferencingMessage) => ChannelReferencingMessage
 }
@@ -38,25 +37,31 @@ export class NewMessageListManager extends React.Component<NewMessageListManager
     this.newMessageListRef = React.createRef<NewMessageList>()
   }
 
+  newMessagesReceived = (message: ChannelReferencingMessage[]) => {
+    this.newMessageListRef.current!.onNewMessagePayload(message)
+  }
+
   componentDidMount() {
-    this.props.mitter.subscribeToPayload((payload) => {
-      if (isNewMessagePayload(payload) && payload.channelId.identifier === this.props.channelId) {
-        Promise.resolve(payload.message)
-          .then(message => {
-            const channelReferencingMessage = getChannelReferencingMessage(payload.channelId.identifier, payload.message)
-            if (this.props.newMessagePayloadHook) {
-              return this.props.newMessagePayloadHook(channelReferencingMessage)
-            }
-            return channelReferencingMessage
-          })
-          .then(message => {
-            this.newMessageListRef.current!.onNewMessagePayload(message)
-          })
-          .catch(ex => {
-            console.log('error in listeniong to new messages')
-          })
-      }
-    })
+    if(this.props.mitter) {
+      this.props.mitter.subscribeToPayload((payload) => {
+        if (isNewMessagePayload(payload) && payload.channelId.identifier === this.props.channelId) {
+          Promise.resolve(payload.message)
+            .then(message => {
+              const channelReferencingMessage = getChannelReferencingMessage(payload.channelId.identifier, payload.message)
+              if (this.props.newMessagePayloadHook) {
+                return this.props.newMessagePayloadHook(channelReferencingMessage)
+              }
+              return channelReferencingMessage
+            })
+            .then(message => {
+              this.newMessageListRef.current!.onNewMessagePayload([message])
+            })
+            .catch(ex => {
+              console.log('error in listeniong to new messages')
+            })
+        }
+      })
+    }
   }
 
   componentDidUpdate(prevProps: NewMessageListManagerProps) {
@@ -74,6 +79,14 @@ export class NewMessageListManager extends React.Component<NewMessageListManager
     })
   }
 
+  fetchNewerMessages = (after?: string) => {
+    return this.props.fetchNewerMessages(this.props.channelId, after)
+  }
+
+  fetchOlderMessages = (before?: string) => {
+    return this.props.fetchOlderMessages(this.props.channelId, before)
+  }
+
   render() {
     if(this.state.refreshing) {
       return <div>Refreshing Channel</div>
@@ -84,8 +97,8 @@ export class NewMessageListManager extends React.Component<NewMessageListManager
         ref={this.newMessageListRef}
         initialMessages={this.props.messages}
         getViewFromProducer={this.getViewFromProducer}
-        fetchNewerMessages={this.props.fetchNewerMessages}
-        fetchOlderMessages={this.props.fetchOlderMessages}
+        fetchNewerMessages={this.fetchNewerMessages}
+        fetchOlderMessages={this.fetchOlderMessages}
         loader={this.props.loader}
       />
     )
