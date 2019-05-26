@@ -279,25 +279,18 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
       }*/
     }
   }
+/* {
+          this.state.showScrollHelper &&
+          <ScrollHelper unreadCount={this.state.unreadCount}
+                        onScrollHelperClick={this.onScrollHelperClick}/>
+        }*/
 
   render() {
     return (
       <React.Fragment>
         {
-          this.state.isFetching ?
-            (
-              <div style={{position: 'absolute', top: 100, left: 500}}>
-                {this.props.loader}
-              </div>
-            )
-            :
-            <React.Fragment/>
+          this.state.isFetching  && this.props.loader
 
-        }
-        {
-          this.state.showScrollHelper &&
-          <ScrollHelper unreadCount={this.state.unreadCount}
-                        onScrollHelperClick={this.onScrollHelperClick}/>
         }
         <AutoSizer
         >
