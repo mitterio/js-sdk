@@ -1,5 +1,5 @@
 import React, {CSSProperties, ReactElement, ReactNode, RefObject} from 'react'
-import {ChannelReferencingMessage} from "../../models";
+import {ChannelReferencingMessage} from "@mitter-io/models";
 import {AutoSizer, List} from 'react-virtualized'
 import {
   CellMeasurer,
@@ -40,10 +40,12 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
     const clonedMessageList = this.getMessageListClone()
     const uniqueMessages = differenceBy(messages, clonedMessageList, 'messageId')
     clonedMessageList.push(...uniqueMessages)
+    const scrollToRow = clonedMessageList.length
     this.setState({
       messages: clonedMessageList
     }, () => {
-      this.internalList.current!.scrollToPosition(this.getScrollHeight())
+      this.internalList.current!.scrollToRow(scrollToRow)
+      // this.internalList.current!.scrollToPosition(this.getScrollHeight())
     })
   }
 
@@ -132,8 +134,9 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
                 this.fetchOlderMessages()
               }
               else if (this.state.inMountingState && !this.fetchTillScrollable) {
-                debugger
-                this.internalList.current!.scrollToPosition(this.getScrollHeight())
+                // this.internalList.current!.measureAllRows()
+                // this.internalList.current!.scrollToPosition((this.internalList.current!.Grid! as any).getTotalRowsHeight())
+                this.internalList.current!.scrollToRow(scrollToRow)
                 setTimeout(() => this.setState({inMountingState: false}), 500)
 
               }
@@ -211,7 +214,10 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
     super(props)
     this.cache = new CellMeasurerCache({
       fixedWidth: true,
-      minHeight: this.getRowHeight()
+      fixedHeight: false,
+      defaultHeight: 140,
+      minHeight: 140,
+      keyMapper: (rowIndex: number, columnIndex: number) => this.state.messages[rowIndex].messageId
     })
 
     this.state = {
