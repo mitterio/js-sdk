@@ -8,14 +8,16 @@ import {getChannelReferencingMessage} from "./utils";
 
 
 type NewMessageListManagerProps = {
+  channelId: string
   messages: ChannelReferencingMessage[]
   producers: Producer<ChannelReferencingMessage>[]
   defaultView: (item: ChannelReferencingMessage) => ReactElement<any>
   fetchNewerMessages: (channelId: string, after?: string) => Promise<ChannelReferencingMessage[]>
   fetchOlderMessages: (channelId: string, before?: string) => Promise<ChannelReferencingMessage[]>
+  minRowHeight: number
+  fixedHeight?: boolean
   loader: ReactElement<any>
   mitter?: Mitter
-  channelId: string
   newMessagePayloadHook?: (message: ChannelReferencingMessage) => ChannelReferencingMessage
 }
 
@@ -65,7 +67,7 @@ export class NewMessageListManager extends React.Component<NewMessageListManager
   }
 
   componentDidUpdate(prevProps: NewMessageListManagerProps) {
-    if(this.props.channelId !== prevProps.channelId) {
+    if(this.props.channelId !== prevProps.channelId && prevProps.channelId !== undefined) {
       this.refresh()
     }
   }
@@ -73,8 +75,10 @@ export class NewMessageListManager extends React.Component<NewMessageListManager
   refresh = () => {
     this.setState({refreshing: true})
     new Promise((resolve, reject) => {
-      setTimeout(() => resolve(), 100)
+      setTimeout(() => resolve(), 500)
     }).then(() => {
+      console.log('refreshing over')
+      this.newMessageListRef = React.createRef<NewMessageList>()
       this.setState({refreshing: false})
     })
   }
@@ -96,10 +100,12 @@ export class NewMessageListManager extends React.Component<NewMessageListManager
       <NewMessageList
         ref={this.newMessageListRef}
         initialMessages={this.props.messages}
+        minRowHeight={this.props.minRowHeight}
         getViewFromProducer={this.getViewFromProducer}
         fetchNewerMessages={this.fetchNewerMessages}
         fetchOlderMessages={this.fetchOlderMessages}
         loader={this.props.loader}
+        fixedHeight={!!this.props.fixedHeight}
       />
     )
   }

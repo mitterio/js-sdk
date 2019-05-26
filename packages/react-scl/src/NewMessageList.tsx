@@ -15,6 +15,8 @@ type NewMessageListProps = {
   getViewFromProducer: (item: ChannelReferencingMessage) => ReactElement<any>
   fetchNewerMessages: (after?: string) => Promise<ChannelReferencingMessage[]>
   fetchOlderMessages: (before?: string) => Promise<ChannelReferencingMessage[]>
+  minRowHeight: number
+  fixedHeight: boolean
   loader: ReactElement<any>
 }
 
@@ -92,6 +94,8 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
 
   onScroll = ({clientHeight, scrollHeight, scrollTop}: { clientHeight: number, scrollHeight: number, scrollTop: number }): void => {
     const messages = this.state.messages
+    if(!this.hasComponentMounted)
+      return
     if (messages && messages.length > 0) {
       if (scrollTop === 0) {
         console.log('fetching oldermessages from onScroll')
@@ -136,7 +140,7 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
               else if (this.state.inMountingState && !this.fetchTillScrollable) {
                 // this.internalList.current!.measureAllRows()
                 // this.internalList.current!.scrollToPosition((this.internalList.current!.Grid! as any).getTotalRowsHeight())
-                this.internalList.current!.scrollToRow(scrollToRow)
+                this.internalList.current!.scrollToRow(this.state.messages.length)
                 setTimeout(() => this.setState({inMountingState: false}), 500)
 
               }
@@ -209,14 +213,14 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
   private virtualizedListId: string
   private fetchTillScrollable: boolean
   private indexRangeMonitor: IndexRangeMonitor
+  private hasComponentMounted: boolean
 
   constructor(props: NewMessageListProps) {
     super(props)
     this.cache = new CellMeasurerCache({
       fixedWidth: true,
-      fixedHeight: false,
-      defaultHeight: 140,
-      minHeight: 140,
+      fixedHeight: this.props.fixedHeight,
+      minHeight: this.props.minRowHeight,
       keyMapper: (rowIndex: number, columnIndex: number) => this.state.messages[rowIndex].messageId
     })
 
@@ -229,6 +233,7 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
       inMountingState: true
     }
 
+    this.hasComponentMounted = false
     this.internalList = React.createRef<List>()
     this.virtualizedListId = 'mitter-virtualized-list' + Date.now()
     this.fetchTillScrollable = true
@@ -243,10 +248,11 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
   componentDidMount() {
     let before = undefined
     if(this.props.initialMessages.length > 0) {
-      before =  this.props.initialMessages[this.props.initialMessages.length -1].messageId
+      before =  this.props.initialMessages[0].messageId
     }
     console.log('fetching older messages from component did mount')
     this.fetchOlderMessages(before )
+    this.hasComponentMounted = true
   }
 
   componentDidUpdate(prevProps: NewMessageListProps, prevState: NewMessageListState) {
