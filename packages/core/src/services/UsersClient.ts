@@ -8,7 +8,7 @@ import {
     UserLocator,
     AttachedEntityMetadata,
     EntityMetadata,
-    QueriableMetadata
+    QueriableMetadata, ImpressedPresence
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -280,15 +280,15 @@ export class UsersClient {
 
     /***
      *
-     * @param {string} userId - The  unique identifier  of the user
+     * @param {string} userIds - Comma Separated User Ids for whom the presence should be fetched
      *
-     * @returns {Promise<Presence>} - Returns a user presence object. The shape of the user
+     * @returns {Promise<Presence>} - Returns a impressed presence object. The shape of the impressed
      * presence object can be found in our tsdocs section  under @mitter-io/models.
      * More details on user presence can be found in our docs under the Users section
      */
-    getUserPresence(userId: string): Promise<Presence> {
+    getUserPresence(userIds: string): Promise<ImpressedPresence> {
         return this.usersAxiosClient
-            .get<'/v1/users/:userId/presence'>(`/v1/users/${userId}/presence`)
+            .get<'/v1/users/:userId/presence'>(`/v1/users/${userIds}/presence`)
             .then(x => x.data)
     }
 

@@ -9,3 +9,7 @@ export enum StandardUserPresenceTypeNames {
 export class Presence {
   constructor(public type: string, public timeToLive: number, public expiresTo?: Presence) {}
 }
+
+export class ImpressedPresence {
+    constructor(presence: Presence, setTimeMs: number) {}
+}

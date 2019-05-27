@@ -6,11 +6,10 @@ import {
   CellMeasurerCache,
   MeasuredCellParent
 } from 'react-virtualized/dist/es/CellMeasurer'
-import ScrollHelper from "./ScrollHelper";
 import uniqBy from 'lodash/uniqBy'
 import differenceBy from 'lodash/differenceBy'
 
-type NewMessageListProps = {
+type MessageWindowProps = {
   initialMessages: ChannelReferencingMessage[]
   getViewFromProducer: (item: ChannelReferencingMessage) => ReactElement<any>
   fetchNewerMessages: (after?: string) => Promise<ChannelReferencingMessage[]>
@@ -20,7 +19,7 @@ type NewMessageListProps = {
   loader: ReactElement<any>
 }
 
-type NewMessageListState = {
+type MessageWindowState = {
   scrollAlignment: 'start' | 'end' | 'center'
   showScrollHelper: boolean
   unreadCount: number
@@ -36,7 +35,7 @@ type IndexRangeMonitor = {
   stopIndex: number
 }
 
-export class NewMessageList extends React.Component<NewMessageListProps, NewMessageListState> {
+export default class MessageWindow extends React.Component<MessageWindowProps, MessageWindowState> {
 
   onNewMessagePayload = (messages: ChannelReferencingMessage[]) => {
     const clonedMessageList = this.getMessageListClone()
@@ -94,16 +93,16 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
 
   onScroll = ({clientHeight, scrollHeight, scrollTop}: { clientHeight: number, scrollHeight: number, scrollTop: number }): void => {
     const messages = this.state.messages
-    if(!this.hasComponentMounted)
+    if (!this.hasComponentMounted)
       return
     if (messages && messages.length > 0) {
       if (scrollTop === 0) {
-        console.log('fetching oldermessages from onScroll')
+
         const firstMessage = messages[0].messageId!
         this.fetchOlderMessages(firstMessage)
       }
       if (scrollHeight - scrollTop === clientHeight) {
-        console.log('firing new message fetch')
+
         const lastMessage = messages[messages.length - 1].messageId!
         this.fetchNewerMessages(lastMessage)
       }
@@ -113,14 +112,14 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
 
   /** CHANGE TO PROMISIFIED SET STATE*/
   fetchOlderMessages = (messageId?: string) => {
-    debugger
+
     if (!this.state.isFetching) {
       this.setState({isFetching: true}, () =>
         this.props.fetchOlderMessages(messageId)
           .then((messages: ChannelReferencingMessage[]) => {
 
             if (messages.length === 0) {
-              console.log('setting flag to false in fetch older messages')
+
               this.fetchTillScrollable = false
             }
 
@@ -145,7 +144,7 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
 
               }
               else {
-                debugger
+
                 this.internalList.current!.scrollToRow(scrollToRow)
               }
             })
@@ -156,8 +155,8 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
 
   fetchNewerMessages = (messageId?: string) => {
     if (!this.state.isFetching && !this.state.inMountingState) {
-      debugger
-      console.log('calling new message fetch')
+
+
       this.setState({isFetching: true}, () =>
         this.props.fetchNewerMessages(messageId)
           .then((messages: ChannelReferencingMessage[]) => {
@@ -169,8 +168,8 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
               messages: dedupedMessageList,
               isFetching: false
             }, () => {
-              if(messages.length > 0)
-              this.internalList.current!.scrollToRow(scrollToRow)
+              if (messages.length > 0)
+                this.internalList.current!.scrollToRow(scrollToRow)
             })
           })
       )
@@ -215,7 +214,7 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
   private indexRangeMonitor: IndexRangeMonitor
   private hasComponentMounted: boolean
 
-  constructor(props: NewMessageListProps) {
+  constructor(props: MessageWindowProps) {
     super(props)
     this.cache = new CellMeasurerCache({
       fixedWidth: true,
@@ -247,17 +246,17 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
 
   componentDidMount() {
     let before = undefined
-    if(this.props.initialMessages.length > 0) {
-      before =  this.props.initialMessages[0].messageId
+    if (this.props.initialMessages.length > 0) {
+      before = this.props.initialMessages[0].messageId
     }
-    console.log('fetching older messages from component did mount')
-    this.fetchOlderMessages(before )
+
+    this.fetchOlderMessages(before)
     this.hasComponentMounted = true
   }
 
-  componentDidUpdate(prevProps: NewMessageListProps, prevState: NewMessageListState) {
+  componentDidUpdate(prevProps: MessageWindowProps, prevState: MessageWindowState) {
     // add checks for loading
-    if (prevState.messages && this.state.messages) {
+    // if (prevState.messages && this.state.messages) {
 
       /*if(this.props.messages.length === prevProps.messages.length) {
         this.fetchTillScrollable = false
@@ -266,7 +265,7 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
       /*if (this.state.messages.length > prevState.messages.length) {
         if (!this.isScrollable() && this.fetchTillScrollable) {
           const messageList = this.state.messages
-          console.log('fetching oldermessages from component did update')
+
           this.fetchOlderMessages(messageList[0].messageId)
         }
 
@@ -277,19 +276,20 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
         }
 
       }*/
-    }
+    // }
   }
-/* {
-          this.state.showScrollHelper &&
-          <ScrollHelper unreadCount={this.state.unreadCount}
-                        onScrollHelperClick={this.onScrollHelperClick}/>
-        }*/
+
+  /* {
+            this.state.showScrollHelper &&
+            <ScrollHelper unreadCount={this.state.unreadCount}
+                          onScrollHelperClick={this.onScrollHelperClick}/>
+          }*/
 
   render() {
     return (
       <React.Fragment>
         {
-          this.state.isFetching  && this.props.loader
+          this.state.isFetching && this.props.loader
 
         }
         <AutoSizer
@@ -303,11 +303,6 @@ export class NewMessageList extends React.Component<NewMessageListProps, NewMess
                 ref={this.internalList}
                 onRowsRendered={(
                   {overscanStartIndex, overscanStopIndex, startIndex, stopIndex}) => {
-                  console.log('overscanStartIndex', overscanStartIndex)
-                  console.log('overscanStopIndex', overscanStopIndex)
-                  console.log('startIndex', startIndex)
-                  console.log('stopIndex', stopIndex)
-                  console.log('-------------------------')
                   this.indexRangeMonitor = {
                     overscanStartIndex: overscanStartIndex,
                     overscanStopIndex: overscanStopIndex,

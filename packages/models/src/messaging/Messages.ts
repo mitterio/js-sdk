@@ -6,6 +6,7 @@ import IdentifiableEntity from '../annotations/IdentifiableEntity'
 import {AppliedAclList} from '../acolyte/AppliedAclList'
 import {Identifier} from '../annotations/Identifier'
 import {PickedPartial} from '../utils/PickedPartial'
+import {Channel} from "./Channels";
 
 export enum StandardPayloadTypeNames {
     TextMessage = 'mitter.mt.Text',
@@ -44,7 +45,8 @@ export class Message implements MetadataAttachable {
         public messageType: StandardMessageType = StandardMessageType.Standard,
         public entityMetadata: EntityMetadata = {},
         public auditInfo?: AuditInfo,
-        public sender?: User
+        public sender?: User,
+        public channel?: Channel
     ) {
     }
 }
@@ -65,7 +67,8 @@ export class ChannelReferencingMessage implements MetadataAttachable {
         public timelineEvents: Array<TimelineEvent>,
         public entityMetadata: EntityMetadata,
         public auditInfo?: AuditInfo,
-        public sender?: User
+        public sender?: User,
+        public channel?: Channel
     ) {
     }
 }

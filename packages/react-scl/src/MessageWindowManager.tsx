@@ -2,12 +2,12 @@ import React, {ReactElement, RefObject} from 'react'
 import {ChannelReferencingMessage} from "@mitter-io/models";
 import {Producer} from './Producer/Producer'
 import {getViewFromProducer} from "./ViewProducers/utils";
-import {NewMessageList} from "./NewMessageList";
+import MessageWindow from "./MessageWindow";
 import {isNewMessagePayload, Mitter} from "@mitter-io/core";
 import {getChannelReferencingMessage} from "./utils";
 
 
-type NewMessageListManagerProps = {
+type MessageWindowManagerProps = {
   channelId: string
   messages: ChannelReferencingMessage[]
   producers: Producer<ChannelReferencingMessage>[]
@@ -21,55 +21,17 @@ type NewMessageListManagerProps = {
   newMessagePayloadHook?: (message: ChannelReferencingMessage) => ChannelReferencingMessage
 }
 
-type NewMessageListManagerState = {
+type MessageWindowManagerState = {
   refreshing: boolean
 }
 
-export class NewMessageListManager extends React.Component<NewMessageListManagerProps, NewMessageListManagerState> {
+export class MessageWindowManager extends React.Component<MessageWindowManagerProps, MessageWindowManagerState> {
   getViewFromProducer = (item: ChannelReferencingMessage) => {
     return getViewFromProducer<ChannelReferencingMessage>(this.props.producers, item, this.props.defaultView)
   }
-  private newMessageListRef: RefObject<NewMessageList>
-
-  constructor(props: NewMessageListManagerProps) {
-    super(props)
-    this.state = {
-      refreshing: false
-    }
-    this.newMessageListRef = React.createRef<NewMessageList>()
-  }
 
   newMessagesReceived = (message: ChannelReferencingMessage[]) => {
-    this.newMessageListRef.current!.onNewMessagePayload(message)
-  }
-
-  componentDidMount() {
-    if(this.props.mitter) {
-      this.props.mitter.subscribeToPayload((payload) => {
-        if (isNewMessagePayload(payload) && payload.channelId.identifier === this.props.channelId) {
-          Promise.resolve(payload.message)
-            .then(message => {
-              const channelReferencingMessage = getChannelReferencingMessage(payload.channelId.identifier, payload.message)
-              if (this.props.newMessagePayloadHook) {
-                return this.props.newMessagePayloadHook(channelReferencingMessage)
-              }
-              return channelReferencingMessage
-            })
-            .then(message => {
-              this.newMessageListRef.current!.onNewMessagePayload([message])
-            })
-            .catch(ex => {
-              console.log('error in listeniong to new messages')
-            })
-        }
-      })
-    }
-  }
-
-  componentDidUpdate(prevProps: NewMessageListManagerProps) {
-    if(this.props.channelId !== prevProps.channelId && prevProps.channelId !== undefined) {
-      this.refresh()
-    }
+    this.messageWindowRef.current!.onNewMessagePayload(message)
   }
 
   refresh = () => {
@@ -77,8 +39,8 @@ export class NewMessageListManager extends React.Component<NewMessageListManager
     new Promise((resolve, reject) => {
       setTimeout(() => resolve(), 500)
     }).then(() => {
-      console.log('refreshing over')
-      this.newMessageListRef = React.createRef<NewMessageList>()
+
+      this.messageWindowRef = React.createRef<MessageWindow>()
       this.setState({refreshing: false})
     })
   }
@@ -91,14 +53,53 @@ export class NewMessageListManager extends React.Component<NewMessageListManager
     return this.props.fetchOlderMessages(this.props.channelId, before)
   }
 
+  private messageWindowRef: RefObject<MessageWindow>
+
+  constructor(props: MessageWindowManagerProps) {
+    super(props)
+    this.state = {
+      refreshing: false
+    }
+    this.messageWindowRef = React.createRef<MessageWindow>()
+  }
+
+  componentDidMount() {
+    if (this.props.mitter) {
+      this.props.mitter.subscribeToPayload((payload) => {
+        if (isNewMessagePayload(payload) && payload.channelId.identifier === this.props.channelId) {
+          Promise.resolve(payload.message)
+            .then(message => {
+              const channelReferencingMessage = getChannelReferencingMessage(payload.channelId.identifier, payload.message)
+              if (this.props.newMessagePayloadHook) {
+                return this.props.newMessagePayloadHook(channelReferencingMessage)
+              }
+              return channelReferencingMessage
+            })
+            .then(message => {
+              this.messageWindowRef.current!.onNewMessagePayload([message])
+            })
+            .catch(ex => {
+              console.log('error in listening to new messages')
+            })
+        }
+      })
+    }
+  }
+
+  componentDidUpdate(prevProps: MessageWindowManagerProps) {
+    if (this.props.channelId !== prevProps.channelId && prevProps.channelId !== undefined) {
+      this.refresh()
+    }
+  }
+
   render() {
-    if(this.state.refreshing) {
+    if (this.state.refreshing) {
       return <div>Refreshing Channel</div>
     }
 
     return (
-      <NewMessageList
-        ref={this.newMessageListRef}
+      <MessageWindow
+        ref={this.messageWindowRef}
         initialMessages={this.props.messages}
         minRowHeight={this.props.minRowHeight}
         getViewFromProducer={this.getViewFromProducer}
