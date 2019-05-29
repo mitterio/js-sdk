@@ -17,7 +17,7 @@ import {
     MULTIPART_MESSAGE_NAME_KEY,
     MULTIPART_MESSAGE_FILE_NAME
 } from '../constants'
-import MessagePaginationManager from '../utils/pagination/MessagePaginationManager'
+import { MessagePaginationManager } from '../utils/pagination/MessagePaginationManager'
 import queryString from 'query-string'
 const base = `${MitterConstants.Api.VersionPrefix}/messages`
 
@@ -136,7 +136,18 @@ export interface MessagesApi {
             response: AttachedEntityMetadata
         }
     }
+    'v1/counts/:countClass/:subject1/:subject2/:subject3': {
+        GET: {
+            params: {
+                countClass: string,
+                subject1: string,
+                subject2: string,
+                subject3: string
+            }
+            response: number
+        }
 
+    }
 
 }
 
@@ -488,6 +499,22 @@ export class MessagesClient {
     getMetadataForMessage(messageId: string, key: string): Promise<AttachedEntityMetadata> {
         return this.messagesAxiosClient
             .get<'/v1/messages/:entityId/metadata/:key'>(`/v1/messages/${messageId}/metadata/${key}`)
+            .then(x => x.data)
+    }
+
+    getCount(countClass: string, subject1?: string, subject2?: string, subject3?: string): Promise<number> {
+        let url = `v1/counts/${countClass}`
+        const subjects = [subject1, subject2, subject3]
+        for(let i = 0; i < subjects.length; i++ ) {
+            if(subjects[i]) {
+                url += `/${subjects[i]}`
+            }
+            else {
+                break
+            }
+        }
+        return this.messagesAxiosClient
+            .get<'v1/counts/:countClass/:subject1/:subject2/:subject3'>(url)
             .then(x => x.data)
     }
 }

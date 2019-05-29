@@ -1,7 +1,7 @@
 import { Pagination } from './PaginationInterface'
 import { Channel, ChannelReferencingMessage } from '@mitter-io/models'
 
-export default class MessagePaginationManager implements Pagination<ChannelReferencingMessage> {
+export class MessagePaginationManager implements Pagination<ChannelReferencingMessage> {
     before: string | undefined
     after: string | undefined
 

@@ -8,7 +8,7 @@ import {
     UserLocator,
     AttachedEntityMetadata,
     EntityMetadata,
-    QueriableMetadata, ImpressedPresence
+    QueriableMetadata, WiredPresence
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -64,7 +64,7 @@ export interface UsersApi {
 
     '/v1/users/:userId/presence': {
         GET: {
-            response: Presence
+            response: WiredPresence
         }
         POST: {
             body: Presence
@@ -182,6 +182,19 @@ export interface UsersApi {
 
             response: AttachedEntityMetadata
         }
+    },
+
+    'v1/counts/:countClass/:subject1/:subject2/:subject3': {
+        GET: {
+            params: {
+                countClass: string,
+                subject1: string,
+                subject2: string,
+                subject3: string
+            }
+            response: number
+        }
+
     }
 
 }
@@ -286,7 +299,7 @@ export class UsersClient {
      * presence object can be found in our tsdocs section  under @mitter-io/models.
      * More details on user presence can be found in our docs under the Users section
      */
-    getUserPresence(userIds: string): Promise<ImpressedPresence> {
+    getUserPresence(userIds: string): Promise<WiredPresence> {
         return this.usersAxiosClient
             .get<'/v1/users/:userId/presence'>(`/v1/users/${userIds}/presence`)
             .then(x => x.data)
@@ -485,6 +498,22 @@ export class UsersClient {
     getMetadataForUser(userId: string, key: string):Promise<AttachedEntityMetadata> {
         return this.usersAxiosClient
             .get<'/v1/users/:entityId/metadata/:key'>(`/v1/users/${userId}/metadata/${key}`)
+            .then(x => x.data)
+    }
+
+    getCount(countClass: string, subject1?: string, subject2?: string, subject3?: string): Promise<number> {
+        let url = `v1/counts/${countClass}`
+        const subjects = [subject1, subject2, subject3]
+        for(let i = 0; i < subjects.length; i++ ) {
+            if(subjects[i]) {
+                url += `/${subjects[i]}`
+            }
+            else {
+                break
+            }
+        }
+        return this.usersAxiosClient
+            .get<'v1/counts/:countClass/:subject1/:subject2/:subject3'>(url)
             .then(x => x.data)
     }
 }

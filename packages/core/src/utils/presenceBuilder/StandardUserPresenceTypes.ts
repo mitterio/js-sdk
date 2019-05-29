@@ -1,6 +1,6 @@
 import {Presence, StandardUserPresenceTypeNames} from "@mitter-io/models";
 
-const StandardUserPresenceTypes = {
+export const StandardUserPresenceTypes = {
     online(timeToLive: number = 0): Presence {
         return new Presence(
             StandardUserPresenceTypeNames.Online,
@@ -37,4 +37,3 @@ const StandardUserPresenceTypes = {
     },
 }
 
-export default StandardUserPresenceTypes

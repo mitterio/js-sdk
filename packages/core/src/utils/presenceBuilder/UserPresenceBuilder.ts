@@ -1,6 +1,6 @@
 import {Presence} from "@mitter-io/models";
 
-class UserPresenceBuilder {
+export class UserPresenceBuilder {
     private presenceList: Array<Presence> = []
 
     startWith(presence: Presence): UserPresenceBuilder {
@@ -24,4 +24,3 @@ class UserPresenceBuilder {
     }
 }
 
-export default UserPresenceBuilder

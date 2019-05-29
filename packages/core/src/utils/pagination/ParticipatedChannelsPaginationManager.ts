@@ -2,7 +2,7 @@ import { Pagination } from './PaginationInterface'
 import {ParticipatedChannel} from "@mitter-io/models";
 
 
-export default class ParticipatedChannelsPaginationManager implements Pagination<ParticipatedChannel> {
+export class ParticipatedChannelsPaginationManager implements Pagination<ParticipatedChannel> {
     before: string | undefined
     after: string | undefined
 

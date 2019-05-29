@@ -15,11 +15,10 @@ import {
     EntityMetadata,
     QueriableMetadata
 } from '@mitter-io/models'
-import ChannelPaginationManager from '../utils/pagination/ChannelPaginationManager'
 import { MAX_CHANNEL_LIST_LENGTH } from '../constants'
 import queryString from 'query-string'
-import ParticipatedChannelsPaginationManager
-    from "../utils/pagination/ParticipatedChannelsPaginationManager";
+import {ParticipatedChannelsPaginationManager} from "../utils/pagination/ParticipatedChannelsPaginationManager";
+import {ChannelListPaginationManager} from "../utils/pagination/ChannelPaginationManager";
 
 const base = `${MitterConstants.Api.VersionPrefix}/channels`
 
@@ -183,6 +182,19 @@ export interface ChannelsApi {
             response: AttachedEntityMetadata
         }
     }
+
+    'v1/counts/:countClass/:subject1/:subject2/:subject3': {
+        GET: {
+            params: {
+                countClass: string,
+                subject1: string,
+                subject2: string,
+                subject3: string
+            }
+            response: number
+        }
+
+    }
 }
 
 export const channelsClientGenerator = clientGenerator<ChannelsApi>()
@@ -222,11 +234,11 @@ export class ChannelsClient {
         limit: number = MAX_CHANNEL_LIST_LENGTH,
         shouldFetchMetadata: boolean = false,
         withProfileAttributes?: string
-    ): ChannelPaginationManager {
+    ): ChannelListPaginationManager {
         if (limit > MAX_CHANNEL_LIST_LENGTH) {
             limit = MAX_CHANNEL_LIST_LENGTH
         }
-        return new ChannelPaginationManager(
+        return new ChannelListPaginationManager(
             (before: string | undefined, after: string | undefined) => this.getAllChannels(before, after, limit, shouldFetchMetadata, withProfileAttributes)
         )
     }
@@ -569,6 +581,22 @@ export class ChannelsClient {
     getMetadataForChannel(channelId: string, key: string):Promise<AttachedEntityMetadata> {
         return this.channelsAxiosClient
             .get<'/v1/channels/:entityId/metadata/:key'>(`/v1/channels/${channelId}/metadata/${key}`)
+            .then(x => x.data)
+    }
+
+    getCount(countClass: string, subject1?: string, subject2?: string, subject3?: string): Promise<number> {
+        let url = `v1/counts/${countClass}`
+        const subjects = [subject1, subject2, subject3]
+        for(let i = 0; i < subjects.length; i++ ) {
+            if(subjects[i]) {
+                url += `/${subjects[i]}`
+            }
+            else {
+                break
+            }
+        }
+        return this.channelsAxiosClient
+            .get<'v1/counts/:countClass/:subject1/:subject2/:subject3'>(url)
             .then(x => x.data)
     }
 }

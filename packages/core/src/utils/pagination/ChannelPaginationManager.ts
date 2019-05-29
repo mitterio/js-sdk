@@ -1,7 +1,7 @@
 import { Channel } from '@mitter-io/models'
 import { Pagination } from './PaginationInterface'
 
-export default class ChannelListPaginationManager implements Pagination<Channel> {
+export class ChannelListPaginationManager implements Pagination<Channel> {
     before: string | undefined
     after: string | undefined
 
