@@ -15,7 +15,7 @@ export class User implements IdentifiableEntity<User> {
     public synthetic: boolean = false,
     public entityProfile: AttachedProfile | null = null,
     public entityMetadata: EntityMetadata = {},
-    public auditInfo: AuditInfo
+    public auditInfo?: AuditInfo
 ) {}
 
   public identifier(): string {

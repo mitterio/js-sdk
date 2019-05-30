@@ -40,14 +40,16 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   onNewMessagePayload = (messages: ChannelReferencingMessage[]) => {
     const clonedMessageList = this.getMessageListClone()
     const uniqueMessages = differenceBy(messages, clonedMessageList, 'messageId')
-    clonedMessageList.push(...uniqueMessages)
-    const scrollToRow = clonedMessageList.length
-    this.setState({
-      messages: clonedMessageList
-    }, () => {
-      this.internalList.current!.scrollToRow(scrollToRow)
-      // this.internalList.current!.scrollToPosition(this.getScrollHeight())
-    })
+    if(uniqueMessages.length > 0) {
+      clonedMessageList.push(...uniqueMessages)
+      const scrollToRow = clonedMessageList.length
+      this.setState({
+        messages: clonedMessageList
+      }, () => {
+        this.internalList.current!.scrollToRow(scrollToRow)
+        // this.internalList.current!.scrollToPosition(this.getScrollHeight())
+      })
+    }
   }
 
   getMessageListClone = (): ChannelReferencingMessage[] => {
