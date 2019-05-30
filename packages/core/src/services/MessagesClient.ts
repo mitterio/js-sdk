@@ -71,6 +71,7 @@ export interface MessagesApi {
 
             query: {
                 shouldFetchChannel: boolean
+                shouldFetchMetadata: boolean
                 after?: string
                 before?: string
                 limit?: number
@@ -295,13 +296,14 @@ export class MessagesClient {
      */
     public getPaginatedMessagesManager(
         channelId: string,
+        shouldFetchMetadata: boolean = false,
         shouldFetchChannel: boolean = false,
         limit: number = MAX_MESSAGE_LIST_LENGTH
     ): MessagePaginationManager {
         if (limit > MAX_MESSAGE_LIST_LENGTH) {
             limit = MAX_MESSAGE_LIST_LENGTH
         }
-        return new MessagePaginationManager((before: string | undefined, after: string | undefined) => this.getMessages(channelId,shouldFetchChannel,before,after,limit))
+        return new MessagePaginationManager((before: string | undefined, after: string | undefined) => this.getMessages(channelId,shouldFetchMetadata,shouldFetchChannel,before,after,limit))
     }
 
     /**
@@ -324,6 +326,7 @@ export class MessagesClient {
 
     public getMessages(
         channelId: string,
+        shouldFetchMetadata: boolean = false,
         shouldFetchChannel: boolean = false,
         before: string | undefined = undefined,
         after: string | undefined = undefined,
@@ -336,6 +339,7 @@ export class MessagesClient {
             .get<'/v1/channels/:channelId/messages'>(`/v1/channels/${channelId}/messages`, {
                 params: Object.assign(
                     {},
+                    {shouldFetchMetadata: shouldFetchMetadata},
                     {shouldFetchChannel: shouldFetchChannel},
                     after !== undefined ? { after } : {},
                     before !== undefined ? { before } : {},
