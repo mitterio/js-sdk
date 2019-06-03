@@ -15,6 +15,7 @@ import { Message } from '@stomp/stompjs'
 import { noOp } from '../utils'
 import WebSocketStandardHeaders from './WebSocketStandardHeaders'
 import nanoid from 'nanoid'
+import {heartbeatIncomingMs, heartbearOutgoingMs, reconnect_delay} from "./WebSocketConstants";
 
 
 export default class WebSocketPipelineDriver implements MessagingPipelineDriver {
@@ -84,6 +85,11 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                 // dev-box-bom1-a0.internal.mitter.io:7180
                 this.activeSocket = Stomp.over(new WebSocket(`${this.mitterContext!.getWeaverUrl()}`))
                 this.activeSocket.debug = noOp
+                this.activeSocket.reconnect_delay = reconnect_delay
+                this.activeSocket.heartbeat = {
+                  incoming: heartbeatIncomingMs,
+                  outgoing: heartbearOutgoingMs
+                }
 
                 let reject: (err: Error | string) => void = noOp
                 let resolve: (result: boolean) => void = noOp

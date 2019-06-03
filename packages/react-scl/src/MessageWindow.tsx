@@ -132,14 +132,15 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
             const scrollToRow = dedupedMessageList.length - initialMessageCount
 
             this.setState({
-              messages: this.getDedupedMessageList(messageListClone),
+              messages: dedupedMessageList,
               isFetching: false
             }, () => {
               if (!this.isScrollable() && this.fetchTillScrollable && this.state.inMountingState) {
                 this.fetchOlderMessages()
               }
               else if (this.state.inMountingState && !this.fetchTillScrollable) {
-                // this.internalList.current!.measureAllRows()
+                 // this.internalList.current!.measureAllRows()
+                // const totalHeight = (this.internalList.current!.Grid! as any).getTotalRowsHeight()
                 // this.internalList.current!.scrollToPosition((this.internalList.current!.Grid! as any).getTotalRowsHeight())
                 this.internalList.current!.scrollToRow(this.state.messages.length)
                 setTimeout(() => this.setState({inMountingState: false}), 500)
@@ -165,7 +166,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
             const messageListClone = this.getMessageListClone()
             const dedupedMessageList = this.getDedupedMessageList(messageListClone)
             const scrollToRow = messageListClone.length
-            messageListClone.push(...messages)
+            dedupedMessageList.push(...messages)
             this.setState({
               messages: dedupedMessageList,
               isFetching: false
@@ -303,6 +304,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
                 id={this.virtualizedListId}
                 height={height}
                 ref={this.internalList}
+                estimatedRowSize={this.props.minRowHeight}
                 onRowsRendered={(
                   {overscanStartIndex, overscanStopIndex, startIndex, stopIndex}) => {
                   this.indexRangeMonitor = {

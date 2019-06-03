@@ -1,6 +1,6 @@
 import { Mitter as MitterCore, MitterConstants, PlatformImplementedFeatures } from '@mitter-io/core'
 import WebKvStore from './kv-store/KvStore'
-import WebSocketPipelineDriver from './drivers/WebsocketMessagingPipelineDriver'
+import WebSocketPipelineDriver from './drivers/WebSocketMessagingPipelineDriver'
 
 type TokenExpireFunction = () => void
 

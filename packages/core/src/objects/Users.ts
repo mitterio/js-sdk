@@ -60,10 +60,6 @@ export default class MitterUser extends MitterObject<MitterUser, User> {
         return super.proxy('entityMetadata')
     }
 
-    get auditInfo(): Promise<AuditInfo> {
-        return super.proxy('auditInfo')
-    }
-
     channels() {
         this.channelsClient
             .get<'/v1/users/:userId/channels'>(`/v1/users/${this._userId}/channels`)
