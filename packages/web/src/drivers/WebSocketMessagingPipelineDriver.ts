@@ -23,9 +23,11 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
     private pipelineSink: BasePipelineSink | undefined = undefined
     private connectionTime: number = 0
     private mitterContext: Mitter | undefined = undefined
+    private deliveryTargetId: string
 
     constructor() {
         this.connectToStream = this.connectToStream.bind(this)
+        this.deliveryTargetId = nanoid()
     }
 
     endpointRegistered(pipelineSink: PipelineSink, userDeliveryEndpoint: DeliveryEndpoint): void {
@@ -112,7 +114,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                     //'init-subscriptions': '/channels/open/e2zeT-Wosx8-ec2Gx-n2KvD',
 
                     const headers: any = {
-                      [WebSocketStandardHeaders.DeliveryTargetId]: nanoid()
+                      [WebSocketStandardHeaders.DeliveryTargetId]: this.deliveryTargetId,
                     }
 
                     if (this.mitterContext!.applicationId !== undefined) {
@@ -127,6 +129,8 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                         ] = userAuthorization
                     }
 
+
+
                     const initSubscriptions = this.mitterContext!.getInitMessagingPipelineSubscriptions()
 
                     if(initSubscriptions.length > 0) {
@@ -135,11 +139,14 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                         ] = initSubscriptions.toString()
                     }
 
-                    // this.activeSocket.reconnect_delay = 1000
 
                     this.activeSocket.connect(
                         headers,
                         frame => {
+                          const connectCb = this.mitterContext!.getOnMessagingPipelineConnectCb()
+                          if(connectCb !== undefined) {
+                            connectCb(initSubscriptions)
+                          }
                             this.activeSocket!!.subscribe(
                                 '/',
                               (message) => {
@@ -155,7 +162,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                             reject(error)
                         },
                         closeEvent => {
-                            setTimeout(this.connectToStream, 3000)
+                            setTimeout(this.connectToStream, reconnect_delay)
                         }
                     )
                 }

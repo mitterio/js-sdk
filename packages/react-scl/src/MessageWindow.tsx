@@ -8,6 +8,7 @@ import {
 } from 'react-virtualized/dist/es/CellMeasurer'
 import uniqBy from 'lodash/uniqBy'
 import differenceBy from 'lodash/differenceBy'
+import debounce from 'lodash/debounce'
 
 type MessageWindowProps = {
   initialMessages: ChannelReferencingMessage[]
@@ -93,7 +94,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
     )
   }
 
-  onScroll = ({clientHeight, scrollHeight, scrollTop}: { clientHeight: number, scrollHeight: number, scrollTop: number }): void => {
+  onScroll = (clientHeight: number, scrollHeight: number, scrollTop: number): void => {
     const messages = this.state.messages
     if (!this.hasComponentMounted)
       return
@@ -139,11 +140,11 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
                 this.fetchOlderMessages()
               }
               else if (this.state.inMountingState && !this.fetchTillScrollable) {
-                 // this.internalList.current!.measureAllRows()
-                // const totalHeight = (this.internalList.current!.Grid! as any).getTotalRowsHeight()
-                // this.internalList.current!.scrollToPosition((this.internalList.current!.Grid! as any).getTotalRowsHeight())
-                this.internalList.current!.scrollToRow(this.state.messages.length)
-                setTimeout(() => this.setState({inMountingState: false}), 500)
+                // this.internalList.current!.measureAllRows()
+                  // this.internalList.current!.recomputeRowHeights()
+                  this.internalList.current!.scrollToRow(this.state.messages.length - 1)
+                // this.internalList.current!.scrollToPosition(offsetForLastRow - 100)
+                  setTimeout(() => this.setState({inMountingState: false}), 500)
 
               }
               else {
@@ -216,6 +217,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   private fetchTillScrollable: boolean
   private indexRangeMonitor: IndexRangeMonitor
   private hasComponentMounted: boolean
+  private debouncedScroll: (clientHeight: number, scrollHeight: number, scrollTop: number) => void
 
   constructor(props: MessageWindowProps) {
     super(props)
@@ -223,6 +225,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       fixedWidth: true,
       fixedHeight: this.props.fixedHeight,
       minHeight: this.props.minRowHeight,
+      defaultHeight:this.props.minRowHeight,
       keyMapper: (rowIndex: number, columnIndex: number) => this.state.messages[rowIndex].messageId
     })
 
@@ -245,6 +248,18 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       startIndex: 0,
       stopIndex: 0
     }
+    this.debouncedScroll = debounce(this.onScroll, 2000, {leading: true})
+  }
+
+  forceFetchNewerMessages = () => {
+    if(this.hasComponentMounted) {
+      const messages = this.state.messages
+      let lastMessage = undefined
+      if(messages.length > 0) {
+        lastMessage = messages[messages.length - 1].messageId!
+      }
+      this.fetchNewerMessages(lastMessage)
+    }
   }
 
   componentDidMount() {
@@ -258,35 +273,13 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   }
 
   componentDidUpdate(prevProps: MessageWindowProps, prevState: MessageWindowState) {
-    // add checks for loading
-    // if (prevState.messages && this.state.messages) {
-
-      /*if(this.props.messages.length === prevProps.messages.length) {
-        this.fetchTillScrollable = false
-      }*/
-
-      /*if (this.state.messages.length > prevState.messages.length) {
-        if (!this.isScrollable() && this.fetchTillScrollable) {
-          const messageList = this.state.messages
-
-          this.fetchOlderMessages(messageList[0].messageId)
-        }
-
-        // this.scrollToPosition(this.state.messages, prevState.messages)
-
-        if (this.state.showScrollHelper) {
-          this.setState({unreadCount: this.state.messages.length - prevState.messages.length})
-        }
-
-      }*/
-    // }
+    if(this.state.inMountingState === false && prevState.inMountingState === true) {
+      const virtualizedList = document.getElementById(this.virtualizedListId)
+      if(virtualizedList) {
+        virtualizedList.scrollTop = virtualizedList.scrollHeight
+      }
+    }
   }
-
-  /* {
-            this.state.showScrollHelper &&
-            <ScrollHelper unreadCount={this.state.unreadCount}
-                          onScrollHelperClick={this.onScrollHelperClick}/>
-          }*/
 
   render() {
     return (
@@ -296,6 +289,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
 
         }
         <AutoSizer
+          onResize={({height, width}) => {console.log('size',height, width)}}
         >
           {({height, width}) => {
             return (
@@ -304,7 +298,9 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
                 id={this.virtualizedListId}
                 height={height}
                 ref={this.internalList}
+                deferredMeasurementCache={this.cache}
                 estimatedRowSize={this.props.minRowHeight}
+
                 onRowsRendered={(
                   {overscanStartIndex, overscanStopIndex, startIndex, stopIndex}) => {
                   this.indexRangeMonitor = {
@@ -318,7 +314,9 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
                 rowCount={this.state.messages.length}
                 rowHeight={this.cache.rowHeight}
                 rowRenderer={this.rowRenderer}
-                onScroll={this.onScroll}
+                onScroll={({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }) => {
+                  this.debouncedScroll(clientHeight, scrollHeight, scrollTop )
+                }}
                 scrollToAlignment={this.state.scrollAlignment}
               />
             )

@@ -53,6 +53,13 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
     return this.props.fetchOlderMessages(this.props.channelId, before)
   }
 
+  forceFetchNewerMessages = () => {
+    const messageWindow = this.messageWindowRef.current
+    if(messageWindow) {
+      messageWindow.forceFetchNewerMessages()
+    }
+  }
+
   private messageWindowRef: RefObject<MessageWindow>
 
   constructor(props: MessageWindowManagerProps) {

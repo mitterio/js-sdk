@@ -74,7 +74,8 @@ export class Mitter extends MitterBase {
         ).getInterceptor(),
 
         /* The base url for mitter apis */
-        this.mitterApiBaseUrl
+        this.mitterApiBaseUrl,
+        this.disableXHRCaching
     )
     private messagingPipelineDriverHost: MessagingPipelineDriverHost
     private subscriptions: ((payload: MessagingPipelinePayload) => void)[] = []
@@ -82,6 +83,7 @@ export class Mitter extends MitterBase {
     private onPipelinesInitialized = statefulPromise<void>()
     private initMessagingPipelineSubscriptions: Array<string>
     private weaverUrl: string
+    private onMessagingPipelineConnectCb: undefined | ((initSubscriptions:Array<string>) => void)
 
     constructor(
         public readonly kvStore: KvStore,
@@ -91,7 +93,8 @@ export class Mitter extends MitterBase {
         mitterInstanceReady: () => void,
         pipelineDrivers: MessagingPipelineDriver[] | MessagingPipelineDriver,
         globalHostObject: any,
-        private platformImplementedFeatures: PlatformImplementedFeatures
+        private platformImplementedFeatures: PlatformImplementedFeatures,
+        private disableXHRCaching: boolean =  true
     ) {
         super()
         this.weaverUrl = this.mitterApiBaseUrl
@@ -133,7 +136,12 @@ export class Mitter extends MitterBase {
         this.mitterAxiosInterceptor.disable(axiosInstance)
     }
 
-    setUserAuthorization(authorizationToken: string, disableTokenCaching: boolean = false, weaverUrl?: string, initMessagingPipelineSubscriptions?: Array<string>) {
+    setUserAuthorization(authorizationToken: string,
+                         disableTokenCaching: boolean = false,
+                         weaverUrl?: string,
+                         initMessagingPipelineSubscriptions?: Array<string>,
+                         onMessagingPipelineConnectCb?: (initSubscription: Array<string>) => void
+    ) {
         if (authorizationToken.split('.').length === 3) {
             if (typeof atob !== 'undefined') {
                 this.cachedUserId = JSON.parse(atob(authorizationToken.split('.')[1]))['userId']
@@ -154,6 +162,7 @@ export class Mitter extends MitterBase {
             this.weaverUrl = weaverUrl
         }
         this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions || []
+        this.onMessagingPipelineConnectCb =  onMessagingPipelineConnectCb
         this.announceAuthorizationAvailable()
         if(!disableTokenCaching) {
             this.kvStore
@@ -164,8 +173,13 @@ export class Mitter extends MitterBase {
         }
     }
 
-    startMessagingPipelineAnonymously(weaverUrl?: string, initMessagingPipelineSubscriptions?: Array<string>): void {
+    startMessagingPipelineAnonymously(
+        weaverUrl?: string,
+        initMessagingPipelineSubscriptions?: Array<string>,
+        onMessagingPipelineConnectCb?: (initSubscription: Array<string>) => void
+    ): void {
         this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions || []
+        this.onMessagingPipelineConnectCb = onMessagingPipelineConnectCb
         if(weaverUrl) {
             this.weaverUrl = weaverUrl
         }
@@ -218,6 +232,10 @@ export class Mitter extends MitterBase {
 
     onPipelinesInit(): Promise<void> {
         return this.onPipelinesInitialized
+    }
+
+    getOnMessagingPipelineConnectCb() {
+        return this.onMessagingPipelineConnectCb
     }
 
     // Smart-object values
