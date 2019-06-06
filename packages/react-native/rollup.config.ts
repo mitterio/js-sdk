@@ -1,11 +1,11 @@
-import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
+// import resolve from 'rollup-plugin-node-resolve'
+// import commonjs from 'rollup-plugin-commonjs'
 import sourceMaps from 'rollup-plugin-sourcemaps'
 import camelCase from 'lodash.camelcase'
 import typescript from 'rollup-plugin-typescript2'
 import json from 'rollup-plugin-json'
-import builtins from 'rollup-plugin-node-builtins'
-import globals from 'rollup-plugin-node-globals'
+// import builtins from 'rollup-plugin-node-builtins'
+// import globals from 'rollup-plugin-node-globals'
 import replace from 'rollup-plugin-replace'
 
 const pkg = require('./package.json')
@@ -29,21 +29,8 @@ export default {
       'process.version.': '"v9.5.0".',
       delimiters: ['', '']
     }),
-
-    resolve({
-        browser: false,
-        jsnext: true
-    }),
-
-    commonjs(),
-
-    globals(),
     json(),
-
-    builtins(),
-
     typescript({ useTsconfigDeclarationDir: true }),
-
     // Resolve source maps to the original source
     sourceMaps()
   ],
