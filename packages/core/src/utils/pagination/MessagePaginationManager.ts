@@ -9,10 +9,16 @@ export class MessagePaginationManager implements Pagination<ChannelReferencingMe
         private getMessages: (before: string | undefined, after: string | undefined) => Promise<ChannelReferencingMessage[]>
     ) {}
 
-    private updatePageDetails(messageList: ChannelReferencingMessage[]) {
+    private updatePageDetails(messageList: ChannelReferencingMessage[], order: 'next' | 'prev') {
         if (messageList.length > 0) {
-            this.before = messageList[messageList.length - 1].messageId
-            this.after = messageList[0].messageId
+            if(order === 'prev') {
+                this.before = messageList[messageList.length - 1].messageId
+                this.after = messageList[0].messageId
+            }
+            else {
+                this.before = messageList[0].messageId
+                this.after = messageList[messageList.length - 1].messageId
+            }
         }
     }
 
@@ -21,7 +27,7 @@ export class MessagePaginationManager implements Pagination<ChannelReferencingMe
             undefined,
             this.after,
         ) as Promise<ChannelReferencingMessage[]>)
-        this.updatePageDetails(messageList)
+        this.updatePageDetails(messageList, 'next')
         return messageList
     }
 
@@ -30,7 +36,7 @@ export class MessagePaginationManager implements Pagination<ChannelReferencingMe
             this.before,
             undefined,
         ) as Promise<ChannelReferencingMessage[]>)
-        this.updatePageDetails(messageList)
+        this.updatePageDetails(messageList, 'prev')
         return messageList
     }
 }

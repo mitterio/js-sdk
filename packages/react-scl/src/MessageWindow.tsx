@@ -7,7 +7,6 @@ import {
   MeasuredCellParent
 } from 'react-virtualized/dist/es/CellMeasurer'
 import uniqBy from 'lodash/uniqBy'
-import differenceBy from 'lodash/differenceBy'
 import debounce from 'lodash/debounce'
 
 type MessageWindowProps = {
@@ -25,6 +24,7 @@ type MessageWindowState = {
   showScrollHelper: boolean
   unreadCount: number
   messages: ChannelReferencingMessage[]
+  messageIds: Array<string>
   isFetching: boolean
   inMountingState: boolean
 }
@@ -38,11 +38,10 @@ type IndexRangeMonitor = {
 
 export default class MessageWindow extends React.Component<MessageWindowProps, MessageWindowState> {
 
-  onNewMessagePayload = (messages: ChannelReferencingMessage[]) => {
-    const clonedMessageList = this.getMessageListClone()
-    const uniqueMessages = differenceBy(messages, clonedMessageList, 'messageId')
-    if(uniqueMessages.length > 0) {
-      clonedMessageList.push(...uniqueMessages)
+  onNewMessagePayload = (message: ChannelReferencingMessage) => {
+    if(message && this.state.messageIds.indexOf(message.messageId) === -1) { // DEDUPING
+      const clonedMessageList = this.getMessageListClone()
+      clonedMessageList.push(message)
       const scrollToRow = clonedMessageList.length
       this.setState({
         messages: clonedMessageList
@@ -129,11 +128,13 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
             const messageListClone = this.getMessageListClone()
             const initialMessageCount = messageListClone.length
             messageListClone.unshift(...messages)
-            const dedupedMessageList = this.getDedupedMessageList(messageListClone)
-            const scrollToRow = dedupedMessageList.length - initialMessageCount
+            // const dedupedMessageList = this.getDedupedMessageList(messageListClone)
+            const scrollToRow = messageListClone.length - initialMessageCount
+            const messageIds =  this.getMessageIds(messageListClone)
 
             this.setState({
-              messages: dedupedMessageList,
+              messages: messageListClone,
+              messageIds: messageIds,
               isFetching: false
             }, () => {
               if (!this.isScrollable() && this.fetchTillScrollable && this.state.inMountingState) {
@@ -165,11 +166,14 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
         this.props.fetchNewerMessages(messageId)
           .then((messages: ChannelReferencingMessage[]) => {
             const messageListClone = this.getMessageListClone()
-            const dedupedMessageList = this.getDedupedMessageList(messageListClone)
             const scrollToRow = messageListClone.length
-            dedupedMessageList.push(...messages)
+            messageListClone.push(...messages)
+            const messageIds =  this.getMessageIds(messageListClone)
+            // const dedupedMessageList = this.getDedupedMessageList(messageListClone)
+
             this.setState({
-              messages: dedupedMessageList,
+              messages: messageListClone,
+              messageIds: messageIds,
               isFetching: false
             }, () => {
               if (messages.length > 0)
@@ -228,12 +232,14 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       defaultHeight:this.props.minRowHeight,
       keyMapper: (rowIndex: number, columnIndex: number) => this.state.messages[rowIndex].messageId
     })
-
+    const dedupedInitialMessages = this.getDedupedMessageList( props.initialMessages)
+    const messageIds = this.getMessageIds(dedupedInitialMessages)
     this.state = {
       scrollAlignment: 'end',
       showScrollHelper: false,
       unreadCount: 0,
-      messages: props.initialMessages,
+      messages: dedupedInitialMessages,
+      messageIds: messageIds,
       isFetching: false,
       inMountingState: true
     }
@@ -249,6 +255,10 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       stopIndex: 0
     }
     this.debouncedScroll = debounce(this.onScroll, 2000, {leading: true})
+  }
+
+  getMessageIds = (messages: ChannelReferencingMessage[]) => {
+    return messages.map(message => message.messageId)
   }
 
   forceFetchNewerMessages = () => {
