@@ -17,12 +17,13 @@ type MessageWindowProps = {
   minRowHeight: number
   fixedHeight: boolean
   loader: ReactElement<any>
+  scrollIndicator?: (unreadCount: number, onClick: () => void) => ReactElement<any>
 }
 
 type MessageWindowState = {
   scrollAlignment: 'start' | 'end' | 'center'
-  showScrollHelper: boolean
-  unreadCount: number
+  showScrollIndicator: boolean
+  approxUnreadCount: number
   messages: ChannelReferencingMessage[]
   messageIds: Array<string>
   isFetching: boolean
@@ -38,15 +39,100 @@ type IndexRangeMonitor = {
 
 export default class MessageWindow extends React.Component<MessageWindowProps, MessageWindowState> {
 
+  private cache: CellMeasurerCache
+  private internalList: RefObject<List>
+  private virtualizedListId: string
+  private fetchTillScrollable: boolean
+  private indexRangeMonitor: IndexRangeMonitor
+  private hasComponentMounted: boolean
+  private debouncedScroll: (clientHeight: number, scrollHeight: number, scrollTop: number) => void
+
+  constructor(props: MessageWindowProps) {
+    super(props)
+    this.cache = new CellMeasurerCache({
+      fixedWidth: true,
+      fixedHeight: this.props.fixedHeight,
+      minHeight: this.props.minRowHeight,
+      defaultHeight:this.props.minRowHeight,
+      keyMapper: (rowIndex: number, columnIndex: number) => this.state.messages[rowIndex].messageId
+    })
+    const dedupedInitialMessages = this.getDedupedMessageList( props.initialMessages)
+    const messageIds = this.getMessageIds(dedupedInitialMessages)
+    this.state = {
+      scrollAlignment: 'end',
+      showScrollIndicator: false,
+      approxUnreadCount: 0,
+      messages: dedupedInitialMessages,
+      messageIds: messageIds,
+      isFetching: false,
+      inMountingState: true
+    }
+
+    this.hasComponentMounted = false
+    this.internalList = React.createRef<List>()
+    this.virtualizedListId = 'mitter-virtualized-list' + Date.now()
+    this.fetchTillScrollable = true
+    this.indexRangeMonitor = {
+      overscanStartIndex: 0,
+      overscanStopIndex: 0,
+      startIndex: 0,
+      stopIndex: 0
+    }
+    this.debouncedScroll = debounce(this.onScroll, 2000, {leading: true})
+  }
+
+  componentDidMount() {
+    let before = undefined
+    if (this.props.initialMessages.length > 0) {
+      before = this.props.initialMessages[0].messageId
+    }
+
+    this.fetchOlderMessages(before)
+    this.hasComponentMounted = true
+  }
+
+  componentDidUpdate(prevProps: MessageWindowProps, prevState: MessageWindowState) {
+    if(this.state.inMountingState === false && prevState.inMountingState === true) {
+      const virtualizedList = document.getElementById(this.virtualizedListId)
+      if(virtualizedList) {
+        virtualizedList.scrollTop = virtualizedList.scrollHeight
+      }
+    }
+  }
+
+  getMessageIds = (messages: ChannelReferencingMessage[]) => {
+    return messages.map(message => message.messageId)
+  }
+
+  forceFetchNewerMessages = () => {
+    if(this.hasComponentMounted) {
+      const messages = this.state.messages
+      let lastMessage = undefined
+      if(messages.length > 0) {
+        lastMessage = messages[messages.length - 1].messageId!
+      }
+      this.fetchNewerMessages(lastMessage)
+    }
+  }
+
   onNewMessagePayload = (message: ChannelReferencingMessage) => {
     if(message && this.state.messageIds.indexOf(message.messageId) === -1) { // DEDUPING
       const clonedMessageList = this.getMessageListClone()
       clonedMessageList.push(message)
       const scrollToRow = clonedMessageList.length
+      const isScrollIndicatorVisible = this.state.showScrollIndicator
+      const unreadCount = isScrollIndicatorVisible ? this.state.approxUnreadCount + 1 : 0
       this.setState({
-        messages: clonedMessageList
+        messages: clonedMessageList,
+        approxUnreadCount:  unreadCount
       }, () => {
-        this.internalList.current!.scrollToRow(scrollToRow)
+        /** If scroll helper is visible then the user is scrolling up to see older messages
+         * , so we should not scroll to the bottom
+         *  so only scroll if the scroll helper is not visible
+         * */
+        if(!isScrollIndicatorVisible) {
+          this.internalList.current!.scrollToRow(scrollToRow)
+        }
         // this.internalList.current!.scrollToPosition(this.getScrollHeight())
       })
     }
@@ -59,6 +145,8 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   getDedupedMessageList = (messageList: ChannelReferencingMessage[]): ChannelReferencingMessage[] => {
     return uniqBy(messageList, 'messageId')
   }
+
+
 
   getRowHeight = ({index}: { index: number | undefined } = {index: undefined}) => {
     return 0
@@ -109,7 +197,6 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
         this.fetchNewerMessages(lastMessage)
       }
     }
-    // this.showScrollHelper()
   }
 
   /** CHANGE TO PROMISIFIED SET STATE*/
@@ -201,105 +288,37 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
     return scrollHeight
   }
 
-  onScrollHelperClick = () => {
-    this.internalList.current!.scrollToPosition(this.getScrollHeight()) // scrolling to bottom
+  onScrollIndicatorClick = () => {
+    /* -1 because scrollToRow is follows Zero based numbering */
+    this.internalList.current!.scrollToRow(this.state.messages.length - 1)
   }
 
-  showScrollHelper = () => {
+  showScrollIndicator = () => {
+    if(this.state.isFetching || this.state.inMountingState)
+      return
     const totalMessages = this.state.messages.length
-    if (this.indexRangeMonitor.stopIndex < totalMessages - 3 && !this.state.showScrollHelper) {
-      this.setState({showScrollHelper: true})
-    }
-    else if (this.indexRangeMonitor.stopIndex >= totalMessages - this.state.unreadCount && this.state.showScrollHelper) {
-      this.setState({showScrollHelper: false, unreadCount: 0})
-    }
-  }
-
-  private cache: CellMeasurerCache
-  private internalList: RefObject<List>
-  private virtualizedListId: string
-  private fetchTillScrollable: boolean
-  private indexRangeMonitor: IndexRangeMonitor
-  private hasComponentMounted: boolean
-  private debouncedScroll: (clientHeight: number, scrollHeight: number, scrollTop: number) => void
-
-  constructor(props: MessageWindowProps) {
-    super(props)
-    this.cache = new CellMeasurerCache({
-      fixedWidth: true,
-      fixedHeight: this.props.fixedHeight,
-      minHeight: this.props.minRowHeight,
-      defaultHeight:this.props.minRowHeight,
-      keyMapper: (rowIndex: number, columnIndex: number) => this.state.messages[rowIndex].messageId
-    })
-    const dedupedInitialMessages = this.getDedupedMessageList( props.initialMessages)
-    const messageIds = this.getMessageIds(dedupedInitialMessages)
-    this.state = {
-      scrollAlignment: 'end',
-      showScrollHelper: false,
-      unreadCount: 0,
-      messages: dedupedInitialMessages,
-      messageIds: messageIds,
-      isFetching: false,
-      inMountingState: true
+    /** indexes follow Zero based numbering
+     * here we are showing scroll helper only if the user has
+     * scrolled upto the second last message
+     */
+    if (!this.state.showScrollIndicator && this.indexRangeMonitor.stopIndex < totalMessages - 2 ) {
+      this.setState({showScrollIndicator: true})
     }
 
-    this.hasComponentMounted = false
-    this.internalList = React.createRef<List>()
-    this.virtualizedListId = 'mitter-virtualized-list' + Date.now()
-    this.fetchTillScrollable = true
-    this.indexRangeMonitor = {
-      overscanStartIndex: 0,
-      overscanStopIndex: 0,
-      startIndex: 0,
-      stopIndex: 0
-    }
-    this.debouncedScroll = debounce(this.onScroll, 2000, {leading: true})
-  }
-
-  getMessageIds = (messages: ChannelReferencingMessage[]) => {
-    return messages.map(message => message.messageId)
-  }
-
-  forceFetchNewerMessages = () => {
-    if(this.hasComponentMounted) {
-      const messages = this.state.messages
-      let lastMessage = undefined
-      if(messages.length > 0) {
-        lastMessage = messages[messages.length - 1].messageId!
-      }
-      this.fetchNewerMessages(lastMessage)
+    else if(this.state.showScrollIndicator && this.indexRangeMonitor.stopIndex >  totalMessages - 2 ) {
+      this.setState({showScrollIndicator: false, approxUnreadCount: 0 })
     }
   }
 
-  componentDidMount() {
-    let before = undefined
-    if (this.props.initialMessages.length > 0) {
-      before = this.props.initialMessages[0].messageId
-    }
 
-    this.fetchOlderMessages(before)
-    this.hasComponentMounted = true
-  }
-
-  componentDidUpdate(prevProps: MessageWindowProps, prevState: MessageWindowState) {
-    if(this.state.inMountingState === false && prevState.inMountingState === true) {
-      const virtualizedList = document.getElementById(this.virtualizedListId)
-      if(virtualizedList) {
-        virtualizedList.scrollTop = virtualizedList.scrollHeight
-      }
-    }
-  }
 
   render() {
     return (
       <React.Fragment>
         {
           this.state.isFetching && this.props.loader
-
         }
         <AutoSizer
-          onResize={({height, width}) => {console.log('size',height, width)}}
         >
           {({height, width}) => {
             return (
@@ -310,7 +329,6 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
                 ref={this.internalList}
                 deferredMeasurementCache={this.cache}
                 estimatedRowSize={this.props.minRowHeight}
-
                 onRowsRendered={(
                   {overscanStartIndex, overscanStopIndex, startIndex, stopIndex}) => {
                   this.indexRangeMonitor = {
@@ -325,13 +343,19 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
                 rowHeight={this.cache.rowHeight}
                 rowRenderer={this.rowRenderer}
                 onScroll={({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }) => {
-                  this.debouncedScroll(clientHeight, scrollHeight, scrollTop )
+                  this.debouncedScroll(clientHeight, scrollHeight, scrollTop)
+                  this.showScrollIndicator()
                 }}
                 scrollToAlignment={this.state.scrollAlignment}
               />
             )
           }}
         </AutoSizer>
+        {
+          this.state.showScrollIndicator &&
+          this.props.scrollIndicator &&
+          this.props.scrollIndicator(this.state.approxUnreadCount,  this.onScrollIndicatorClick)
+        }
 
       </React.Fragment>
     )

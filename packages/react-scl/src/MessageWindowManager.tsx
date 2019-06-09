@@ -19,8 +19,8 @@ type MessageWindowManagerProps = {
   loader: ReactElement<any>
   fixedHeight?: boolean
   mitter?: Mitter
-  messageThrottleRateMs? : number
   newMessagePayloadHook?: (message: ChannelReferencingMessage) => ChannelReferencingMessage
+  scrollIndicator?: (unreadCount: number, onClick: () => void) => ReactElement<any>
 }
 
 type MessageWindowManagerState = {
@@ -30,8 +30,6 @@ type MessageWindowManagerState = {
 export class MessageWindowManager extends React.Component<MessageWindowManagerProps, MessageWindowManagerState> {
 
   private messageWindowRef: RefObject<MessageWindow>
-  private throttleRateMs: number
-  private messageQueue: ChannelReferencingMessage[]
   private timer: Timeout | undefined = undefined
 
   constructor(props: MessageWindowManagerProps) {
@@ -40,8 +38,6 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
       refreshing: false
     }
     this.messageWindowRef = React.createRef<MessageWindow>()
-    this.throttleRateMs  = props.messageThrottleRateMs || 100
-    this.messageQueue = []
   }
 
   componentDidMount() {
@@ -57,7 +53,7 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
               return channelReferencingMessage
             })
             .then(message => {
-              this.messageWindowRef.current!.onNewMessagePayload(message)
+              this.pushNewMessage(message)
             })
             .catch(ex => {
               console.log('error in listening to new messages')
@@ -65,7 +61,6 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
         }
       })
     }
-    this.startTimer()
   }
 
   componentDidUpdate(prevProps: MessageWindowManagerProps) {
@@ -73,35 +68,16 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
       this.refresh()
     }
   }
-  componentWillMount(): void {
-    if(this.timer) {
-      clearInterval(this.timer)
-    }
-  }
-
-  startTimer = () => {
-    this.timer = setInterval(this.pushQueuedMessages , this.throttleRateMs)
-  }
-
-  pushQueuedMessages = () => {
-    if(this.messageQueue.length > 0) {
-      const toBeInsertedMessage = this.messageQueue.shift()
-      if(toBeInsertedMessage)
-        this.messageWindowRef.current!.onNewMessagePayload(toBeInsertedMessage)
-    }
-  }
 
   getViewFromProducer = (item: ChannelReferencingMessage) => {
     return getViewFromProducer<ChannelReferencingMessage>(this.props.producers, item, this.props.defaultView)
   }
 
-  newMessagesReceived = (messages: ChannelReferencingMessage[]) => {
-    // this.messageWindowRef.current!.onNewMessagePayload(message)
-    this.messageQueue.push(...messages)
+  pushNewMessage = (toBeInsertedMessage: ChannelReferencingMessage) => {
+    this.messageWindowRef.current!.onNewMessagePayload(toBeInsertedMessage)
   }
 
   refresh = () => {
-    this.messageQueue = []
     this.setState({refreshing: true})
     new Promise((resolve, reject) => {
       setTimeout(() => resolve(), 500)
@@ -144,6 +120,7 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
         fetchOlderMessages={this.fetchOlderMessages}
         loader={this.props.loader}
         fixedHeight={!!this.props.fixedHeight}
+        scrollIndicator={this.props.scrollIndicator}
       />
     )
   }
