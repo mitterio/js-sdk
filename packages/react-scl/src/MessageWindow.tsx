@@ -27,6 +27,7 @@ type MessageWindowState = {
   messages: ChannelReferencingMessage[]
   messageIds: Array<string>
   isFetching: boolean
+  showFetchingIndicator: boolean
   inMountingState: boolean
 }
 
@@ -65,6 +66,8 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       messages: dedupedInitialMessages,
       messageIds: messageIds,
       isFetching: false,
+      // Indicator needs to be always shown when fetching older messages
+      showFetchingIndicator: true,
       inMountingState: true
     }
 
@@ -249,7 +252,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
     if (!this.state.isFetching && !this.state.inMountingState) {
 
 
-      this.setState({isFetching: true}, () =>
+      this.setState({isFetching: true, showFetchingIndicator: false}, () =>
         this.props.fetchNewerMessages(messageId)
           .then((messages: ChannelReferencingMessage[]) => {
             const messageListClone = this.getMessageListClone()
@@ -261,7 +264,9 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
             this.setState({
               messages: messageListClone,
               messageIds: messageIds,
-              isFetching: false
+              isFetching: false,
+              // Indicator needs to be always shown when fetching older messages
+              showFetchingIndicator: true
             }, () => {
               if (messages.length > 0)
                 this.internalList.current!.scrollToRow(scrollToRow)
@@ -294,7 +299,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   }
 
   showScrollIndicator = () => {
-    if(this.state.isFetching || this.state.inMountingState)
+    if (this.state.isFetching || this.state.inMountingState)
       return
     const totalMessages = this.state.messages.length
     /** indexes follow Zero based numbering
@@ -316,7 +321,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
     return (
       <React.Fragment>
         {
-          this.state.isFetching && this.props.loader
+          (this.state.isFetching && this.state.showFetchingIndicator) && this.props.loader
         }
         <AutoSizer
         >
