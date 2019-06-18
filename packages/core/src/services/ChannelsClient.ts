@@ -13,7 +13,7 @@ import {
     EntityProfile,
     AttachedEntityMetadata,
     EntityMetadata,
-    QueriableMetadata
+    QueriableMetadata, StandardRuleSetNames
 } from '@mitter-io/models'
 import { MAX_CHANNEL_LIST_LENGTH } from '../constants'
 import queryString from 'query-string'
@@ -324,7 +324,8 @@ export class ChannelsClient {
         before: string | undefined = undefined,
         after: string | undefined = undefined,
         limit: number = MAX_CHANNEL_LIST_LENGTH,
-        shouldFetchMetadata: boolean = false
+        shouldFetchMetadata: boolean = false,
+        rulesetFilter: StandardRuleSetNames | undefined = undefined
     ): Promise<ParticipatedChannel[]> {
         return this.channelsAxiosClient
             .get<'/v1/users/me/channels'>('/v1/users/me/channels', {
@@ -334,6 +335,7 @@ export class ChannelsClient {
                     before !== undefined ? { before } : {},
                     limit !== undefined ? { limit } : {},
                     {shouldFetchMetadata: shouldFetchMetadata},
+                    rulesetFilter !== undefined ? { rulesetFilter } : {},
                 ),
             })
             .then(x => x.data)
@@ -342,12 +344,19 @@ export class ChannelsClient {
     public getPaginatedParticipatedChannelsManager(
         limit: number = MAX_CHANNEL_LIST_LENGTH,
         shouldFetchMetadata: boolean = false,
+        rulesetFilter: StandardRuleSetNames | undefined = undefined
     ): ParticipatedChannelsPaginationManager {
         if (limit > MAX_CHANNEL_LIST_LENGTH) {
             limit = MAX_CHANNEL_LIST_LENGTH
         }
         return new ParticipatedChannelsPaginationManager(
-            (before: string | undefined, after: string | undefined) => this.participatedChannels(before, after, limit, shouldFetchMetadata)
+            (before: string | undefined, after: string | undefined) => this.participatedChannels(
+                before,
+                after,
+                limit,
+                shouldFetchMetadata,
+                rulesetFilter
+            )
         )
     }
 
