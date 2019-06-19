@@ -1,5 +1,6 @@
 import IdentifiableEntity from '../annotations/IdentifiableEntity'
 import { AuditInfo } from '../commons/common-models'
+import { User } from '../user/User'
 import { TimelineEvent } from './TimelineEvents'
 import { EntityMetadata } from '../entity/EntityMetadata'
 import { EntityProfile } from '../entity/EntityProfile'
@@ -45,7 +46,9 @@ export class ChannelParticipation {
     constructor(
         public participantId: Identifier | string,
         public participationStatus: ParticipationStatus = ParticipationStatus.Active,
-        public channelId: Identifier | string
+        public channelId: Identifier | string,
+        public participant: User,
+        public auditInfo?: AuditInfo
     ) {}
 }
 
