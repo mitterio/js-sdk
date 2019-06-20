@@ -13,7 +13,7 @@ import {
     EntityProfile,
     AttachedEntityMetadata,
     EntityMetadata,
-    QueriableMetadata, StandardRuleSetNames
+    QueriableMetadata, StandardRuleSetNames, ChannelSummary
 } from '@mitter-io/models'
 import { MAX_CHANNEL_LIST_LENGTH } from '../constants'
 import queryString from 'query-string'
@@ -194,6 +194,15 @@ export interface ChannelsApi {
             response: number
         }
 
+    }
+
+    '/v1/open-connect/channels-counter/channels/:channelIds/summary': {
+        GET: {
+            params: {
+                channelIds: string
+            }
+            response: ChannelSummary[]
+        }
     }
 }
 
@@ -606,6 +615,12 @@ export class ChannelsClient {
         }
         return this.channelsAxiosClient
             .get<'v1/counts/:countClass/:subject1/:subject2/:subject3'>(url)
+            .then(x => x.data)
+    }
+
+    getSummaryForChannels(channelIds: string): Promise<ChannelSummary[]>{
+        return this.channelsAxiosClient
+            .get<'/v1/open-connect/channels-counter/channels/:channelIds/summary'>(`/v1/open-connect/channels-counter/channels/${channelIds}/summary`, {})
             .then(x => x.data)
     }
 }

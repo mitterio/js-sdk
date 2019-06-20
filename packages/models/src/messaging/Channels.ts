@@ -1,6 +1,7 @@
 import IdentifiableEntity from '../annotations/IdentifiableEntity'
 import { AuditInfo } from '../commons/common-models'
 import { User } from '../user/User'
+import { Message } from './Messages'
 import { TimelineEvent } from './TimelineEvents'
 import { EntityMetadata } from '../entity/EntityMetadata'
 import { EntityProfile } from '../entity/EntityProfile'
@@ -54,4 +55,12 @@ export class ChannelParticipation {
 
 export class ParticipatedChannel {
     constructor(public participationStatus: ParticipationStatus, public channel: Channel) {}
+}
+
+export class ChannelSummary {
+    constructor(
+        public channelId: string,
+        public messages: Array<Message>,
+        public unreadMessageCount: number
+    ){}
 }
