@@ -59,7 +59,7 @@ export class ParticipatedChannel {
 
 export class ChannelSummary {
     constructor(
-        public channelId: string,
+        public channelId: Identifier | string,
         public messages: Array<Message>,
         public unreadMessageCount: number
     ){}
