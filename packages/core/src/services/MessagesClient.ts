@@ -226,7 +226,7 @@ export class MessagesClient {
                               senderIds: string | undefined = undefined,
                               shouldFetchMetadata: boolean = false,
                               shouldFetchChannel: boolean = false,
-                              withChannelProfileAttributes: string = '*',
+                              withChannelProfileAttributes: string | undefined = undefined,
                               before: string | undefined = undefined,
                               after: string | undefined = undefined,
                               limit: number = MAX_MESSAGE_LIST_LENGTH
@@ -239,7 +239,7 @@ export class MessagesClient {
                     {},
                     {shouldFetchMetadata: shouldFetchMetadata},
                     {shouldFetchChannel: shouldFetchChannel},
-                    {withChannelProfileAttributes: withChannelProfileAttributes},
+                    withChannelProfileAttributes !== undefined ? { withChannelProfileAttributes } : {},
                     metadata !== undefined ? { metadata: metadata } : {},
                     channelIds !== undefined ? { channelIds } : {},
                     senderIds !== undefined ? { senderIds } : {},
@@ -278,7 +278,7 @@ export class MessagesClient {
         senderIds?: string,
         shouldFetchMetadata: boolean = false,
         shouldFetchChannel: boolean = false,
-        withChannelProfileAttributes: string = '*',
+        withChannelProfileAttributes: string | undefined = undefined,
         limit: number = MAX_MESSAGE_LIST_LENGTH
     ): MessagePaginationManager {
         if (limit > MAX_MESSAGE_LIST_LENGTH) {
@@ -301,7 +301,7 @@ export class MessagesClient {
         channelId: string,
         shouldFetchMetadata: boolean = false,
         shouldFetchChannel: boolean = false,
-        withChannelProfileAttributes: string = '*',
+        withChannelProfileAttributes: string | undefined ,
         limit: number = MAX_MESSAGE_LIST_LENGTH
     ): MessagePaginationManager {
         if (limit > MAX_MESSAGE_LIST_LENGTH) {
@@ -332,7 +332,7 @@ export class MessagesClient {
         channelId: string,
         shouldFetchMetadata: boolean = false,
         shouldFetchChannel: boolean = false,
-        withChannelProfileAttributes: string = '*',
+        withChannelProfileAttributes: string | undefined = undefined,
         before: string | undefined = undefined,
         after: string | undefined = undefined,
         limit: number = MAX_MESSAGE_LIST_LENGTH
@@ -346,7 +346,7 @@ export class MessagesClient {
                     {},
                     {shouldFetchMetadata: shouldFetchMetadata},
                     {shouldFetchChannel: shouldFetchChannel},
-                    {withChannelProfileAttributes: withChannelProfileAttributes},
+                    withChannelProfileAttributes !== undefined ? { withChannelProfileAttributes } : {},
                     after !== undefined ? { after } : {},
                     before !== undefined ? { before } : {},
                     limit !== undefined ? { limit } : {}
