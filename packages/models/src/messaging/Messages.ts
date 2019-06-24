@@ -57,7 +57,7 @@ export type RequestMessage = PickedPartial<Message, RequiredMessageParams>
 
 export class ChannelReferencingMessage implements MetadataAttachable {
     constructor(
-        public channelId: string,
+        public channelId: Identifier,
         public messageId: string,
         public messageType: StandardMessageType = StandardMessageType.Standard,
         public payloadType: string = StandardPayloadTypeNames.TextMessage,

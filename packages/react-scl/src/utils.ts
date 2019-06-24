@@ -7,7 +7,7 @@ function getRandomInt(max: number) {
 
 export function getChannelReferencingMessage(channelId:string, message: Message): ChannelReferencingMessage {
   return new ChannelReferencingMessage(
-    channelId,
+    {identifier: channelId},
     message.messageId as string,
     message.messageType,
     message.payloadType,
