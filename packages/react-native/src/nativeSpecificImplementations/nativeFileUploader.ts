@@ -17,7 +17,7 @@ export function nativeFileUploader<T extends BlobConfig | UriConfig>(
   channelId: string,
   message: Message,
   fileObject: T
-): Error | Promise<Message> {
+): Promise<Message> {
   const data = RNFetchBlob.wrap((fileObject as UriConfig).uri)
 
   return RNFetchBlob.fetch(requestParams.method, requestParams.path, requestParams.headers, [
@@ -36,7 +36,7 @@ export function nativeFileUploader<T extends BlobConfig | UriConfig>(
   ]).then((res: FetchBlobResponse) => {
     const { status } = res.respInfo
     if (status === 400 || status === 401 || status === 403) {
-      throw res.data
+      throw res.data as Error
     }
     return res.data as Promise<Message>
     //  return "YOU GOT HERE!"

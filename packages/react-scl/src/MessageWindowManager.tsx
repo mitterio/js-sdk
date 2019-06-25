@@ -107,7 +107,7 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
 
   render() {
     if (this.state.refreshing) {
-      return <div>Refreshing Channel</div>
+      return <React.Fragment/>
     }
 
     return (

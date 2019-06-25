@@ -241,6 +241,8 @@ export class ChannelsClient {
      */
     public getPaginatedChannelsManager(
         limit: number = MAX_CHANNEL_LIST_LENGTH,
+        paginateUsingCountOffset: boolean =false,
+        initCountOffset:number = 0,
         shouldFetchMetadata: boolean = false,
         withProfileAttributes?: string
     ): ChannelListPaginationManager {
@@ -248,7 +250,10 @@ export class ChannelsClient {
             limit = MAX_CHANNEL_LIST_LENGTH
         }
         return new ChannelListPaginationManager(
-            (before: string | undefined, after: string | undefined) => this.getAllChannels(before, after, limit, shouldFetchMetadata, withProfileAttributes)
+            (before: string | undefined, after: string | undefined, countOffset: number | undefined) => this.getAllChannels(before, after, limit, countOffset, shouldFetchMetadata, withProfileAttributes),
+            limit,
+            paginateUsingCountOffset,
+            initCountOffset
         )
     }
 
@@ -279,6 +284,7 @@ export class ChannelsClient {
         before: string | undefined = undefined,
         after: string | undefined = undefined,
         limit: number = MAX_CHANNEL_LIST_LENGTH,
+        entityCountOffset: number | undefined = undefined,
         shouldFetchMetadata: boolean = false,
         withProfileAttributes: string | undefined = undefined,
         metadata: QueriableMetadata | undefined = undefined,
@@ -294,6 +300,7 @@ export class ChannelsClient {
                     after !== undefined ? { after } : {},
                     before !== undefined ? { before } : {},
                     limit !== undefined ? { limit } : {},
+                    entityCountOffset !== undefined ? { entityCountOffset } : {},
                     {shouldFetchMetadata: shouldFetchMetadata},
                     withProfileAttributes === undefined ? {}: {withProfileAttributes: withProfileAttributes}
                 ),
@@ -333,6 +340,7 @@ export class ChannelsClient {
         before: string | undefined = undefined,
         after: string | undefined = undefined,
         limit: number = MAX_CHANNEL_LIST_LENGTH,
+        entityCountOffset: number | undefined = undefined,
         shouldFetchMetadata: boolean = false,
         rulesetFilter: StandardRuleSetNames | undefined = undefined
     ): Promise<ParticipatedChannel[]> {
@@ -343,6 +351,7 @@ export class ChannelsClient {
                     after !== undefined ? { after } : {},
                     before !== undefined ? { before } : {},
                     limit !== undefined ? { limit } : {},
+                    entityCountOffset !== undefined ? { entityCountOffset } : {},
                     {shouldFetchMetadata: shouldFetchMetadata},
                     rulesetFilter !== undefined ? { rulesetFilter } : {},
                 ),
@@ -352,6 +361,8 @@ export class ChannelsClient {
 
     public getPaginatedParticipatedChannelsManager(
         limit: number = MAX_CHANNEL_LIST_LENGTH,
+        paginateUsingCountOffset: boolean =false,
+        initCountOffset:number = 0,
         shouldFetchMetadata: boolean = false,
         rulesetFilter: StandardRuleSetNames | undefined = undefined
     ): ParticipatedChannelsPaginationManager {
@@ -359,13 +370,17 @@ export class ChannelsClient {
             limit = MAX_CHANNEL_LIST_LENGTH
         }
         return new ParticipatedChannelsPaginationManager(
-            (before: string | undefined, after: string | undefined) => this.participatedChannels(
+            (before: string | undefined, after: string | undefined, countOffset: number | undefined) => this.participatedChannels(
                 before,
                 after,
                 limit,
+                countOffset,
                 shouldFetchMetadata,
                 rulesetFilter
-            )
+            ),
+            limit,
+            paginateUsingCountOffset,
+            initCountOffset
         )
     }
 
