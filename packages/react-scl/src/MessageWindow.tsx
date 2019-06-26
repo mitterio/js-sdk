@@ -17,6 +17,7 @@ type MessageWindowProps = {
   minRowHeight: number
   fixedHeight: boolean
   loader: ReactElement<any>
+  fetchThreshold: number
   scrollIndicator?: (unreadCount: number, onClick: () => void) => ReactElement<any>
 }
 
@@ -47,6 +48,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   private indexRangeMonitor: IndexRangeMonitor
   private hasComponentMounted: boolean
   private debouncedScroll: (clientHeight: number, scrollHeight: number, scrollTop: number) => void
+  private insideFetchThreshold: boolean =  false
 
   constructor(props: MessageWindowProps) {
     super(props)
@@ -81,7 +83,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       startIndex: 0,
       stopIndex: 0
     }
-    this.debouncedScroll = debounce(this.onScroll, 2000, {leading: true})
+    this.debouncedScroll = debounce(this.onScroll, 100, {leading: true})
   }
 
   componentDidMount() {
@@ -189,11 +191,21 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
     if (!this.hasComponentMounted)
       return
     if (messages && messages.length > 0) {
-      if (scrollTop === 0) {
 
+
+      if (scrollTop <= this.props.fetchThreshold && !this.insideFetchThreshold) {
         const firstMessage = messages[0].messageId!
+        this.insideFetchThreshold = true
         this.fetchOlderMessages(firstMessage)
+        return
       }
+
+      if(scrollTop > this.props.fetchThreshold) {
+        this.insideFetchThreshold = false
+      }
+
+
+      /** check if user has scrolled to the botttom */
       if (scrollHeight - scrollTop === clientHeight) {
 
         const lastMessage = messages[messages.length - 1].messageId!

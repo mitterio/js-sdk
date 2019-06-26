@@ -17,6 +17,7 @@ type MessageWindowManagerProps = {
   fetchOlderMessages: (channelId: string, before?: string) => Promise<ChannelReferencingMessage[]>
   minRowHeight: number
   loader: ReactElement<any>
+  fetchThreshold?: number
   fixedHeight?: boolean
   mitter?: Mitter
   newMessagePayloadHook?: (message: ChannelReferencingMessage) => ChannelReferencingMessage
@@ -104,7 +105,6 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
   }
 
 
-
   render() {
     if (this.state.refreshing) {
       return <React.Fragment/>
@@ -121,6 +121,7 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
         loader={this.props.loader}
         fixedHeight={!!this.props.fixedHeight}
         scrollIndicator={this.props.scrollIndicator}
+        fetchThreshold = {this.props.fetchThreshold || 0}
       />
     )
   }
