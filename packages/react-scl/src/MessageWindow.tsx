@@ -208,8 +208,8 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       /** check if user has scrolled to the botttom */
       if (scrollHeight - scrollTop === clientHeight) {
 
-        const lastMessage = messages[messages.length - 1].messageId!
-        this.fetchNewerMessages(lastMessage)
+        // const lastMessage = messages[messages.length - 1].messageId!
+        // this.fetchNewerMessages(lastMessage)
       }
     }
   }
