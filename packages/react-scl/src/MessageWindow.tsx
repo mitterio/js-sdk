@@ -26,7 +26,6 @@ type MessageWindowState = {
   showScrollIndicator: boolean
   approxUnreadCount: number
   messages: ChannelReferencingMessage[]
-  messageIds: Array<string>
   isFetching: boolean
   showFetchingIndicator: boolean
   inMountingState: boolean
@@ -49,6 +48,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   private hasComponentMounted: boolean
   private debouncedScroll: (clientHeight: number, scrollHeight: number, scrollTop: number) => void
   private insideFetchThreshold: boolean =  false
+  private messageIds: Array<string>
 
   constructor(props: MessageWindowProps) {
     super(props)
@@ -59,14 +59,14 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       defaultHeight:this.props.minRowHeight,
       keyMapper: (rowIndex: number, columnIndex: number) => this.state.messages[rowIndex].messageId
     })
+
     const dedupedInitialMessages = this.getDedupedMessageList( props.initialMessages)
-    const messageIds = this.getMessageIds(dedupedInitialMessages)
+    this.messageIds = this.getMessageIds(dedupedInitialMessages)
     this.state = {
       scrollAlignment: 'end',
       showScrollIndicator: false,
       approxUnreadCount: 0,
       messages: dedupedInitialMessages,
-      messageIds: messageIds,
       isFetching: false,
       // Indicator needs to be always shown when fetching older messages
       showFetchingIndicator: true,
@@ -121,7 +121,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   }
 
   onNewMessagePayload = (message: ChannelReferencingMessage) => {
-    if(message && this.state.messageIds.indexOf(message.messageId) === -1) { // DEDUPING
+    if(message && this.messageIds.indexOf(message.messageId) === -1) { // DEDUPING
       const clonedMessageList = this.getMessageListClone()
       clonedMessageList.push(message)
       const scrollToRow = clonedMessageList.length
@@ -209,6 +209,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       if (scrollHeight - scrollTop === clientHeight) {
 
         const lastMessage = messages[messages.length - 1].messageId!
+
         this.fetchNewerMessages(lastMessage)
       }
     }
@@ -230,13 +231,12 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
             const messageListClone = this.getMessageListClone()
             const initialMessageCount = messageListClone.length
             messageListClone.unshift(...messages)
-            // const dedupedMessageList = this.getDedupedMessageList(messageListClone)
-            const scrollToRow = messageListClone.length - initialMessageCount
-            const messageIds =  this.getMessageIds(messageListClone)
+            const dedupedMessageList = this.getDedupedMessageList(messageListClone)
+            const scrollToRow = dedupedMessageList.length - initialMessageCount
+            this.messageIds =  this.getMessageIds(dedupedMessageList)
 
             this.setState({
-              messages: messageListClone,
-              messageIds: messageIds,
+              messages: dedupedMessageList,
               isFetching: false
             }, () => {
               if (!this.isScrollable() && this.fetchTillScrollable && this.state.inMountingState) {
@@ -268,14 +268,13 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
         this.props.fetchNewerMessages(messageId)
           .then((messages: ChannelReferencingMessage[]) => {
             const messageListClone = this.getMessageListClone()
-            const scrollToRow = messageListClone.length
-            messageListClone.push(...messages)
-            const messageIds =  this.getMessageIds(messageListClone)
-            // const dedupedMessageList = this.getDedupedMessageList(messageListClone)
+            const dedupedMessageList = this.getDedupedMessageList(messageListClone)
+            const scrollToRow = dedupedMessageList.length
+            dedupedMessageList.push(...messages)
+            this.messageIds =  this.getMessageIds(dedupedMessageList)
 
             this.setState({
-              messages: messageListClone,
-              messageIds: messageIds,
+              messages: dedupedMessageList,
               isFetching: false,
               // Indicator needs to be always shown when fetching older messages
               showFetchingIndicator: true
