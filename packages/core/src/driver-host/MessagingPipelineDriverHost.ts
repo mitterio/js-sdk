@@ -134,7 +134,7 @@ export class MessagingPipelineDriverHost {
                         .then(deliveryEndpoint => {
                             if (deliveryEndpoint !== undefined) {
                                 console.log('delivery Endpoint is ', deliveryEndpoint)
-                                this.registerEndpoint(driverSpec, deliveryEndpoint).then(
+                                return this.registerEndpoint(driverSpec, deliveryEndpoint).then(
                                     provisionedEndpoint => provisionedEndpoint
                                 )
                             } else {
