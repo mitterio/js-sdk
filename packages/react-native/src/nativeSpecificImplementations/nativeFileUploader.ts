@@ -15,7 +15,7 @@ export function nativeFileUploader<T extends BlobConfig | UriConfig>(
   channelId: string,
   message: Message,
   fileObject: T
-): Promise<Message> {
+): Error | Promise<Message> {
   const data = RNFetchBlob.wrap((fileObject as UriConfig).uri)
 
   return RNFetchBlob.fetch(requestParams.method, requestParams.path, requestParams.headers, [
@@ -26,12 +26,18 @@ export function nativeFileUploader<T extends BlobConfig | UriConfig>(
       data: data
     },
     {
-      name: MULTIPART_MESSAGE_FILE_NAME,
-      filename: MULTIPART_MESSAGE_NAME_KEY,
+      name: MULTIPART_MESSAGE_NAME_KEY,
+      filename: MULTIPART_MESSAGE_FILE_NAME,
       type: 'application/json',
       data: base64.encode(JSON.stringify(message))
     }
   ]).then((res: FetchBlobResponse) => {
+    const { status } = res.respInfo
+
+    if ([400, 401, 403, 413].indexOf(status) > -1) {
+      throw res.data
+    }
+
     return res.data as Promise<Message>
   })
 }
