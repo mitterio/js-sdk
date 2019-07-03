@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/core",
-  "version": "0.6.45",
+  "version": "0.6.46",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-core.umd.js",
