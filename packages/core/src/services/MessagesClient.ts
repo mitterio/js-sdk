@@ -444,7 +444,7 @@ export class MessagesClient {
         channelId: string,
         message: Message,
         fileObject: T
-    ): Promise<Message> {
+    ): Promise<Message> | Error {
         if (this.platformImplementedFeatures.processMultipartRequest !== undefined) {
             const uploadPath =
                 this.mitterApiConfiguration.mitterApiBaseUrl + `/v1/channels/${channelId}/messages`

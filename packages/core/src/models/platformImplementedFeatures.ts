@@ -9,7 +9,7 @@ export interface PlatformImplementedFeatures {
               channelId: string,
               message: Message,
               fileObject: T
-          ) => Promise<Message>)
+          ) => Promise<Message> | Error)
         | undefined
     base64Decoder: undefined | ((encodedString: string) => string)
 }
