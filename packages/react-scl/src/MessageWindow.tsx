@@ -50,6 +50,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   private insideFetchThreshold: boolean =  false
   private messageIds: Array<string>
 
+
   constructor(props: MessageWindowProps) {
     super(props)
     this.cache = new CellMeasurerCache({
@@ -208,9 +209,9 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       /** check if user has scrolled to the botttom */
       if (scrollHeight - scrollTop === clientHeight) {
 
-        const lastMessage = messages[messages.length - 1].messageId!
+        // const lastMessage = messages[messages.length - 1].messageId!
 
-        this.fetchNewerMessages(lastMessage)
+        // this.fetchNewerMessages(lastMessage)
       }
     }
   }

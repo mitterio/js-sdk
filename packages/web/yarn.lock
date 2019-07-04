@@ -18,7 +18,7 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
-"@mitter-io/core@^0.6.45":
+"@mitter-io/core@^0.6.46":
   version "0.6.45"
   resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.6.45.tgz#bb90bc91265b138f67c9bf35ee0f521f31e3528b"
   integrity sha512-0abbZhJS9A4Xmk2DreiMCUmNgnELe7xn1Q1wAAcEQ34Dm2FQ6KnZMuD/XRtPmup+bpZhHLJY/p3TPRs7mE/k3g==
