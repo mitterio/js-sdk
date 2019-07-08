@@ -28,7 +28,10 @@ export interface PipelineSink extends BasePipelineSink {
 }
 
 export default interface MessagingPipelineDriver {
-    initialize(mitter: Mitter): PipelineDriverInitialization
+    initialize(mitter: Mitter,
+               initMessagingPipelineSubscriptions: Array<string>,
+               onMessagingPipelineConnectCb: (initSubscription: Array<string>) => void
+               ): PipelineDriverInitialization
 
     getDeliveryEndpoint(): Promise<DeliveryEndpoint | undefined>
 

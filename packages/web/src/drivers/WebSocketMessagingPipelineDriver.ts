@@ -4,12 +4,9 @@ import {
     PipelineDriverInitialization,
     Mitter,
     BasePipelineSink,
-    StandardHeaders
 } from '@mitter-io/core'
 
 import { DeliveryEndpoint } from '@mitter-io/models'
-
-// import SockJs from 'sockjs-client'
 import * as Stomp from '@stomp/stompjs'
 import { Message } from '@stomp/stompjs'
 import { noOp } from '../utils'
@@ -21,8 +18,9 @@ import {heartbeatIncomingMs, heartbearOutgoingMs, reconnect_delay} from "./WebSo
 export default class WebSocketPipelineDriver implements MessagingPipelineDriver {
     private activeSocket: Stomp.Client | undefined = undefined
     private pipelineSink: BasePipelineSink | undefined = undefined
-    private connectionTime: number = 0
     private mitterContext: Mitter | undefined = undefined
+    private initMessagingPipelineSubscriptions: Array<string> = []
+    private onMessagingPipelineConnectCb: (initSubscription: Array<string>) => void = () =>  {noOp()}
     private deliveryTargetId: string
 
     constructor() {
@@ -43,8 +41,13 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
         noOp()
     }
 
-    initialize(mitter: Mitter): PipelineDriverInitialization {
+    initialize(mitter: Mitter,
+               initMessagingPipelineSubscriptions: Array<string>,
+               onMessagingPipelineConnectCb: (initSubscription: Array<string>) => void
+    ): PipelineDriverInitialization {
         this.mitterContext = mitter
+        this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions
+        this.onMessagingPipelineConnectCb = onMessagingPipelineConnectCb
 
         return {
             pipelineDriverSpec: {
@@ -84,8 +87,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
             }
         } else {
             this.mitterContext.getUserAuthorization().then(userAuthorization => {
-                // dev-box-bom1-a0.internal.mitter.io:7180
-                this.activeSocket = Stomp.over(new WebSocket(`${this.mitterContext!.getWeaverUrl()}`))
+                this.activeSocket = Stomp.over(new WebSocket(`${this.mitterContext!.weaverUrl}`))
                 this.activeSocket.debug = noOp
                 this.activeSocket.reconnect_delay = reconnect_delay
                 this.activeSocket.heartbeat = {
@@ -107,12 +109,6 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                 if (this.activeSocket === undefined) {
                     reject(Error('Cannot construct'))
                 } else {
-                    /*const authHeaders: any = {
-                        [StandardHeaders.UserAuthorizationHeader]: userAuthorization
-                    }*/
-                    // 'x-mitter-user-authorization':'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJtaXR0ZXItaW8iLCJ1c2VyVG9rZW5JZCI6Im44YTVoV2QybHVJWTJOVUkiLCJ1c2VydG9rZW4iOiJwb25kZW5sMzByYWNkNjU2MzV0YnU3ZDZnciIsImFwcGxpY2F0aW9uSWQiOiJ3akptby10dFRLeS1rWTh3RC1yTE5rdiIsInVzZXJJZCI6IktnZTBhLWk3WVdiLTVGRHhmLXBXTEtpIn0.e1YpwZ28Nj76y7GFEDIOl6LAlN9B-j6rqTkz3IXTbaGuQ3rKyDvTtAGu3w6PGY_B1n4RVuaG0gucefaM_Qc3Pg'
-                    //'init-subscriptions': '/channels/open/e2zeT-Wosx8-ec2Gx-n2KvD',
-
                     const headers: any = {
                       [WebSocketStandardHeaders.DeliveryTargetId]: this.deliveryTargetId,
                     }
@@ -131,7 +127,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
 
 
 
-                    const initSubscriptions = this.mitterContext!.getInitMessagingPipelineSubscriptions()
+                    const initSubscriptions = this.initMessagingPipelineSubscriptions
 
                     if(initSubscriptions.length > 0) {
                       headers[
@@ -143,7 +139,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                     this.activeSocket.connect(
                         headers,
                         frame => {
-                          const connectCb = this.mitterContext!.getOnMessagingPipelineConnectCb()
+                          const connectCb = this.onMessagingPipelineConnectCb
                           if(connectCb !== undefined) {
                             connectCb(initSubscriptions)
                           }

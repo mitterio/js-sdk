@@ -29,6 +29,8 @@ export class MessagingPipelineDriverHost {
         pipelineDrivers: Array<MessagingPipelineDriver> | MessagingPipelineDriver,
         private mitterContext: Mitter,
         private kvStore: KvStore | undefined = undefined,
+        private initMessagingPipelineSubscriptions: Array<string>,
+        private onMessagingPipelineConnectCb: (initSubscription: Array<string>) => void,
         private onAllPipelinesInitialized: (e?: any) => void = () => {}
     ) {
         if (pipelineDrivers instanceof Array) {
@@ -94,7 +96,9 @@ export class MessagingPipelineDriverHost {
             let driverSpec: PipelineDriverSpec
             try {
                 let { initialized, pipelineDriverSpec } = await driver.initialize(
-                    this.mitterContext
+                    this.mitterContext,
+                    this.initMessagingPipelineSubscriptions,
+                    this.onMessagingPipelineConnectCb
                 )
                 driverInitialized = initialized
                 pipelineInits.push(driverInitialized)

@@ -48,60 +48,53 @@ export class Mitter extends MitterBase {
         UserAuthorizationToken: 'userAuthorizationToken',
         UserId: 'userId'
     }
-    mitterApiConfigurationProvider = () => {
-        return new MitterApiConfiguration(
-            new UserAuthorizationInterceptor(
-                () => this.cachedUserAuthorization,
-                this.applicationId
-            ).getInterceptor(),
-            this.mitterApiBaseUrl,
-            this.enableAxiosInterceptor
-        )
-    }
-    enableAxiosInterceptor = (axiosInstance: AxiosInstance) => {
-        this.mitterAxiosInterceptor.enable(axiosInstance)
-    }
     private cachedUserAuthorization: string | undefined = undefined
     private cachedUserId: string | undefined = undefined
-    private mitterAxiosInterceptor: MitterAxiosApiInterceptor = new MitterAxiosApiInterceptor(
-        /* the application if */
-        this.applicationId,
-
-        /* The generic request interceptor to use */
-        new UserAuthorizationInterceptor(
-            () => this.cachedUserAuthorization,
-            this.applicationId
-        ).getInterceptor(),
-
-        /* The base url for mitter apis */
-        this.mitterApiBaseUrl,
-        this.disableXHRCaching
-    )
+    private mitterAxiosInterceptor: MitterAxiosApiInterceptor
     private messagingPipelineDriverHost: MessagingPipelineDriverHost
     private subscriptions: ((payload: MessagingPipelinePayload) => void)[] = []
     private onAuthAvailableSubscribers: (() => void)[] = []
     private onPipelinesInitialized = statefulPromise<void>()
-    private initMessagingPipelineSubscriptions: Array<string>
-    private weaverUrl: string
-    private onMessagingPipelineConnectCb: undefined | ((initSubscriptions:Array<string>) => void)
 
     constructor(
+
         public readonly kvStore: KvStore,
         public readonly applicationId: string | undefined,
         public readonly mitterApiBaseUrl: string = MitterConstants.MitterApiUrl,
-        private onTokenExpireFunctions: (() => void)[],
-        mitterInstanceReady: () => void,
+        public readonly weaverUrl: string,
         pipelineDrivers: MessagingPipelineDriver[] | MessagingPipelineDriver,
         globalHostObject: any,
+        initMessagingPipelineSubscriptions: Array<string>,
         private platformImplementedFeatures: PlatformImplementedFeatures,
-        private disableXHRCaching: boolean =  true
+        disableXHRCaching: boolean,
+        mitterInstanceReady: () => void,
+        private onTokenExpireFunctions: (() => void)[],
+        onMessagingPipelineConnectCb: (initSubscription: Array<string>) => void
+
     ) {
         super()
-        this.weaverUrl = this.mitterApiBaseUrl
+
+        this.mitterAxiosInterceptor = new MitterAxiosApiInterceptor(
+            /* the application id */
+            this.applicationId,
+
+            /* The generic request interceptor to use */
+            new UserAuthorizationInterceptor(
+                () => this.cachedUserAuthorization,
+                this.applicationId
+            ).getInterceptor(),
+
+            /* The base url for mitter apis */
+            this.mitterApiBaseUrl,
+            disableXHRCaching
+        )
+
         this.messagingPipelineDriverHost = new MessagingPipelineDriverHost(
             pipelineDrivers,
             this,
             kvStore,
+            initMessagingPipelineSubscriptions,
+            onMessagingPipelineConnectCb,
             (e?: any) => {
                 if (e !== undefined) {
                     this.onPipelinesInitialized.reject(e)
@@ -115,9 +108,23 @@ export class Mitter extends MitterBase {
             this.subscriptions.forEach(subscription => subscription(messagingPayload))
         )
 
-        this.initMessagingPipelineSubscriptions = []
-
         globalHostObject._mitter_context = this
+
+    }
+
+    mitterApiConfigurationProvider = () => {
+        return new MitterApiConfiguration(
+            new UserAuthorizationInterceptor(
+                () => this.cachedUserAuthorization,
+                this.applicationId
+            ).getInterceptor(),
+            this.mitterApiBaseUrl,
+            this.enableAxiosInterceptor
+        )
+    }
+
+    enableAxiosInterceptor = (axiosInstance: AxiosInstance) => {
+        this.mitterAxiosInterceptor.enable(axiosInstance)
     }
 
     platformImplementedFeaturesProvider() {
@@ -136,12 +143,7 @@ export class Mitter extends MitterBase {
         this.mitterAxiosInterceptor.disable(axiosInstance)
     }
 
-    setUserAuthorization(authorizationToken: string,
-                         disableTokenCaching: boolean = false,
-                         weaverUrl?: string,
-                         initMessagingPipelineSubscriptions?: Array<string>,
-                         onMessagingPipelineConnectCb?: (initSubscription: Array<string>) => void
-    ) {
+    setUserAuthorization(authorizationToken: string, disableTokenCaching: boolean = false) {
         if (authorizationToken.split('.').length === 3) {
             if (typeof atob !== 'undefined') {
                 this.cachedUserId = JSON.parse(atob(authorizationToken.split('.')[1]))['userId']
@@ -158,11 +160,6 @@ export class Mitter extends MitterBase {
         }
 
         this.cachedUserAuthorization = authorizationToken
-        if(weaverUrl) {
-            this.weaverUrl = weaverUrl
-        }
-        this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions || []
-        this.onMessagingPipelineConnectCb =  onMessagingPipelineConnectCb
         this.announceAuthorizationAvailable()
         if(!disableTokenCaching) {
             this.kvStore
@@ -173,25 +170,8 @@ export class Mitter extends MitterBase {
         }
     }
 
-    startMessagingPipelineAnonymously(
-        weaverUrl?: string,
-        initMessagingPipelineSubscriptions?: Array<string>,
-        onMessagingPipelineConnectCb?: (initSubscription: Array<string>) => void
-    ): void {
-        this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions || []
-        this.onMessagingPipelineConnectCb = onMessagingPipelineConnectCb
-        if(weaverUrl) {
-            this.weaverUrl = weaverUrl
-        }
+    startMessagingPipelineAnonymously(): void {
         this.messagingPipelineDriverHost.refresh()
-    }
-
-    getInitMessagingPipelineSubscriptions(): Array<string> {
-        return this.initMessagingPipelineSubscriptions
-    }
-
-    getWeaverUrl(): string {
-        return this.weaverUrl
     }
 
     getUserAuthorization(): Promise<string | undefined> {
@@ -226,16 +206,8 @@ export class Mitter extends MitterBase {
         }
     }
 
-    initializePipelinesAnonymously() {
-        this.messagingPipelineDriverHost.refresh()
-    }
-
     onPipelinesInit(): Promise<void> {
         return this.onPipelinesInitialized
-    }
-
-    getOnMessagingPipelineConnectCb() {
-        return this.onMessagingPipelineConnectCb
     }
 
     // Smart-object values
