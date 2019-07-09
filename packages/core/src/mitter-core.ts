@@ -19,6 +19,7 @@ export * from './utils/pagination/ParticipatedChannelsPaginationManager'
 export * from './utils/pagination/PaginationInterface'
 export * from './utils/presenceBuilder/StandardUserPresenceTypes'
 export * from './utils/presenceBuilder/UserPresenceBuilder'
+export * from './config'
 
 export { default as MessagingPipelineDriver } from './specs/MessagingPipelineDriver'
 export { PlatformMitter } from './Mitter'

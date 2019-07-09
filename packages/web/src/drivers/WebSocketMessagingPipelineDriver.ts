@@ -87,7 +87,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
             }
         } else {
             this.mitterContext.getUserAuthorization().then(userAuthorization => {
-                this.activeSocket = Stomp.over(new WebSocket(`${this.mitterContext!.weaverUrl}`))
+                this.activeSocket = Stomp.over(new WebSocket(`${this.mitterContext!.mitterCoreConfig.weaverUrl}`))
                 this.activeSocket.debug = noOp
                 this.activeSocket.reconnect_delay = reconnect_delay
                 this.activeSocket.heartbeat = {
@@ -113,10 +113,10 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                       [WebSocketStandardHeaders.DeliveryTargetId]: this.deliveryTargetId,
                     }
 
-                    if (this.mitterContext!.applicationId !== undefined) {
+                    if (this.mitterContext!.mitterCoreConfig.applicationId !== undefined) {
                       headers[
                             WebSocketStandardHeaders.MitterApplicationId
-                        ] = this.mitterContext!.applicationId
+                        ] = this.mitterContext!.mitterCoreConfig.applicationId
                     }
 
                    if(userAuthorization) {

@@ -2,10 +2,9 @@ import { AuditInfo } from '../commons/common-models'
 import { User } from '../user/User'
 import {TimelineEvent} from './TimelineEvents'
 import {EntityMetadata, MetadataAttachable} from '../entity/EntityMetadata'
-import IdentifiableEntity from '../annotations/IdentifiableEntity'
 import {AppliedAclList} from '../acolyte/AppliedAclList'
 import {Identifier} from '../annotations/Identifier'
-import {PickedPartial} from '../utils/PickedPartial'
+import {PickedPartial} from '../utils/ts-types'
 import {Channel} from "./Channels";
 
 export enum StandardPayloadTypeNames {

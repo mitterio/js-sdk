@@ -6,7 +6,7 @@ import { TimelineEvent } from './TimelineEvents'
 import { EntityMetadata } from '../entity/EntityMetadata'
 import { EntityProfile } from '../entity/EntityProfile'
 import { Identifier } from '../annotations/Identifier'
-import { PickedPartial } from '../utils/PickedPartial'
+import { PickedPartial } from '../utils/ts-types'
 import { AppliedAclList } from '../acolyte/AppliedAclList'
 
 export enum StandardRuleSetNames {
