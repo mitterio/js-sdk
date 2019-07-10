@@ -3,37 +3,57 @@ import {
     MitterAxiosApiInterceptor,
     MitterConstants,
     PlatformImplementedFeatures,
-    MitterApiConfiguration
+    MitterApiConfiguration,
+    MitterUserHooks,
 } from '@mitter-io/core'
 import { AxiosInstance } from 'axios'
 import { AccessKeySigningInterceptor } from './auth/access-key-interceptor'
 import { AccessKeyApplicationCredentials } from './auth/application-credentials'
+import {MitterNodeCoreConfig, MitterNodeUserConfig, MitterNodeUserHooks} from "./config";
+import {getDefaultMitterUserHooks, getMitterNodeCoreConfig} from './utils';
 
 export class MitterNode extends MitterBase {
     private accessKeySigningInterceptor: AccessKeySigningInterceptor
 
     constructor(
-        private applicationId: string,
+        public  mitterNodeCoreConfig: MitterNodeCoreConfig,
+        /*private applicationId: string,
         private accessKey: AccessKeyApplicationCredentials,
-        public mitterApiBaseUrl: string
+        public mitterApiBaseUrl: string,*/
+        private mitterUserHooks: MitterUserHooks
     ) {
         super()
-        this.accessKeySigningInterceptor = new AccessKeySigningInterceptor(accessKey)
+        this.accessKeySigningInterceptor = new AccessKeySigningInterceptor(mitterNodeCoreConfig.accessKey)
     }
 
     version() {
         return '0.5.0'
     }
 
+    setMitterHooks = (hooks: Partial<MitterUserHooks> = {}) => {
+        this.mitterUserHooks = {
+            ...this.mitterUserHooks,
+            ...hooks,
+
+        }
+    }
+
+    getMitterHooks = () => {
+        return this.mitterUserHooks
+    }
+
+
+
     enableAxiosInterceptor(axiosInstance: AxiosInstance) {
         new MitterAxiosApiInterceptor(
             /* the application id */
-            this.applicationId,
+            this.mitterNodeCoreConfig.applicationId,
 
             /* the default signing interceptor to use */
             this.accessKeySigningInterceptor.getInterceptor(),
 
-            this.mitterApiBaseUrl
+            this.mitterNodeCoreConfig.mitterApiBaseUrl,
+            false
         ).enable(axiosInstance)
     }
 
@@ -44,7 +64,7 @@ export class MitterNode extends MitterBase {
     mitterApiConfigurationProvider = () => {
         return new MitterApiConfiguration(
             this.accessKeySigningInterceptor.getInterceptor(),
-            this.mitterApiBaseUrl,
+            this.mitterNodeCoreConfig.mitterApiBaseUrl,
             this.enableAxiosInterceptor.bind(this)
         )
     }
@@ -52,11 +72,13 @@ export class MitterNode extends MitterBase {
 
 export const Mitter = {
     forNode: function(
-        applicationId: string,
-        accessKey: AccessKeyApplicationCredentials,
-        mitterApiBaseUrl: string = MitterConstants.MitterApiUrl
+        mitterNodeUserConfig: MitterNodeUserConfig,
+        mitterNodeUserHooks?: MitterNodeUserHooks
     ): MitterNode {
-        return new MitterNode(applicationId, accessKey, mitterApiBaseUrl)
+        return new MitterNode(
+            getMitterNodeCoreConfig(mitterNodeUserConfig),
+            getDefaultMitterUserHooks(mitterNodeUserHooks)
+        )
     }
 }
 

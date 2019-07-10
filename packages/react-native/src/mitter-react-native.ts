@@ -1,15 +1,19 @@
-import { Mitter as MitterCore, MitterUserConfig } from '@mitter-io/core'
+import { Mitter as MitterCore, MitterUserConfig, MitterUserHooks } from '@mitter-io/core'
 import base64 from 'base-64'
 import MitterFcmPipelineDriver from './drivers/MitterFcmPipelineDriver'
 import NativeKvStore from './kv-store/kvStore'
 import { nativeFileUploader } from './nativeSpecificImplementations/nativeFileUploader'
-import { createMitterCoreConfig } from './utils'
+import { getDefaultMitterUserHooks, getMitterCoreConfig } from './utils'
 
 export { NativeKvStore }
 export const Mitter = {
-  forReactNative: function(mitterUserConfig: MitterUserConfig): MitterCore {
+  forReactNative: function(
+    mitterUserConfig: MitterUserConfig,
+    mitterUserHooks?: Partial<MitterUserHooks>
+  ): MitterCore {
     return new MitterCore(
-      createMitterCoreConfig(mitterUserConfig),
+      getMitterCoreConfig(mitterUserConfig),
+      getDefaultMitterUserHooks(mitterUserHooks),
       new NativeKvStore(),
       new MitterFcmPipelineDriver(),
       global,

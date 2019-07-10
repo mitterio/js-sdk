@@ -13,6 +13,7 @@ import { noOp } from '../utils'
 import WebSocketStandardHeaders from './WebSocketStandardHeaders'
 import nanoid from 'nanoid'
 import {heartbeatIncomingMs, heartbearOutgoingMs, reconnect_delay} from "./WebSocketConstants";
+import {MessagingPipelineConnectCb} from "../../../core/src/config";
 
 
 export default class WebSocketPipelineDriver implements MessagingPipelineDriver {
@@ -20,7 +21,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
     private pipelineSink: BasePipelineSink | undefined = undefined
     private mitterContext: Mitter | undefined = undefined
     private initMessagingPipelineSubscriptions: Array<string> = []
-    private onMessagingPipelineConnectCb: (initSubscription: Array<string>) => void = () =>  {noOp()}
+    private onMessagingPipelineConnectCbs: MessagingPipelineConnectCb[] = [noOp]
     private deliveryTargetId: string
 
     constructor() {
@@ -43,11 +44,11 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
 
     initialize(mitter: Mitter,
                initMessagingPipelineSubscriptions: Array<string>,
-               onMessagingPipelineConnectCb: (initSubscription: Array<string>) => void
+               onMessagingPipelineConnectCb: MessagingPipelineConnectCb[]
     ): PipelineDriverInitialization {
         this.mitterContext = mitter
         this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions
-        this.onMessagingPipelineConnectCb = onMessagingPipelineConnectCb
+        this.onMessagingPipelineConnectCbs = onMessagingPipelineConnectCb
 
         return {
             pipelineDriverSpec: {
@@ -139,9 +140,11 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                     this.activeSocket.connect(
                         headers,
                         frame => {
-                          const connectCb = this.onMessagingPipelineConnectCb
-                          if(connectCb !== undefined) {
-                            connectCb(initSubscriptions)
+                          const connectCbs = this.onMessagingPipelineConnectCbs
+                          if(connectCbs !== undefined) {
+                            connectCbs.forEach(connectCb => {
+                              connectCb(initSubscriptions)
+                            })
                           }
                             this.activeSocket!!.subscribe(
                                 '/',

@@ -1,5 +1,6 @@
 import { DeliveryEndpoint, MessagingPipelinePayload } from '@mitter-io/models'
 import { Mitter } from './../mitter-core'
+import {MessagingPipelineConnectCb} from "../config";
 
 export interface PipelineDriverSpec {
     name: string
@@ -30,7 +31,7 @@ export interface PipelineSink extends BasePipelineSink {
 export default interface MessagingPipelineDriver {
     initialize(mitter: Mitter,
                initMessagingPipelineSubscriptions: Array<string>,
-               onMessagingPipelineConnectCb: (initSubscription: Array<string>) => void
+               onMessagingPipelineConnectCb: MessagingPipelineConnectCb[]
                ): PipelineDriverInitialization
 
     getDeliveryEndpoint(): Promise<DeliveryEndpoint | undefined>

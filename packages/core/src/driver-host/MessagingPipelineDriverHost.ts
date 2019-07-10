@@ -4,7 +4,7 @@ import MessagingPipelineDriver, {
     PipelineDriverSpec,
     PipelineSink
 } from './../specs/MessagingPipelineDriver'
-import { KvStore, Mitter, UsersClient } from '../mitter-core'
+import {KvStore, MessagingPipelineConnectCb, Mitter, UsersClient} from '../mitter-core'
 import { noOp } from '../utils'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 
@@ -30,7 +30,7 @@ export class MessagingPipelineDriverHost {
         private mitterContext: Mitter,
         private kvStore: KvStore | undefined = undefined,
         private initMessagingPipelineSubscriptions: Array<string>,
-        private onMessagingPipelineConnectCb: (initSubscription: Array<string>) => void,
+        private onMessagingPipelineConnectCb: MessagingPipelineConnectCb[],
         private onAllPipelinesInitialized: (e?: any) => void = () => {}
     ) {
         if (pipelineDrivers instanceof Array) {

@@ -2,7 +2,7 @@ import { MessagingPipelinePayload, User, PickedPartial } from '@mitter-io/models
 import { AxiosInstance } from 'axios'
 import { UserAuthorizationInterceptor } from './auth/user-interceptors'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
-import { KvStore, PlatformMitter } from './mitter-core'
+import {KvStore, MitterUserHooks, PlatformMitter} from './mitter-core'
 import { MitterApiConfiguration } from './MitterApiConfiguration'
 import { MitterAxiosApiInterceptor } from './MitterApiGateway'
 import { MitterClientSet } from './MitterClientSet'
@@ -37,6 +37,10 @@ export abstract class MitterBase implements PlatformMitter, MitterApiConfigurati
 
     abstract platformImplementedFeaturesProvider(): PlatformImplementedFeatures
 
+    /*because the node server needs it*/
+    abstract getMitterHooks(): void
+    abstract setMitterHooks(): void
+
     version(): string {
         return '0.5.0'
     }
@@ -59,6 +63,7 @@ export class Mitter extends MitterBase {
 
     constructor(
         public mitterCoreConfig: MitterCoreConfig,
+        public mitterUserHooks: MitterUserHooks,
         public readonly kvStore: KvStore,
         pipelineDrivers: MessagingPipelineDriver[] | MessagingPipelineDriver,
         globalHostObject: any,
@@ -86,7 +91,7 @@ export class Mitter extends MitterBase {
             this,
             kvStore,
             this.mitterCoreConfig.initMessagingPipelineSubscriptions,
-            this.mitterCoreConfig.onMessagingPipelineConnectCb,
+            this.mitterUserHooks.onMessagingPipelineConnectCb,
             (e?: any) => {
                 if (e !== undefined) {
                     this.onPipelinesInitialized.reject(e)
@@ -102,6 +107,18 @@ export class Mitter extends MitterBase {
 
         globalHostObject._mitter_context = this
 
+    }
+
+    setMitterHooks = (hooks: Partial<MitterUserHooks> = {}) => {
+        this.mitterUserHooks = {
+            ...this.mitterUserHooks,
+            ...hooks
+
+        }
+    }
+
+    getMitterHooks = (): MitterUserHooks => {
+        return this.mitterUserHooks
     }
 
     mitterApiConfigurationProvider = () => {
@@ -215,7 +232,7 @@ export class Mitter extends MitterBase {
     }
 
     private executeOnTokenExpireFunctions() {
-        this.mitterCoreConfig.onTokenExpire.forEach(onTokenExpire => {
+        this.mitterUserHooks.onTokenExpire.forEach(onTokenExpire => {
             onTokenExpire()
         })
     }

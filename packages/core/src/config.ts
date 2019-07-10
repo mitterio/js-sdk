@@ -1,6 +1,7 @@
 import {PickedPartial} from "../../models";
 
-type TokenExpireFunction = () => void
+export type TokenExpireFunction = () => void
+export type MessagingPipelineConnectCb = (initSubscription: Array<string>) => void
 
 export type MitterCoreConfig = {
     applicationId: string
@@ -8,16 +9,14 @@ export type MitterCoreConfig = {
     mitterApiBaseUrl: string ,
     initMessagingPipelineSubscriptions: Array<string>,
     disableXHRCaching: boolean,
-    mitterInstanceReady: () => void,
+}
+
+export type MitterUserHooks = {
     onTokenExpire: TokenExpireFunction[],
-    onMessagingPipelineConnectCb: (initSubscription: Array<string>) => void
+    onMessagingPipelineConnectCb: MessagingPipelineConnectCb[],
+    mitterInstanceReady: () => void,
 }
 
 export type MitterUserConfig = PickedPartial<MitterCoreConfig,
-    "mitterApiBaseUrl" |
-    "initMessagingPipelineSubscriptions" |
-    "disableXHRCaching" |
-    "mitterInstanceReady" |
-    "onTokenExpire" |
-    "onMessagingPipelineConnectCb"
+    "applicationId"
     >
