@@ -83,7 +83,8 @@ export class Mitter extends MitterBase {
 
             /* The base url for mitter apis */
             this.mitterCoreConfig.mitterApiBaseUrl,
-            this.mitterCoreConfig.disableXHRCaching
+            this.mitterCoreConfig.disableXHRCaching,
+            // this.getMitterHooks
         )
 
         this.messagingPipelineDriverHost = new MessagingPipelineDriverHost(
