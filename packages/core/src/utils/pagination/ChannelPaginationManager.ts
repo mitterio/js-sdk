@@ -18,11 +18,17 @@ export class ChannelListPaginationManager implements Pagination<Channel> {
         }
     }
 
-    private updatePageDetails(channelList: Channel[]) {
+    private updatePageDetails(channelList: Channel[], order: 'next' | 'prev') {
         if (channelList.length > 0) {
             if(!this.paginateUsingCountOffset) {
-                this.before = channelList[channelList.length - 1].channelId!
-                this.after = channelList[0].channelId!
+                if(order === 'prev') {
+                    this.before = channelList[channelList.length - 1].channelId!
+                    this.after = channelList[0].channelId!
+                }
+                else {
+                    this.before = channelList[0].channelId!
+                    this.after = channelList[channelList.length - 1].channelId!
+                }
             }
             else {
                     this.countOffset = this.countOffset! + channelList.length
@@ -37,7 +43,7 @@ export class ChannelListPaginationManager implements Pagination<Channel> {
             this.after,
             this.countOffset
         ) as Promise<Channel[]>)
-        this.updatePageDetails(channelList)
+        this.updatePageDetails(channelList, 'next')
         return channelList
     }
 
@@ -52,7 +58,7 @@ export class ChannelListPaginationManager implements Pagination<Channel> {
             undefined,
             countOffset
         ) as Promise<Channel[]>)
-        this.updatePageDetails(channelList)
+        this.updatePageDetails(channelList, 'prev')
         return channelList
     }
 }
