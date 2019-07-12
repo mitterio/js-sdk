@@ -1,4 +1,4 @@
-import { MessagingPipelinePayload, User, PickedPartial } from '@mitter-io/models'
+import { MessagingPipelinePayload, User } from '@mitter-io/models'
 import { AxiosInstance } from 'axios'
 import { UserAuthorizationInterceptor } from './auth/user-interceptors'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
@@ -17,8 +17,6 @@ export interface PlatformMitter {
     info?(): string
 
     version(): string
-
-    platformImplementedFeaturesProvider(): PlatformImplementedFeatures
 }
 
 export interface MitterApiConfigurationProvider {
@@ -26,20 +24,22 @@ export interface MitterApiConfigurationProvider {
 }
 
 export abstract class MitterBase implements PlatformMitter, MitterApiConfigurationProvider {
+
+
+    constructor(
+        public mitterUserHooks: MitterUserHooks,
+        public platformImplementedFeatures: PlatformImplementedFeatures,
+
+    ) {}
+
     clients = (): MitterClientSet => {
         return new MitterClientSet(
             this.mitterApiConfigurationProvider(),
-            this.platformImplementedFeaturesProvider()
+            this.platformImplementedFeatures
         )
     }
 
     abstract mitterApiConfigurationProvider(): MitterApiConfiguration
-
-    abstract platformImplementedFeaturesProvider(): PlatformImplementedFeatures
-
-    /*because the node server needs it*/
-    abstract getMitterHooks(): void
-    abstract setMitterHooks(): void
 
     version(): string {
         return '0.5.0'
@@ -67,9 +67,9 @@ export class Mitter extends MitterBase {
         public readonly kvStore: KvStore,
         pipelineDrivers: MessagingPipelineDriver[] | MessagingPipelineDriver,
         globalHostObject: any,
-        private platformImplementedFeatures: PlatformImplementedFeatures,
+        platformImplementedFeatures: PlatformImplementedFeatures,
     ) {
-        super()
+        super(mitterUserHooks, platformImplementedFeatures)
 
         this.mitterAxiosInterceptor = new MitterAxiosApiInterceptor(
             /* the application id */
@@ -110,18 +110,6 @@ export class Mitter extends MitterBase {
 
     }
 
-    setMitterHooks = (hooks: Partial<MitterUserHooks> = {}) => {
-        this.mitterUserHooks = {
-            ...this.mitterUserHooks,
-            ...hooks
-
-        }
-    }
-
-    getMitterHooks = (): MitterUserHooks => {
-        return this.mitterUserHooks
-    }
-
     mitterApiConfigurationProvider = () => {
         return new MitterApiConfiguration(
             new UserAuthorizationInterceptor(
@@ -137,9 +125,6 @@ export class Mitter extends MitterBase {
         this.mitterAxiosInterceptor.enable(axiosInstance)
     }
 
-    platformImplementedFeaturesProvider() {
-        return this.platformImplementedFeatures
-    }
 
     userAuthorizationAvailable(onAuthAvailable: () => void) {
         this.onAuthAvailableSubscribers.push(onAuthAvailable)

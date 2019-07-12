@@ -61,7 +61,10 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       keyMapper: (rowIndex: number, columnIndex: number) => this.state.messages[rowIndex].messageId
     })
 
-    const dedupedInitialMessages = this.getDedupedMessageList( props.initialMessages)
+    /** deduping the initial message list provided by the user,
+     *  ideally the user should dedupe it , this is just here to act as a safety net
+    * */
+    const dedupedInitialMessages = uniqBy(props.initialMessages, 'messageId')
     this.messageIds = this.getMessageIds(dedupedInitialMessages)
     this.state = {
       scrollAlignment: 'end',
@@ -110,6 +113,12 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
     return messages.map(message => message.messageId)
   }
 
+  /**this function exists because of the below reason
+   * - there might be a delay between the call to get a delivery target and assigning a delivery target by central
+   *   so there is  a possibilty that messages might get dropped, since there is no delivery target the messages might get dropped
+   *   though the delay might be very small, this just acts as a safety net
+   * */
+
   forceFetchNewerMessages = () => {
     if(this.hasComponentMounted) {
       const messages = this.state.messages
@@ -148,8 +157,12 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
     return this.state.messages.slice()
   }
 
+
   getDedupedMessageList = (messageList: ChannelReferencingMessage[]): ChannelReferencingMessage[] => {
-    return uniqBy(messageList, 'messageId')
+    return messageList.filter(message => {
+      return this.messageIds.indexOf(message.messageId) === -1
+    })
+    // return uniqBy(messageList, 'messageId')
   }
 
 
@@ -232,6 +245,10 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
             const messageListClone = this.getMessageListClone()
             const initialMessageCount = messageListClone.length
             messageListClone.unshift(...messages)
+            /**
+             * though deduping is not needed here as the messages returned by the server
+             * are supposed to be unique , keeping it here as  a safety net
+             * */
             const dedupedMessageList = this.getDedupedMessageList(messageListClone)
             const scrollToRow = dedupedMessageList.length - initialMessageCount
             this.messageIds =  this.getMessageIds(dedupedMessageList)
@@ -269,6 +286,11 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
         this.props.fetchNewerMessages(messageId)
           .then((messages: ChannelReferencingMessage[]) => {
             const messageListClone = this.getMessageListClone()
+            /**
+             * this is needed here as the scroll goes to the bottom on each message send,
+             * and this triggers  a fetch new messages call , to prevent duplication of messages
+             * as it returned by the message pipeline and from the fetch newer message call
+             * */
             const dedupedMessageList = this.getDedupedMessageList(messageListClone)
             const scrollToRow = dedupedMessageList.length
             dedupedMessageList.push(...messages)

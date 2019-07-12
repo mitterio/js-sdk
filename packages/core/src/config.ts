@@ -1,4 +1,4 @@
-import {PickedPartial} from "../../models";
+import {PickedPartial} from "@mitter-io/models";
 
 export type TokenExpireFunction = () => void
 export type MessagingPipelineConnectCb = (initSubscription: Array<string>) => void
@@ -18,5 +18,5 @@ export type MitterUserHooks = {
 }
 
 export type MitterUserConfig = PickedPartial<MitterCoreConfig,
-    "applicationId"
+    "applicationId" | "weaverUrl"
     >

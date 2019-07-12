@@ -18,29 +18,14 @@ export class MitterNode extends MitterBase {
         /*private applicationId: string,
         private accessKey: AccessKeyApplicationCredentials,
         public mitterApiBaseUrl: string,*/
-        private mitterUserHooks: MitterUserHooks
+        mitterUserHooks: MitterUserHooks
     ) {
-        super()
+        super(
+            mitterUserHooks,
+            {} as PlatformImplementedFeatures
+        )
         this.accessKeySigningInterceptor = new AccessKeySigningInterceptor(mitterNodeCoreConfig.accessKey)
     }
-
-    version() {
-        return '0.5.0'
-    }
-
-    setMitterHooks = (hooks: Partial<MitterUserHooks> = {}) => {
-        this.mitterUserHooks = {
-            ...this.mitterUserHooks,
-            ...hooks,
-
-        }
-    }
-
-    getMitterHooks = () => {
-        return this.mitterUserHooks
-    }
-
-
 
     enableAxiosInterceptor(axiosInstance: AxiosInstance) {
         new MitterAxiosApiInterceptor(

@@ -1,6 +1,6 @@
 import {MitterCoreConfig, MitterUserHooks} from '@mitter-io/core'
 import {AccessKeyApplicationCredentials} from "./auth/application-credentials";
-import {MakeKeyPartial} from "../../models/src/utils/ts-types";
+import {MakeKeyPartial} from "@mitter-io/models";
 
 export type MitterNodeCoreConfig = {accessKey: AccessKeyApplicationCredentials} &   Pick<MitterCoreConfig,
     "applicationId" | "mitterApiBaseUrl">

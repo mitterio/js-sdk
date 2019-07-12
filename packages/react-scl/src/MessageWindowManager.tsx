@@ -31,7 +31,6 @@ type MessageWindowManagerState = {
 export class MessageWindowManager extends React.Component<MessageWindowManagerProps, MessageWindowManagerState> {
 
   private messageWindowRef: RefObject<MessageWindow>
-  private timer: Timeout | undefined = undefined
 
   constructor(props: MessageWindowManagerProps) {
     super(props)
