@@ -1,11 +1,10 @@
 import React, {ReactElement, RefObject} from 'react'
-import {ChannelReferencingMessage} from "@mitter-io/models";
+import {ChannelReferencingMessage, MessagingPipelinePayload} from "@mitter-io/models";
 import {Producer} from './Producer/Producer'
 import {getViewFromProducer} from "./ViewProducers/utils";
 import MessageWindow from "./MessageWindow";
 import {isNewMessagePayload, Mitter} from "@mitter-io/core";
 import {getChannelReferencingMessage} from "./utils";
-import Timeout = NodeJS.Timeout;
 
 
 type MessageWindowManagerProps = {
@@ -42,7 +41,7 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
 
   componentDidMount() {
     if (this.props.mitter) {
-      this.props.mitter.subscribeToPayload((payload) => {
+      this.props.mitter.subscribeToPayload((payload: MessagingPipelinePayload) => {
         if (isNewMessagePayload(payload) && payload.channelId.identifier === this.props.channelId) {
           Promise.resolve(payload.message)
             .then(message => {
