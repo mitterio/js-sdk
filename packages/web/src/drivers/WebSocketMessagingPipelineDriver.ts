@@ -20,8 +20,6 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
     private activeSocket: Stomp.Client | undefined = undefined
     private pipelineSink: BasePipelineSink | undefined = undefined
     private mitterContext: Mitter | undefined = undefined
-    private initMessagingPipelineSubscriptions: Array<string> = []
-    private onMessagingPipelineConnectCbs: MessagingPipelineConnectCb[] = [noOp]
     private deliveryTargetId: string
 
     constructor() {
@@ -42,13 +40,8 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
         noOp()
     }
 
-    initialize(mitter: Mitter,
-               initMessagingPipelineSubscriptions: Array<string>,
-               onMessagingPipelineConnectCb: MessagingPipelineConnectCb[]
-    ): PipelineDriverInitialization {
+    initialize(mitter: Mitter): PipelineDriverInitialization {
         this.mitterContext = mitter
-        this.initMessagingPipelineSubscriptions = initMessagingPipelineSubscriptions
-        this.onMessagingPipelineConnectCbs = onMessagingPipelineConnectCb
 
         return {
             pipelineDriverSpec: {
@@ -128,7 +121,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
 
 
 
-                    const initSubscriptions = this.initMessagingPipelineSubscriptions
+                    const initSubscriptions = this.mitterContext!.mitterCoreConfig.initMessagingPipelineSubscriptions
 
                     if(initSubscriptions.length > 0) {
                       headers[
@@ -140,7 +133,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                     this.activeSocket.connect(
                         headers,
                         frame => {
-                          const connectCbs = this.onMessagingPipelineConnectCbs
+                          const connectCbs = this.mitterContext!.mitterUserHooks.onMessagingPipelineConnectCbs
                           if(connectCbs !== undefined) {
                             connectCbs.forEach(connectCb => {
                               connectCb(initSubscriptions)

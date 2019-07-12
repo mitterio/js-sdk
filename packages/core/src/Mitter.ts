@@ -91,8 +91,6 @@ export class Mitter extends MitterBase {
             pipelineDrivers,
             this,
             kvStore,
-            this.mitterCoreConfig.initMessagingPipelineSubscriptions,
-            this.mitterUserHooks.onMessagingPipelineConnectCb,
             (e?: any) => {
                 if (e !== undefined) {
                     this.onPipelinesInitialized.reject(e)

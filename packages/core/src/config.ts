@@ -13,7 +13,7 @@ export type MitterCoreConfig = {
 
 export type MitterUserHooks = {
     onTokenExpire: TokenExpireFunction[],
-    onMessagingPipelineConnectCb: MessagingPipelineConnectCb[],
+    onMessagingPipelineConnectCbs: MessagingPipelineConnectCb[],
     mitterInstanceReady: () => void,
 }
 

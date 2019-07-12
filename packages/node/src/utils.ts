@@ -16,7 +16,7 @@ export function getDefaultMitterUserHooks(hooks: Partial<MitterNodeUserHooks> = 
     return {
         mitterInstanceReady: () => {},
         onTokenExpire: [noOp],
-        onMessagingPipelineConnectCb: [noOp],
+        onMessagingPipelineConnectCbs: [noOp],
         ...hooks
     }
 }
