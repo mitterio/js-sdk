@@ -42,10 +42,10 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
   componentDidMount() {
     if (this.props.mitter) {
       this.props.mitter.subscribeToPayload((payload: MessagingPipelinePayload) => {
-        if (isNewMessagePayload(payload) && payload.channelId.identifier === this.props.channelId) {
+        if (isNewMessagePayload(payload) && (payload as NewMessagePayload).channelId.identifier === this.props.channelId) {
           Promise.resolve((payload as NewMessagePayload).message)
             .then(message => {
-              const channelReferencingMessage = getChannelReferencingMessage(payload.channelId.identifier, payload.message)
+              const channelReferencingMessage = getChannelReferencingMessage((payload as NewMessagePayload).channelId.identifier, (payload as NewMessagePayload).message)
               if (this.props.newMessagePayloadHook) {
                 return this.props.newMessagePayloadHook(channelReferencingMessage)
               }
