@@ -5,7 +5,7 @@ import {
   MULTIPART_MESSAGE_NAME_KEY,
   MULTIPART_MESSAGE_FILE_NAME
 } from '@mitter-io/core'
-import { Message } from '@mitter-io/models'
+import { Message, ChannelReferencingMessage } from '@mitter-io/models'
 import base64 from 'base-64'
 import RNFetchBlob, { FetchBlobResponse } from 'rn-fetch-blob'
 import { base64ValidationRegex } from '../utils'
@@ -15,7 +15,7 @@ export function nativeFileUploader<T extends BlobConfig | UriConfig>(
   channelId: string,
   message: Message,
   fileObject: T
-): Error | Promise<Message> {
+): Error | Promise<ChannelReferencingMessage> {
   const data = RNFetchBlob.wrap((fileObject as UriConfig).uri)
 
   return RNFetchBlob.fetch(requestParams.method, requestParams.path, requestParams.headers, [
@@ -38,6 +38,6 @@ export function nativeFileUploader<T extends BlobConfig | UriConfig>(
       throw res.data
     }
 
-    return res.data as Promise<Message>
+    return res.data as Promise<ChannelReferencingMessage>
   })
 }

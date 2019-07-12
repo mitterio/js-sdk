@@ -113,12 +113,12 @@
     "tslint": "^5.8.0",
     "tslint-config-prettier": "^1.1.0",
     "tslint-config-standard": "^7.0.0",
-    "typedoc": "^0.12.0",
+    "typedoc": "^0.14.2",
     "typescript": "3.0.3",
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
-    "@mitter-io/core": "^0.6.46",
+    "@mitter-io/core": "^0.6.45",
     "@mitter-io/models": "^0.6.45",
     "@stomp/stompjs": "^4.0.7",
     "@types/sockjs-client": "^1.1.0",

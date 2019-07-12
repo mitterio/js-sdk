@@ -117,6 +117,15 @@ export interface UsersApi {
     }
 
     '/v1/users/:userId/profile/:key': {
+        GET: {
+            params: {
+                userId: string
+                key: string
+            }
+            response: EntityProfileAttribute[]
+        }
+
+
         POST: {
             params: {
                 userId: string
@@ -127,16 +136,6 @@ export interface UsersApi {
         }
     }
 
-    '/v1/users/:userId/profile/:keys': {
-        GET: {
-            params: {
-                userId: string
-                key: string
-            }
-        }
-
-        response: EntityProfileAttribute[]
-    }
 
     '/v1/attribute-def/users': {
         GET: {
@@ -426,7 +425,7 @@ export class UsersClient {
 
     getUserProfileAttributes(userId: string, keys: string): Promise<EntityProfileAttribute[]> {
         return this.usersAxiosClient
-            .get<'/v1/users/:userId/profile/:keys'>(`/v1/users/${userId}/profile/${keys}`)
+            .get<'/v1/users/:userId/profile/:key'>(`/v1/users/${userId}/profile/${keys}`)
             .then(x => x.data)
     }
 

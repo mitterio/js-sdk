@@ -86,6 +86,8 @@ export interface MessagesApi {
             }
 
             body: Message | FormData
+
+            response: ChannelReferencingMessage
         }
     }
 
@@ -115,6 +117,7 @@ export interface MessagesApi {
                 channelId: string
                 messageIds: string
             }
+            response: void
         }
     }
 
@@ -175,7 +178,7 @@ export class MessagesClient {
      * More details on messages can be found in our docs under the Messages section
      * @returns {Promise<Message>} - Returns a promisified Message object
      */
-    public sendMessage(channelId: string, message: Message): Promise<Message> {
+    public sendMessage(channelId: string, message: Message): Promise<ChannelReferencingMessage> {
         return this.messagesAxiosClient
             .post<'/v1/channels/:channelId/messages'>(
                 `/v1/channels/${encodeURIComponent(channelId)}/messages`,
@@ -444,7 +447,7 @@ export class MessagesClient {
         channelId: string,
         message: Message,
         fileObject: T
-    ): Promise<Message> | Error {
+    ): Promise<ChannelReferencingMessage> | Error {
         if (this.platformImplementedFeatures.processMultipartRequest !== undefined) {
             const uploadPath =
                 this.mitterApiConfiguration.mitterApiBaseUrl + `/v1/channels/${channelId}/messages`

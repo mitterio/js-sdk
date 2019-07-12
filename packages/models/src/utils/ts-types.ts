@@ -1,6 +1,6 @@
 export type PickedPartial<P extends object, K extends keyof P> = Partial<P> & Pick<P, K>
 
-type Exclude<T, U> = T extends U ? never : T;
+// type Exclude<T, U> = T extends U ? never : T
 
 /*in the latets TS version Omit is part of the library itself */
 /** for omitting a certain key(s)*/
