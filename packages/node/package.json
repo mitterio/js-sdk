@@ -114,7 +114,8 @@
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
-    "@mitter-io/core": "^0.6.46",
+    "@mitter-io/core": "^0.6.45",
+    "@mitter-io/models": "^0.6.45",
     "@types/md5": "^2.1.32",
     "@types/randomstring": "^1.1.6",
     "axios": "^0.18.0",
