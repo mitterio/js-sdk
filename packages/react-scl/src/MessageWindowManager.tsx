@@ -1,5 +1,5 @@
 import React, {ReactElement, RefObject} from 'react'
-import {ChannelReferencingMessage, MessagingPipelinePayload} from "@mitter-io/models";
+import {ChannelReferencingMessage, MessagingPipelinePayload, NewMessagePayload} from "@mitter-io/models";
 import {Producer} from './Producer/Producer'
 import {getViewFromProducer} from "./ViewProducers/utils";
 import MessageWindow from "./MessageWindow";
@@ -43,7 +43,7 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
     if (this.props.mitter) {
       this.props.mitter.subscribeToPayload((payload: MessagingPipelinePayload) => {
         if (isNewMessagePayload(payload) && payload.channelId.identifier === this.props.channelId) {
-          Promise.resolve(payload.message)
+          Promise.resolve((payload as NewMessagePayload).message)
             .then(message => {
               const channelReferencingMessage = getChannelReferencingMessage(payload.channelId.identifier, payload.message)
               if (this.props.newMessagePayloadHook) {
