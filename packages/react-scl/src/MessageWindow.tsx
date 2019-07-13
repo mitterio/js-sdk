@@ -107,6 +107,17 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
         virtualizedList.scrollTop = virtualizedList.scrollHeight
       }
     }
+    /*if(prevState.messages.length !== this.state.messages.length) {
+      this.resizeAll()
+    }*/
+  }
+
+  resizeAll = () => {
+    this.cache.clearAll();
+    if (this.internalList.current) {
+      //console.log('resixzing')
+      this.internalList.current.recomputeRowHeights();
+    }
   }
 
   getMessageIds = (messages: ChannelReferencingMessage[]) => {
@@ -244,17 +255,18 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
 
             const messageListClone = this.getMessageListClone()
             const initialMessageCount = messageListClone.length
-            messageListClone.unshift(...messages)
+            const dedupedMessages = this.getDedupedMessageList(messages)
+            messageListClone.unshift(...dedupedMessages)
             /**
              * though deduping is not needed here as the messages returned by the server
              * are supposed to be unique , keeping it here as  a safety net
              * */
-            const dedupedMessageList = this.getDedupedMessageList(messageListClone)
-            const scrollToRow = dedupedMessageList.length - initialMessageCount
-            this.messageIds =  this.getMessageIds(dedupedMessageList)
+
+            const scrollToRow = messageListClone.length - initialMessageCount
+            this.messageIds =  this.getMessageIds(messageListClone)
 
             this.setState({
-              messages: dedupedMessageList,
+              messages: messageListClone,
               isFetching: false
             }, () => {
               if (!this.isScrollable() && this.fetchTillScrollable && this.state.inMountingState) {
@@ -291,13 +303,13 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
              * and this triggers  a fetch new messages call , to prevent duplication of messages
              * as it returned by the message pipeline and from the fetch newer message call
              * */
-            const dedupedMessageList = this.getDedupedMessageList(messageListClone)
-            const scrollToRow = dedupedMessageList.length
-            dedupedMessageList.push(...messages)
-            this.messageIds =  this.getMessageIds(dedupedMessageList)
+            const dedupedMessages = this.getDedupedMessageList(messages)
+            const scrollToRow = messageListClone.length
+            messageListClone.push(...dedupedMessages)
+            this.messageIds =  this.getMessageIds(messageListClone)
 
             this.setState({
-              messages: dedupedMessageList,
+              messages: messageListClone,
               isFetching: false,
               // Indicator needs to be always shown when fetching older messages
               showFetchingIndicator: true
@@ -382,8 +394,8 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
                 rowHeight={this.cache.rowHeight}
                 rowRenderer={this.rowRenderer}
                 onScroll={({ clientHeight, scrollHeight, scrollTop }: { clientHeight: number, scrollHeight: number, scrollTop: number }) => {
-                  this.debouncedScroll(clientHeight, scrollHeight, scrollTop)
                   this.showScrollIndicator()
+                  this.debouncedScroll(clientHeight, scrollHeight, scrollTop)
                 }}
                 scrollToAlignment={this.state.scrollAlignment}
               />

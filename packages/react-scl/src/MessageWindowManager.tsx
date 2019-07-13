@@ -52,7 +52,7 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
               return channelReferencingMessage
             })
             .then(message => {
-              this.pushNewMessage(message)
+              this.pushNewMessage(JSON.parse((JSON.stringify(message))))
             })
             .catch(ex => {
               console.log('error in listening to new messages')
