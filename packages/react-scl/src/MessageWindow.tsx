@@ -272,6 +272,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
               if (!this.isScrollable() && this.fetchTillScrollable && this.state.inMountingState) {
                 this.fetchOlderMessages()
               }
+
               else if (this.state.inMountingState && !this.fetchTillScrollable) {
                 // this.internalList.current!.measureAllRows()
                   // this.internalList.current!.recomputeRowHeights()
@@ -280,9 +281,13 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
                   setTimeout(() => this.setState({inMountingState: false}), 500)
 
               }
-              else {
 
-                this.internalList.current!.scrollToRow(scrollToRow)
+              else {
+                this.setState({
+                  scrollAlignment: 'start'
+                }, () => {
+                  this.internalList.current!.scrollToRow(scrollToRow)
+                })
               }
             })
           })
@@ -315,7 +320,11 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
               showFetchingIndicator: true
             }, () => {
               if (messages.length > 0)
-                this.internalList.current!.scrollToRow(scrollToRow)
+                this.setState({
+                  scrollAlignment: 'end'
+                }, () => {
+                  this.internalList.current!.scrollToRow(scrollToRow)
+                })
             })
           })
       )
@@ -341,7 +350,13 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
 
   onScrollIndicatorClick = () => {
     /* -1 because scrollToRow is follows Zero based numbering */
-    this.internalList.current!.scrollToRow(this.state.messages.length - 1)
+    this.setState({
+      scrollAlignment: 'end'
+    }, () => {
+      // this.internalList.current!.scrollToRow(scrollToRow)
+      this.internalList.current!.scrollToRow(this.state.messages.length - 1)
+    })
+
   }
 
   showScrollIndicator = () => {
