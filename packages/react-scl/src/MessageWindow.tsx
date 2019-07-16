@@ -157,7 +157,12 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
          *  so only scroll if the scroll helper is not visible
          * */
         if(!isScrollIndicatorVisible) {
-          this.internalList.current!.scrollToRow(scrollToRow)
+          this.setState({
+            scrollAlignment: 'end'
+          }, () => {
+            this.internalList.current!.scrollToRow(scrollToRow)
+          })
+          // this.internalList.current!.scrollToRow(scrollToRow)
         }
         // this.internalList.current!.scrollToPosition(this.getScrollHeight())
       })
