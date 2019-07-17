@@ -1,6 +1,5 @@
-import { DeliveryEndpoint, MessagingPipelinePayload } from '@mitter-io/models'
+import { DeliveryEndpoint, MessagingPipelinePayload, DeliveryTarget } from '@mitter-io/models'
 import { Mitter } from './../mitter-core'
-import {MessagingPipelineConnectCb} from "../config";
 
 export interface PipelineDriverSpec {
     name: string
@@ -23,7 +22,7 @@ export interface BasePipelineSink {
 }
 
 export interface PipelineSink extends BasePipelineSink {
-    endpointInvalidated(deliveryEndpoint: DeliveryEndpoint): void
+    endpointInvalidated(deliveryTarget: DeliveryTarget): void
     authorizedUserUnavailable(): void
     statusUpdate(newStatus: PipelineStatus): void
 }
@@ -31,9 +30,9 @@ export interface PipelineSink extends BasePipelineSink {
 export default interface MessagingPipelineDriver {
     initialize(mitter: Mitter): PipelineDriverInitialization
 
-    getDeliveryEndpoint(): Promise<DeliveryEndpoint | undefined>
+    getDeliveryTarget(): Promise<DeliveryTarget | undefined>
 
-    endpointRegistered(pipelineSink: PipelineSink, userDeliveryEndpoint: DeliveryEndpoint): void
+    deliveryTargetRegistered(pipelineSink: PipelineSink, userDeliveryTarget: DeliveryTarget): void
 
     pipelineSinkChanged?(pipelineSink: BasePipelineSink): void
 

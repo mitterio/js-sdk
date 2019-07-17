@@ -73,3 +73,12 @@ export * from './annotations/Identifier'
 export * from './commons/common-models'
 
 export * from './counts/counts'
+
+export * from './weaver/DeliveryTarget/DeliveryTarget'
+export * from './weaver/DeliveryTarget/RegisteredSubscription'
+export * from './weaver/DeliveryTarget/RegisteredDeliveryTarget'
+export * from './weaver/DeliveryTarget/StandardDeliveryTargetType'
+
+export * from './weaver/Subscriptions/MessageResolutionSubscription'
+export * from './weaver/Subscriptions/Subscriptions'
+export * from './weaver/Subscriptions/UserResolutionSubscription'

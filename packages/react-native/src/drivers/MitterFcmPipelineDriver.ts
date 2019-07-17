@@ -6,8 +6,14 @@ import {
 } from '@mitter-io/core'
 
 import firebase from 'react-native-firebase'
-import { DeliveryEndpoint, FcmDeliveryEndpoint } from '@mitter-io/models'
+import {
+  DeliveryEndpoint,
+  FcmDeliveryEndpoint,
+  DeliveryTarget,
+  StandardDeliveryTargetType
+} from '@mitter-io/models'
 import { noOp } from '../utils'
+import nanoid from 'nanoid'
 
 // tslint:disable-next-line:variable-name
 export const FcmDriverSpecName = 'io.mitter.drivers.fcm'
@@ -24,17 +30,18 @@ export default class MitterFcmPipelineDriver implements MessagingPipelineDriver 
     }
   }
 
-  async getDeliveryEndpoint(): Promise<DeliveryEndpoint> {
+  async getDeliveryTarget(): Promise<DeliveryTarget> {
     return firebase
       .messaging()
       .getToken()
       .then(fcmToken => {
-        return new FcmDeliveryEndpoint(fcmToken)
+        // return new FcmDeliveryEndpoint(fcmToken)
+        return new DeliveryTarget(nanoid(), StandardDeliveryTargetType.Fcm, fcmToken)
       })
   }
 
-  endpointRegistered(pipelineSink: PipelineSink, deliveryEndpoint: DeliveryEndpoint): void {
-    registerFirebaseListener(pipelineSink, deliveryEndpoint)
+  deliveryTargetRegistered(pipelineSink: PipelineSink, deliveryTarget: DeliveryTarget): void {
+    registerFirebaseListener(pipelineSink, deliveryTarget)
   }
 
   halt() {
@@ -44,7 +51,7 @@ export default class MitterFcmPipelineDriver implements MessagingPipelineDriver 
 
 function registerFirebaseListener(
   pipelineSink: PipelineSink,
-  _deliveryEndpoint: DeliveryEndpoint
+  _deliveryTarget: DeliveryTarget
 ): void {
   console.log('registering firebase listener')
   firebase.messaging().onMessage(message => {

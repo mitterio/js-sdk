@@ -21,7 +21,8 @@ export default {
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: [
     'websocket',
-    'query-string'
+    'query-string',
+    'nanoid'
   ],
   watch: {
     include: ['src/**', './../mitter-ts-core/dist/**']

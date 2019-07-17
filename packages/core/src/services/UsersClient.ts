@@ -8,7 +8,7 @@ import {
     UserLocator,
     AttachedEntityMetadata,
     EntityMetadata,
-    QueriableMetadata, WiredPresence
+    QueriableMetadata, WiredPresence, DeliveryTarget, RegisteredDeliveryTarget
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -16,6 +16,7 @@ import { PlatformImplementedFeatures } from '../models/platformImplementedFeatur
 import { clientGenerator } from './common'
 import { MitterConstants } from './constants'
 import queryString from 'query-string'
+import {WiredDeliveryTarget} from "../../../models/src/weaver/DeliveryTarget/DeliveryTarget";
 
 const base = `${MitterConstants.Api.VersionPrefix}/users`
 
@@ -104,6 +105,22 @@ export interface UsersApi {
             }
             body: DeliveryEndpoint['serializedEndpoint']
             response: void
+        }
+    }
+
+    '/v1/delivery-targets': {
+        GET: {
+            params: {
+                deliveryTargetId: string
+            }
+            response: WiredDeliveryTarget
+        }
+        POST: {
+            query: {
+                mappedUserId?: string
+            }
+            body: DeliveryTarget
+            response: RegisteredDeliveryTarget
         }
     }
 
@@ -375,6 +392,35 @@ export class UsersClient {
                 `/v1/users/me/delivery-endpoints/${serializedEndpoint}`
             )
             .then(x => x.data)
+    }
+
+    addUserDeliveryTarget(
+        deliveryTarget: DeliveryTarget,
+        userId: string | undefined
+    ): Promise<RegisteredDeliveryTarget> {
+        return this.usersAxiosClient
+            .post<'/v1/delivery-targets'>(
+                '/v1/delivery-targets',
+                deliveryTarget,
+                {
+                    params: Object.assign(
+                        {},
+                        userId !== undefined ? { mappedUserId: userId}: {}
+                    )
+                }
+            )
+            .then(x =>  x.data)
+    }
+
+    getUserDeliveryTarget(
+        deliveryTargetId: string
+    ): Promise<WiredDeliveryTarget> {
+        return this.usersAxiosClient
+            .get<'/v1/delivery-targets'>(
+                `/v1/delivery-targets/${deliveryTargetId}`
+            )
+            .then(x => x.data)
+
     }
 
     /***

@@ -19,7 +19,7 @@ export default {
     { file: pkg.module, format: 'es', sourcemap: true },
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
-  external: ['realm', 'react-native-firebase', 'react-native', 'rn-fetch-blob', 'query-string'],
+  external: ['realm', 'react-native-firebase', 'react-native', 'rn-fetch-blob', 'query-string', 'nanoid'],
   watch: {
     include: ['src/**', './../mitter-ts-core/dist/**'],
   },
