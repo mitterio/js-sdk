@@ -1,7 +1,9 @@
 import {
     MessagingPipelinePayload,
     PipelineControlPayload,
-    StandardPipelinePayloadNames
+    StandardPipelinePayloadNames,
+    WiredMessageResolutionSubscription,
+    WiredUserResolutionSubscription
 } from './../mitter-models'
 
 import { MitterError, MitterErrorCodes } from './../wire/errors'
@@ -82,4 +84,8 @@ export function getId(input: Identifier | string) {
     } else {
         return input.identifier
     }
+}
+
+export function predicateForSubscription(subscription: WiredMessageResolutionSubscription | WiredUserResolutionSubscription ): subscription is WiredMessageResolutionSubscription {
+    return (subscription as WiredMessageResolutionSubscription)['@subscriptionType'] === 'message-resolution-subscription'
 }

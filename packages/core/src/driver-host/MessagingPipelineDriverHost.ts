@@ -13,6 +13,8 @@ import {
     DeliveryTarget,
     WiredDeliveryTarget,
     RegisteredDeliveryTarget,
+    MessageResolutionSubscription,
+    predicateForSubscription,
     MessagingPipelinePayload
 } from '@mitter-io/models'
 
@@ -21,9 +23,10 @@ import MessagingPipelineDriver, {
     PipelineDriverSpec,
     PipelineSink
 } from './../specs/MessagingPipelineDriver'
-import {KvStore, MessagingPipelineConnectCb, Mitter, UsersClient} from '../mitter-core'
+import {KvStore, Mitter, UsersClient} from '../mitter-core'
 import { noOp } from '../utils'
 import axios, { AxiosError, AxiosResponse } from 'axios'
+import nanoid from 'nanoid'
 
 export type MessageSink = (payload: MessagingPipelinePayload) => void
 
@@ -213,6 +216,7 @@ export class MessagingPipelineDriverHost {
             .then((resp: WiredDeliveryTarget) => {
                 // wired delivery target extends delivery target
                 delete resp.identifier
+                this.subscribeToChannels(deliveryTarget)
                 return resp
             })
             .catch((resp: AxiosError) => {
@@ -240,6 +244,7 @@ export class MessagingPipelineDriverHost {
                 )
 
                 this.syncEndpointsToStore()
+                this.subscribeToChannels(deliveryTarget)
                 return deliveryTarget
             })
             .catch((resp: AxiosError) => {
@@ -250,6 +255,7 @@ export class MessagingPipelineDriverHost {
                         })
                     )
                     this.syncEndpointsToStore()
+                    this.subscribeToChannels(deliveryTarget)
                     return deliveryTarget
                 } else {
                     throw resp
@@ -300,5 +306,22 @@ export class MessagingPipelineDriverHost {
 
     private consumeNewPayload(_: PipelineDriverSpec, payload: MessagingPipelinePayload) {
         this.subscriptions.forEach(subscription => subscription(payload))
+    }
+
+    private subscribeToChannels(deliveryTarget: DeliveryTarget): void {
+        const channelsToSubscribe = this.mitterContext.mitterCoreConfig.initMessagingPipelineSubscriptions
+        if(channelsToSubscribe.length === 0)
+            return
+        const subscriptionId = nanoid()
+        const messageResolutionSubscription = new MessageResolutionSubscription(subscriptionId, channelsToSubscribe)
+        this.usersClient.addSubscription(deliveryTarget.deliveryTargetId, messageResolutionSubscription)
+            .then((resp) => {
+                if(predicateForSubscription(resp)) {
+                    console.log('channels that are subscribed to ',resp.channelIds )
+                }
+            })
+            .catch(resp => {
+                console.log('error in subscribing to channels', resp)
+            })
     }
 }

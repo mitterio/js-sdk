@@ -8,7 +8,15 @@ import {
     UserLocator,
     AttachedEntityMetadata,
     EntityMetadata,
-    QueriableMetadata, WiredPresence, DeliveryTarget, WiredDeliveryTarget, RegisteredDeliveryTarget
+    QueriableMetadata,
+    WiredPresence,
+    DeliveryTarget,
+    WiredDeliveryTarget,
+    RegisteredDeliveryTarget,
+    MessageResolutionSubscription,
+    UserResolutionSubscription,
+    WiredUserResolutionSubscription,
+    WiredMessageResolutionSubscription
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -120,6 +128,16 @@ export interface UsersApi {
             }
             body: DeliveryTarget
             response: RegisteredDeliveryTarget
+        }
+    }
+
+    '/v1/delivery-targets/:deliveryTargetId': {
+        POST: {
+            params: {
+                deliveryTargetId: string
+            }
+            body: UserResolutionSubscription | MessageResolutionSubscription
+            response: WiredUserResolutionSubscription | WiredMessageResolutionSubscription
         }
     }
 
@@ -420,6 +438,18 @@ export class UsersClient {
             )
             .then(x => x.data)
 
+    }
+
+    addSubscription(
+        deliveryTargetId: string,
+        subscription: UserResolutionSubscription | MessageResolutionSubscription
+    ): Promise<WiredUserResolutionSubscription | WiredMessageResolutionSubscription> {
+        return this.usersAxiosClient
+            .post<'/v1/delivery-targets/:deliveryTargetId'>(
+                `/v1/delivery-targets/${deliveryTargetId}`,
+                subscription
+            )
+            .then(x => x.data)
     }
 
     /***
