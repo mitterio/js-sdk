@@ -446,7 +446,7 @@ export class UsersClient {
     ): Promise<WiredUserResolutionSubscription | WiredMessageResolutionSubscription> {
         return this.usersAxiosClient
             .post<'/v1/delivery-targets/:deliveryTargetId'>(
-                `/v1/delivery-targets/${deliveryTargetId}`,
+                `/v1/delivery-targets/${deliveryTargetId}/subscription`,
                 subscription
             )
             .then(x => x.data)

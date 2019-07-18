@@ -26,7 +26,6 @@ import MessagingPipelineDriver, {
 import {KvStore, Mitter, UsersClient} from '../mitter-core'
 import { noOp } from '../utils'
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import nanoid from 'nanoid'
 
 export type MessageSink = (payload: MessagingPipelinePayload) => void
 
@@ -312,7 +311,7 @@ export class MessagingPipelineDriverHost {
         const channelsToSubscribe = this.mitterContext.mitterCoreConfig.initMessagingPipelineSubscriptions
         if(channelsToSubscribe.length === 0)
             return
-        const subscriptionId = nanoid()
+        const subscriptionId = 'qwerty'
         const messageResolutionSubscription = new MessageResolutionSubscription(subscriptionId, channelsToSubscribe)
         this.usersClient.addSubscription(deliveryTarget.deliveryTargetId, messageResolutionSubscription)
             .then((resp) => {
