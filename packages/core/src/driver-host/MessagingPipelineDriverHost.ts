@@ -1,4 +1,21 @@
-import { DeliveryEndpoint, MessagingPipelinePayload } from '@mitter-io/models'
+import {
+    AttributeDef,
+    DeliveryEndpoint,
+    EntityProfile,
+    EntityProfileAttribute,
+    Presence,
+    User,
+    UserLocator,
+    AttachedEntityMetadata,
+    EntityMetadata,
+    QueriableMetadata,
+    WiredPresence,
+    DeliveryTarget,
+    WiredDeliveryTarget,
+    RegisteredDeliveryTarget,
+    MessagingPipelinePayload
+} from '@mitter-io/models'
+
 import MessagingPipelineDriver, {
     BasePipelineSink,
     PipelineDriverSpec,
@@ -7,8 +24,6 @@ import MessagingPipelineDriver, {
 import {KvStore, MessagingPipelineConnectCb, Mitter, UsersClient} from '../mitter-core'
 import { noOp } from '../utils'
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import {DeliveryTarget, RegisteredDeliveryTarget} from "@mitter-io/models";
-import {WiredDeliveryTarget} from "../../../models/src/weaver/DeliveryTarget/DeliveryTarget";
 
 export type MessageSink = (payload: MessagingPipelinePayload) => void
 

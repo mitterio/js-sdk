@@ -8,7 +8,7 @@ import {
     UserLocator,
     AttachedEntityMetadata,
     EntityMetadata,
-    QueriableMetadata, WiredPresence, DeliveryTarget, RegisteredDeliveryTarget
+    QueriableMetadata, WiredPresence, DeliveryTarget, WiredDeliveryTarget, RegisteredDeliveryTarget
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -16,7 +16,6 @@ import { PlatformImplementedFeatures } from '../models/platformImplementedFeatur
 import { clientGenerator } from './common'
 import { MitterConstants } from './constants'
 import queryString from 'query-string'
-import {WiredDeliveryTarget} from "../../../models/src/weaver/DeliveryTarget/DeliveryTarget";
 
 const base = `${MitterConstants.Api.VersionPrefix}/users`
 

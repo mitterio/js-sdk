@@ -1,6 +1,21 @@
-import { DeliveryEndpoint, MessagingPipelinePayload, DeliveryTarget } from '@mitter-io/models'
 import { Mitter } from './../mitter-core'
-
+import {
+    AttributeDef,
+    DeliveryEndpoint,
+    EntityProfile,
+    EntityProfileAttribute,
+    Presence,
+    User,
+    UserLocator,
+    AttachedEntityMetadata,
+    EntityMetadata,
+    QueriableMetadata,
+    WiredPresence,
+    DeliveryTarget,
+    WiredDeliveryTarget,
+    RegisteredDeliveryTarget,
+    MessagingPipelinePayload
+} from '@mitter-io/models'
 export interface PipelineDriverSpec {
     name: string
 }
