@@ -37,7 +37,7 @@ export interface BasePipelineSink {
 }
 
 export interface PipelineSink extends BasePipelineSink {
-    endpointInvalidated(deliveryTarget: DeliveryTarget): void
+    deliveryTargetInvalidated(deliveryTarget: DeliveryTarget): void
     authorizedUserUnavailable(): void
     statusUpdate(newStatus: PipelineStatus): void
 }

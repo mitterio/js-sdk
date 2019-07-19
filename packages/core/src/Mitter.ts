@@ -167,6 +167,10 @@ export class Mitter extends MitterBase {
         this.messagingPipelineDriverHost.refresh()
     }
 
+    stopMessagingPipeline(): void {
+        this.messagingPipelineDriverHost.stop()
+    }
+
     getUserAuthorization(): Promise<string | undefined> {
         if (this.cachedUserAuthorization !== undefined) {
             return Promise.resolve(this.cachedUserAuthorization)

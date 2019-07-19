@@ -3,13 +3,13 @@ import { GenericRequestParameters } from '../auth/interceptors-base'
 import { BlobConfig, UriConfig } from '../services/MessagesClient'
 
 export interface PlatformImplementedFeatures {
-    processMultipartRequest:
+    processMultipartRequest?:
         | (<T extends BlobConfig | UriConfig>(
               requestParams: GenericRequestParameters,
               channelId: string,
               message: Message,
               fileObject: T
           ) => Promise<ChannelReferencingMessage> | Error)
-        | undefined
-    base64Decoder: undefined | ((encodedString: string) => string)
+    base64Decoder?: ((encodedString: string) => string),
+    randomIdGenerator?: () => string
 }

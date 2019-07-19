@@ -4,6 +4,7 @@ import MitterFcmPipelineDriver from './drivers/MitterFcmPipelineDriver'
 import NativeKvStore from './kv-store/kvStore'
 import { nativeFileUploader } from './nativeSpecificImplementations/nativeFileUploader'
 import { getDefaultMitterUserHooks, getMitterCoreConfig } from './utils'
+import uuid from 'react-native-uuid'
 
 export { NativeKvStore }
 export const Mitter = {
@@ -19,7 +20,8 @@ export const Mitter = {
       global,
       {
         processMultipartRequest: nativeFileUploader,
-        base64Decoder: base64.decode
+        base64Decoder: base64.decode,
+        randomIdGenerator: uuid.v4
       }
     )
   }

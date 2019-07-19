@@ -13,7 +13,7 @@ import {
   StandardDeliveryTargetType
 } from '@mitter-io/models'
 import { noOp } from '../utils'
-// import uuid from 'react-native-uuid'
+import uuid from 'react-native-uuid'
 
 // tslint:disable-next-line:variable-name
 export const FcmDriverSpecName = 'io.mitter.drivers.fcm'
@@ -36,7 +36,7 @@ export default class MitterFcmPipelineDriver implements MessagingPipelineDriver 
       .getToken()
       .then(fcmToken => {
         // return new FcmDeliveryEndpoint(fcmToken)
-        return new DeliveryTarget('1234567890', StandardDeliveryTargetType.Fcm, fcmToken)
+        return new DeliveryTarget(uuid.v4(), StandardDeliveryTargetType.Fcm, fcmToken)
       })
   }
 
@@ -62,5 +62,9 @@ function registerFirebaseListener(
     } catch (e) {
       console.warn(e)
     }
+  })
+  firebase.notifications().onNotification(notification => {
+    // Process your notification as required
+    console.log('notificiation resceived', notification)
   })
 }

@@ -1,15 +1,4 @@
 import {
-    AttributeDef,
-    DeliveryEndpoint,
-    EntityProfile,
-    EntityProfileAttribute,
-    Presence,
-    User,
-    UserLocator,
-    AttachedEntityMetadata,
-    EntityMetadata,
-    QueriableMetadata,
-    WiredPresence,
     DeliveryTarget,
     WiredDeliveryTarget,
     RegisteredDeliveryTarget,
@@ -43,6 +32,7 @@ export class MessagingPipelineDriverHost {
     private pipelineDrivers: Array<MessagingPipelineDriver>
     private subscriptions: Array<MessageSink> = []
     private usersClient: UsersClient
+    private operatingDeliveryTarget: DeliveryTarget | undefined
 
     constructor(
         pipelineDrivers: Array<MessagingPipelineDriver> | MessagingPipelineDriver,
@@ -58,6 +48,7 @@ export class MessagingPipelineDriverHost {
 
         this.mitterContext.userAuthorizationAvailable(() => this.refresh())
         this.usersClient = this.mitterContext.clients().users()
+        this.operatingDeliveryTarget = undefined
     }
 
     public subscribe(messageSink: MessageSink) {
@@ -73,7 +64,7 @@ export class MessagingPipelineDriverHost {
             .catch(e => {
                 this.onAllPipelinesInitialized(e)
             })*/
-        this.loadStoredEndpoints().then(() =>
+        this.loadStoredDeliveryTargets().then(() =>
             this.initializeMessagingPipelines()
                 .then(() => {
                     this.onAllPipelinesInitialized()
@@ -84,13 +75,22 @@ export class MessagingPipelineDriverHost {
         )
     }
 
-    private async loadStoredEndpoints(): Promise<void> {
+    public stop() {
+        if(this.operatingDeliveryTarget !== undefined) {
+            // ideally delete the delivery target here
+        }
+        else {
+            console.log('no operating delivery target found for the user,')
+        }
+    }
+
+    private async loadStoredDeliveryTargets(): Promise<void> {
         this.savedDeliveryTargets = new SavedDeliveryTargets()
 
         if (this.kvStore === undefined) {
             console.warn(
-                'You are not using a store for persisting delivery endpoints.' +
-                    ' This might cause your users to very quickly hit provisioning limits on their endpoints'
+                'You are not using a store for persisting delivery targets.' +
+                    ' This might cause your users to very quickly hit provisioning limits on their targets'
             )
 
             return
@@ -99,7 +99,7 @@ export class MessagingPipelineDriverHost {
         let savedDeliveryTargets = await this.kvStore.getItem<SavedDeliveryTargets>(
             MessagingPipelineDriverHost.StoreKeys.SavedDeliveryTargets
         )
-        console.log('stored delivery endpoints are ', savedDeliveryTargets)
+        console.log('stored delivery targets are ', savedDeliveryTargets)
         if (savedDeliveryTargets !== undefined) {
             this.savedDeliveryTargets = savedDeliveryTargets
         }
@@ -129,36 +129,36 @@ export class MessagingPipelineDriverHost {
             if (driverSpec.name in this.savedDeliveryTargets.deliveryTargets) {
                 console.log('driver', driverSpec.name)
                 console.log(
-                    'delivery Endpoint',
+                    'delivery Target',
                     this.savedDeliveryTargets.deliveryTargets[driverSpec.name]
                 )
-                preProvisionPromise = this.syncEndpoint(
+                preProvisionPromise = this.syncDeliveryTarget(
                     this.savedDeliveryTargets.deliveryTargets[driverSpec.name]
                 )
                 console.log(
-                    `Found an endpoint already present for ${
+                    `Found a delivery target already present for ${
                         driverSpec.name
                     }. If invalid, it will be re-provisioned`
                 )
             }
 
             preProvisionPromise.then(syncedDeliveryTarget => {
-                let operatingEndpoint: Promise<DeliveryTarget | void>
+                let operatingDeliveryTarget: Promise<DeliveryTarget | void>
 
                 if (syncedDeliveryTarget === undefined) {
-                    console.log('The endpoint on sync was determined to be invalid, refreshing')
+                    console.log('The delivery target on sync was determined to be invalid, refreshing')
 
-                    operatingEndpoint = driverInitialized
+                    operatingDeliveryTarget = driverInitialized
                         .then(() => driver.getDeliveryTarget())
                         .then(deliveryTarget => {
                             if (deliveryTarget !== undefined) {
-                                console.log('delivery Endpoint is ', deliveryTarget)
-                                return this.registerEndpoint(driverSpec, deliveryTarget).then(
-                                    provisionedEndpoint => provisionedEndpoint
+                                console.log('delivery Target is ', deliveryTarget)
+                                return this.registerDeliveryTarget(driverSpec, deliveryTarget).then(
+                                    provisionedDeliveryTarget => provisionedDeliveryTarget
                                 )
                             } else {
                                 // return undefined
-                                throw new Error('no endpoint found')
+                                throw new Error('no delivery target found')
                                 // return Promise.reject('no endpoint found')
                             }
                         })
@@ -171,12 +171,12 @@ export class MessagingPipelineDriverHost {
                         })
                 } else {
                     console.log(
-                        'The endpoint on sync was determined to be valid. Continuing with the same'
+                        'The delivery target on sync was determined to be valid. Continuing with the same'
                     )
-                    operatingEndpoint = Promise.resolve(syncedDeliveryTarget)
+                    operatingDeliveryTarget = Promise.resolve(syncedDeliveryTarget)
                 }
 
-                operatingEndpoint.then(deliveryTarget => {
+                operatingDeliveryTarget.then(deliveryTarget => {
                     if (deliveryTarget !== undefined) {
                         this.announceSinkForDriver(
                             driver,
@@ -203,13 +203,14 @@ export class MessagingPipelineDriverHost {
         pipelineSink: PipelineSink
     ) {
         driver.deliveryTargetRegistered(pipelineSink, deliveryTarget)
+        this.operatingDeliveryTarget = deliveryTarget
 
         if (driver.pipelineSinkChanged !== undefined) {
             driver.pipelineSinkChanged(pipelineSink)
         }
     }
 
-    private syncEndpoint(deliveryTarget: DeliveryTarget): Promise<DeliveryTarget | void> {
+    private syncDeliveryTarget(deliveryTarget: DeliveryTarget): Promise<DeliveryTarget | void> {
         return this.usersClient
             .getUserDeliveryTarget(deliveryTarget.deliveryTargetId)
             .then((resp: WiredDeliveryTarget) => {
@@ -229,7 +230,7 @@ export class MessagingPipelineDriverHost {
             })
     }
 
-    private registerEndpoint(
+    private registerDeliveryTarget(
         driverSpec: PipelineDriverSpec,
         deliveryTarget: DeliveryTarget
     ): Promise<DeliveryTarget | void> {
@@ -242,7 +243,7 @@ export class MessagingPipelineDriverHost {
                     })
                 )
 
-                this.syncEndpointsToStore()
+                this.syncDeliveryTargetsToStore()
                 this.subscribeToChannels(deliveryTarget)
                 return deliveryTarget
             })
@@ -253,7 +254,7 @@ export class MessagingPipelineDriverHost {
                             [driverSpec.name]: deliveryTarget
                         })
                     )
-                    this.syncEndpointsToStore()
+                    this.syncDeliveryTargetsToStore()
                     this.subscribeToChannels(deliveryTarget)
                     return deliveryTarget
                 } else {
@@ -262,7 +263,7 @@ export class MessagingPipelineDriverHost {
             })
     }
 
-    private syncEndpointsToStore() {
+    private syncDeliveryTargetsToStore() {
         if (this.kvStore === undefined) {
             return
         }
@@ -272,7 +273,7 @@ export class MessagingPipelineDriverHost {
                 MessagingPipelineDriverHost.StoreKeys.SavedDeliveryTargets,
                 this.savedDeliveryTargets
             )
-            .catch(e => console.warn('Error syncing delivery endpoints to storage', e))
+            .catch(e => console.warn('Error syncing delivery targets to storage', e))
     }
 
     private generateStatelessPipelineSink(driverSpec: PipelineDriverSpec): BasePipelineSink {
@@ -289,8 +290,8 @@ export class MessagingPipelineDriverHost {
                 this.consumeNewPayload(driverSpec, payload)
             },
 
-            endpointInvalidated: (deliveryTarget: DeliveryTarget) => {
-                this.invalidateEndpoint(driverSpec, deliveryTarget)
+            deliveryTargetInvalidated: (deliveryTarget: DeliveryTarget) => {
+                this.invalidateDeliveryTarget(driverSpec, deliveryTarget)
             },
 
             authorizedUserUnavailable: noOp,
@@ -299,7 +300,7 @@ export class MessagingPipelineDriverHost {
         }
     }
 
-    private invalidateEndpoint(_: PipelineDriverSpec, __: DeliveryTarget) {
+    private invalidateDeliveryTarget(_: PipelineDriverSpec, __: DeliveryTarget) {
         throw new Error('')
     }
 
@@ -311,7 +312,12 @@ export class MessagingPipelineDriverHost {
         const channelsToSubscribe = this.mitterContext.mitterCoreConfig.initMessagingPipelineSubscriptions
         if(channelsToSubscribe.length === 0)
             return
-        const subscriptionId = 'qwerty'
+        let subscriptionId = Date.now().toString()
+
+        if(this.mitterContext.platformImplementedFeatures.randomIdGenerator) {
+            subscriptionId = this.mitterContext.platformImplementedFeatures.randomIdGenerator()
+        }
+
         const messageResolutionSubscription = new MessageResolutionSubscription(subscriptionId, channelsToSubscribe)
         this.usersClient.addSubscription(deliveryTarget.deliveryTargetId, messageResolutionSubscription)
             .then((resp) => {

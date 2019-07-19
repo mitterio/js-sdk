@@ -2,6 +2,7 @@ import { Mitter as MitterCore, MitterConstants, PlatformImplementedFeatures, Mit
 import WebKvStore from './kv-store/KvStore'
 import WebSocketPipelineDriver from './drivers/WebSocketMessagingPipelineDriver'
 import {getDefaultMitterUserHooks, getMitterCoreConfig} from './utils';
+import nanoid from 'nanoid'
 
 export const Mitter = {
     forWeb: function(
@@ -14,7 +15,9 @@ export const Mitter = {
           new WebKvStore(),
           new WebSocketPipelineDriver(),
           window,
-          {} as PlatformImplementedFeatures
+          {
+            randomIdGenerator: nanoid
+          } as PlatformImplementedFeatures
         )
     }
 }
