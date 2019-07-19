@@ -13,6 +13,7 @@ import {
   StandardDeliveryTargetType
 } from '@mitter-io/models'
 import { noOp } from '../utils'
+// import uuid from 'react-native-uuid'
 
 // tslint:disable-next-line:variable-name
 export const FcmDriverSpecName = 'io.mitter.drivers.fcm'
@@ -35,7 +36,7 @@ export default class MitterFcmPipelineDriver implements MessagingPipelineDriver 
       .getToken()
       .then(fcmToken => {
         // return new FcmDeliveryEndpoint(fcmToken)
-        return new DeliveryTarget('12345678910', StandardDeliveryTargetType.Fcm, fcmToken)
+        return new DeliveryTarget('1234567890', StandardDeliveryTargetType.Fcm, fcmToken)
       })
   }
 
