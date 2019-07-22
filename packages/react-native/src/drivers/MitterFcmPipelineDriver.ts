@@ -6,12 +6,7 @@ import {
 } from '@mitter-io/core'
 
 import firebase from 'react-native-firebase'
-import {
-  DeliveryEndpoint,
-  FcmDeliveryEndpoint,
-  DeliveryTarget,
-  StandardDeliveryTargetType
-} from '@mitter-io/models'
+import { DeliveryTarget, StandardDeliveryTargetType } from '@mitter-io/models'
 import { noOp } from '../utils'
 import uuid from 'react-native-uuid'
 
@@ -63,8 +58,17 @@ function registerFirebaseListener(
       console.warn(e)
     }
   })
+
   firebase.notifications().onNotification(notification => {
     // Process your notification as required
-    console.log('notificiation resceived', notification)
+    try {
+      console.log('notification from fcm recevied', notification)
+      const payload = JSON.parse((notification as any)._data.data)
+      pipelineSink.received(payload)
+      return Promise.resolve()
+    } catch (e) {
+      console.warn(e)
+      return Promise.resolve()
+    }
   })
 }

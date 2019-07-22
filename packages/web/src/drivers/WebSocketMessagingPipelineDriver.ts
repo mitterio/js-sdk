@@ -12,7 +12,12 @@ import { Message } from '@stomp/stompjs'
 import { noOp } from '../utils'
 import WebSocketStandardHeaders from './WebSocketStandardHeaders'
 import nanoid from 'nanoid'
-import {heartbeatIncomingMs, heartbearOutgoingMs, reconnect_delay} from "./WebSocketConstants";
+import {
+  heartbeatIncomingMs,
+  heartbearOutgoingMs,
+  reconnect_delay,
+  webSocketInitSubscriptionsPrefix
+} from "./WebSocketConstants";
 
 
 export default class WebSocketPipelineDriver implements MessagingPipelineDriver {
@@ -121,11 +126,14 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
 
 
                     const initSubscriptions = this.mitterContext!.mitterCoreConfig.initMessagingPipelineSubscriptions
+                    const preFixedInitSubscriptions = initSubscriptions.map(channelId => {
+                      return webSocketInitSubscriptionsPrefix + channelId
+                    })
 
                     if(initSubscriptions.length > 0) {
                       headers[
                         WebSocketStandardHeaders.InitSubscriptions
-                        ] = initSubscriptions.toString()
+                        ] = preFixedInitSubscriptions.toString()
                     }
 
 
