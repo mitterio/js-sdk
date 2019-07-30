@@ -101,6 +101,11 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   }
 
   componentDidUpdate(prevProps: MessageWindowProps, prevState: MessageWindowState) {
+    /** scroll to bottom on first load as react virtualized
+     * is unable to scroll to bottom due to some calculation problemts
+     * within the library
+     *
+     * */
     if(this.state.inMountingState === false && prevState.inMountingState === true) {
       const virtualizedList = document.getElementById(this.virtualizedListId)
       if(virtualizedList) {

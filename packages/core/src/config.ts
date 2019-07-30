@@ -18,5 +18,5 @@ export type MitterUserHooks = {
 }
 
 export type MitterUserConfig = PickedPartial<MitterCoreConfig,
-    "mitterApiBaseUrl" | "weaverUrl"
+    "applicationId" | "weaverUrl" 
     >
