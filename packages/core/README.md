@@ -10,6 +10,7 @@
     
     
 * Configs taken by the mitter object and the callback functions exposed by the object
+
     The following configs are passed onto the Mitter class from web, react-native or node packages
     ```
     public mitterCoreConfig: MitterCoreConfig -  
@@ -46,6 +47,7 @@
     ```  
     
 * Mitter Api Gateway
+
     All requests made through the SDK goes through the Api Gateway. Basic function of the gateway
     is to intercept requests, modify the request according to the configuration passed by the Mitter Class.
     Currently it intercepts response's too , but doesn't modify it .
@@ -57,6 +59,7 @@
     
     
 * Mitter Api Configuration
+
      `MitterApiConfiguration` takes in an interceptor and is passed to all the
      clients(channels client, users client, messages client etc) and the client uses this
      configuration to make API calls to mitter.
@@ -89,12 +92,14 @@
     as it is created when  websocket connects for the first time
 
 * Implementation of the kv store
+
     The core package expects a local storage which implements the `KvStore` interface.
     This storage is used to store userAuthTokens and delivery targets
     Web package exports an implementation of the local storage.
     React-native package exports an implmentation of the async storage
     
 * Clients in mitter SDK
+
     Clients are mainly used to make api requests to Mitter, except in a few cases
     to get paginationMangers for channels or messages or users. 
    
@@ -108,6 +113,7 @@
   get an idea on how to add a new api
   
 * Explanation of Platform Implemented Features (for implementation of functions implemented differently in different environments) and how to use it
+
    The need for this arose because different environments implement features differently.
    
    For eg file upload in the web-environment can be handled via `FormData`,

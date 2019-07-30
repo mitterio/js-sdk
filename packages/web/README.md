@@ -1,8 +1,10 @@
 ### Web
 * Function of the package
+
   The package is to be used in web-environment to interact with mitter .
   
 * Details on how it uses core package and exposes the mitter object
+
     Web SDK uses the mitter core internally to expose all the functionalities of the SDK to the user
      
      The web SDK passes the user configs and callbacks along with some other configs needed by core
@@ -35,7 +37,7 @@
                  randomIdGenerator?: () => string // for random id generation in web and react-native
                  uses nano id package
              }
-     ```
+             ```
 
 * Details of the configuration and callback functions exposed by the package
 

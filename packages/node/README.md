@@ -1,11 +1,13 @@
-### Node
+ ### Node
  * Function of the package
+ 
     Library for consuming mitter.io APIs for backend applications on node and node-like environments.
  
  * Details of accessKey signer
     
     
  * Details Api configuration provider that it implements
+ 
     Takes in AccessKeySigningInterceptor to intercept calls made to mitter and 
     adds in the required headers generated from the applicatiionSecret 
  
@@ -31,6 +33,7 @@
                 ```  
  
  * Details on how it uses core package and exposes the mitter object 
+ 
     The Node package takes in  `mitterNodeUserConfig` and `mitterNodeUserHooks`
     and prepares default configs and passes it into the mitter Core package
      

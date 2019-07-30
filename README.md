@@ -150,6 +150,7 @@ Attached is a diagram which will make the dependencies clear
     ```  
     
 * Mitter Api Gateway
+
     All requests made through the SDK goes through the Api Gateway. Basic function of the gateway
     is to intercept requests, modify the request according to the configuration passed by the Mitter Class.
     Currently it intercepts response's too , but doesn't modify it .
@@ -161,6 +162,7 @@ Attached is a diagram which will make the dependencies clear
     
     
 * Mitter Api Configuration
+
      `MitterApiConfiguration` takes in an interceptor and is passed to all the
      clients(channels client, users client, messages client etc) and the client uses this
      configuration to make API calls to mitter.
@@ -193,12 +195,14 @@ Attached is a diagram which will make the dependencies clear
     as it is created when  websocket connects for the first time
 
 * Implementation of the kv store
+
     The core package expects a local storage which implements the `KvStore` interface.
     This storage is used to store userAuthTokens and delivery targets
     Web package exports an implementation of the local storage.
     React-native package exports an implmentation of the async storage
     
 * Clients in mitter SDK
+
     Clients are mainly used to make api requests to Mitter, except in a few cases
     to get paginationMangers for channels or messages or users. 
    
@@ -212,6 +216,7 @@ Attached is a diagram which will make the dependencies clear
   get an idea on how to add a new api
   
 * Explanation of Platform Implemented Features (for implementation of functions implemented differently in different environments) and how to use it
+
    The need for this arose because different environments implement features differently.
    
    For eg file upload in the web-environment can be handled via `FormData`,
@@ -242,9 +247,11 @@ Attached is a diagram which will make the dependencies clear
 
 ### Web
 * Function of the package
+
   The package is to be used in web-environment to interact with mitter .
   
 * Details on how it uses core package and exposes the mitter object
+
     Web SDK uses the mitter core internally to expose all the functionalities of the SDK to the user
      
      The web SDK passes the user configs and callbacks along with some other configs needed by core
@@ -320,6 +327,7 @@ After taking the configs , the web package fills in the default values if the us
 
 
 * Function of the package
+
     React Native SDK for working with mitter.io.
 
 * Details on how it uses core package and exposes the mitter object
@@ -366,6 +374,7 @@ After taking the configs , the web package fills in the default values if the us
   
 
 * Details of the configuration and callback functions exposed by the package
+
      Listed below is the config that the user can/has to pass
          ```
             public mitterUserConfig: MitterUserConfig -  
@@ -392,7 +401,9 @@ After taking the configs , the web package fills in the default values if the us
     The React-Native package uses fcm for message delivery. The fcmDriver
     uses `react-native-firebase` package and uses the firebase SDK provided by it.
     More details can be found in the  `MitterFcmPipelineDriver` class
+    
 * Details of the kv Store implemented by the package
+
 The React-Native Package implements a Kv store around react-native's async storage API
 
 * Details of the platform Specific features implemented by the package
@@ -405,12 +416,14 @@ The React-Native Package implements
  
  ### Node
  * Function of the package
+ 
     Library for consuming mitter.io APIs for backend applications on node and node-like environments.
  
  * Details of accessKey signer
     
     
  * Details Api configuration provider that it implements
+ 
     Takes in AccessKeySigningInterceptor to intercept calls made to mitter and 
     adds in the required headers generated from the applicatiionSecret 
  
@@ -436,6 +449,7 @@ The React-Native Package implements
                 ```  
  
  * Details on how it uses core package and exposes the mitter object 
+ 
     The Node package takes in  `mitterNodeUserConfig` and `mitterNodeUserHooks`
     and prepares default configs and passes it into the mitter Core package
      
@@ -462,6 +476,7 @@ The React-Native Package implements
 
 ### React-SCL
  * Function of the package
+ 
  This package is used for only for front-end UI in the web. Currently there 
  are two components in this package `MessageList` and `MessageWindow`.
  Both components are powered by `react-virtualized` and is used for managing large message lists efficiently.
@@ -612,6 +627,7 @@ The React-Native Package implements
 
 ```
 * Message View Producer Sample
+
 ```
  this.messageViewProducer = createMessageViewProducer(
             (_message) => true,
@@ -665,6 +681,7 @@ The React-Native Package implements
 
 
 * example of a scroll indicator
+
 ```
 import React from 'react'
 
@@ -714,6 +731,7 @@ export default function ScrollIndicator() {
 ```
 
 * example of new messagePayload hook
+
 ```
 export const channelReferencingMessageToLowerCase = (message: ChannelReferencingMessage): ChannelReferencingMessage => {
     message.textPayload = message.textPayload.toLowerCase() 

@@ -1,5 +1,6 @@
 ### React-SCL
  * Function of the package
+ 
  This package is used for only for front-end UI in the web. Currently there 
  are two components in this package `MessageList` and `MessageWindow`.
  Both components are powered by `react-virtualized` and is used for managing large message lists efficiently.
@@ -73,12 +74,12 @@
  | scrollIndicator?    | (unreadCount: number, onClick: () => void) => ReactElement<any>             |
  
  
- ### MessageListManager (Deprecated)
+ ### MessageListManager
   `MessageListManager` is the component exposed to the user. It uses `MessageList` to manager messages and 
   `MessageList` internally uses `React-Virtualized`. The props taken by the component is given above
   
   
- ### MessageList   (Deprecated)
+ ### MessageList  
   `MessageList` internally uses `React-Virtualized`. Please go through the API docs of 
     `React-Virtualized` before going through this component. The props taken by this component is given above.
     
@@ -150,6 +151,7 @@
 
 ```
 * Message View Producer Sample
+
 ```
  this.messageViewProducer = createMessageViewProducer(
             (_message) => true,
@@ -203,6 +205,7 @@
 
 
 * example of a scroll indicator
+
 ```
 import React from 'react'
 
@@ -252,6 +255,7 @@ export default function ScrollIndicator() {
 ```
 
 * example of new messagePayload hook
+
 ```
 export const channelReferencingMessageToLowerCase = (message: ChannelReferencingMessage): ChannelReferencingMessage => {
     message.textPayload = message.textPayload.toLowerCase() 

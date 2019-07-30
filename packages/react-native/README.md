@@ -1,7 +1,7 @@
 ### React-Native
 
-
 * Function of the package
+
     React Native SDK for working with mitter.io.
 
 * Details on how it uses core package and exposes the mitter object
@@ -48,6 +48,7 @@
   
 
 * Details of the configuration and callback functions exposed by the package
+
      Listed below is the config that the user can/has to pass
          ```
             public mitterUserConfig: MitterUserConfig -  
@@ -74,7 +75,9 @@
     The React-Native package uses fcm for message delivery. The fcmDriver
     uses `react-native-firebase` package and uses the firebase SDK provided by it.
     More details can be found in the  `MitterFcmPipelineDriver` class
+    
 * Details of the kv Store implemented by the package
+
 The React-Native Package implements a Kv store around react-native's async storage API
 
 * Details of the platform Specific features implemented by the package
