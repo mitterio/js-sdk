@@ -13,24 +13,24 @@
  
  * Details of the configuration and callback functions exposed by the package
      ```
-                public mitterNodeUserConfig: MitterNodeUserConfig -  
-                    {
-                        accessKey:{
-                            accessKey: string,
-                            accessSecret: string
-                        }, 
-                        applicationId: string
-                        mitterApiBaseUrl?: string , // base url for mitter server
-                    }
-                
-                public mitterNodeUserHooks?: MitterNodeUserHooks, - callback functions in response to some event
-                    {
-                        onTokenExpire: TokenExpireFunction[], // an array of function to be called when a user auth token expires
-                            In a situation if the app has already loaded and the user has missed some messages because of a delay in the websocket connection , then this callback can be used to fetch the latest messages for the channel the user is on
-                        mitterInstanceReady: () => void, // to inform the user that mitter messaging pipeline  is ready . Currently not implemented 
-                    }
-                
-                ```  
+    public mitterNodeUserConfig: MitterNodeUserConfig -  
+        {
+            accessKey:{
+                accessKey: string,
+                accessSecret: string
+            }, 
+            applicationId: string
+            mitterApiBaseUrl?: string , // base url for mitter server
+        }
+    
+    public mitterNodeUserHooks?: MitterNodeUserHooks, - callback functions in response to some event
+        {
+            onTokenExpire: TokenExpireFunction[], // an array of function to be called when a user auth token expires
+                In a situation if the app has already loaded and the user has missed some messages because of a delay in the websocket connection , then this callback can be used to fetch the latest messages for the channel the user is on
+            mitterInstanceReady: () => void, // to inform the user that mitter messaging pipeline  is ready . Currently not implemented 
+        }
+    
+    ```  
  
  * Details on how it uses core package and exposes the mitter object 
  

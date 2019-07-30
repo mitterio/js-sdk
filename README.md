@@ -339,34 +339,34 @@ After taking the configs , the web package fills in the default values if the us
      
  below is the configuration that React-Native web SDK passes to mitter core
      
-     ```
-             public mitterCoreConfig: MitterCoreConfig -  
-                 {
-                     weaverUrl:string, // url for weaver
-                     mitterApiBaseUrl: string , // base url for mitter server
-                     initMessagingPipelineSubscriptions: Array<string>, // channel ids to which the user want to subscribe even if he is not a participant of that channel
-                     disableXHRCaching: boolean, // disable XHR mainly get request caching by the browser 
-                 }
-             
-             public mitterUserHooks: MitterUserHooks, - callback functions in response to some event
-                 {
-                     onTokenExpire: TokenExpireFunction[], // an array of function to be called when a user auth token expires
-                     onMessagingPipelineConnectCbs: MessagingPipelineConnectCb[], // for the time being only used for websocket connection, callback to inform the user when a websocket connection is successful for the first time
-                     In a situation if the app has already loaded and the user has missed some messages because of a delay in the websocket connection , then this callback can be used to fetch the latest messages for the channel the user is on
-                     mitterInstanceReady: () => void, // to inform the user that mitter messaging pipeline  is ready . Currently not implemented 
-                 }
-             
-             public readonly kvStore: KvStore, - implentation of local storage
-             pipelineDrivers: MessagingPipelineDriver[] | MessagingPipelineDriver, - [WebSockerDriver]
-             globalHostObject: any, - the global object particular to the environment. Window 
-             platformImplementedFeatures: PlatformImplementedFeatures, - Platform specific features .Currently implemented features are
-             {
-                processMultipartRequest: nativeFileUploader, // uses rn-fetch-blob
-                base64Decoder: base64.decode, // uses base-64 package
-                randomIdGenerator: uuid.v4 // uses react-native-uuid
-                
-             }
-             ```
+```
+ public mitterCoreConfig: MitterCoreConfig -  
+     {
+         weaverUrl:string, // url for weaver
+         mitterApiBaseUrl: string , // base url for mitter server
+         initMessagingPipelineSubscriptions: Array<string>, // channel ids to which the user want to subscribe even if he is not a participant of that channel
+         disableXHRCaching: boolean, // disable XHR mainly get request caching by the browser 
+     }
+ 
+ public mitterUserHooks: MitterUserHooks, - callback functions in response to some event
+     {
+         onTokenExpire: TokenExpireFunction[], // an array of function to be called when a user auth token expires
+         onMessagingPipelineConnectCbs: MessagingPipelineConnectCb[], // for the time being only used for websocket connection, callback to inform the user when a websocket connection is successful for the first time
+         In a situation if the app has already loaded and the user has missed some messages because of a delay in the websocket connection , then this callback can be used to fetch the latest messages for the channel the user is on
+         mitterInstanceReady: () => void, // to inform the user that mitter messaging pipeline  is ready . Currently not implemented 
+     }
+ 
+ public readonly kvStore: KvStore, - implentation of local storage
+ pipelineDrivers: MessagingPipelineDriver[] | MessagingPipelineDriver, - [WebSockerDriver]
+ globalHostObject: any, - the global object particular to the environment. Window 
+ platformImplementedFeatures: PlatformImplementedFeatures, - Platform specific features .Currently implemented features are
+ {
+    processMultipartRequest: nativeFileUploader, // uses rn-fetch-blob
+    base64Decoder: base64.decode, // uses base-64 package
+    randomIdGenerator: uuid.v4 // uses react-native-uuid
+    
+ }
+ ```
              
   Currently using `react-native-uuid` leads to a build time error saying could not find `buffer`.
   Please do `yarn add buffer` or `npm install buffer` to resolve this error. This bug is still an open issue in
@@ -376,24 +376,25 @@ After taking the configs , the web package fills in the default values if the us
 * Details of the configuration and callback functions exposed by the package
 
      Listed below is the config that the user can/has to pass
-         ```
-            public mitterUserConfig: MitterUserConfig -  
-                {
-                    weaverUrl?:string, // url for weaver
-                    mitterApiBaseUrl?: string , // base url for mitter server
-                    initMessagingPipelineSubscriptions: Array<string>, // channel ids to which the user want to subscribe even if he is not a participant of that channel
-                    disableXHRCaching: boolean, // disable XHR mainly get request caching by the browser , defaults to true
-                }
-            
-            public mitterUserHooks?: MitterUserHooks, - callback functions in response to some event
-                {
-                    onTokenExpire: TokenExpireFunction[], // an array of function to be called when a user auth token expires
-                    onMessagingPipelineConnectCbs: MessagingPipelineConnectCb[], // for the time being only used for websocket connection, callback to inform the user when a websocket connection is successful for the first time
-                    In a situation if the app has already loaded and the user has missed some messages because of a delay in the websocket connection , then this callback can be used to fetch the latest messages for the channel the user is on
-                    mitterInstanceReady: () => void, // to inform the user that mitter messaging pipeline  is ready . Currently not implemented 
-                }
-            
-            ```  
+     
+```
+public mitterUserConfig: MitterUserConfig -  
+    {
+        weaverUrl?:string, // url for weaver
+        mitterApiBaseUrl?: string , // base url for mitter server
+        initMessagingPipelineSubscriptions: Array<string>, // channel ids to which the user want to subscribe even if he is not a participant of that channel
+        disableXHRCaching: boolean, // disable XHR mainly get request caching by the browser , defaults to true
+    }
+
+public mitterUserHooks?: MitterUserHooks, - callback functions in response to some event
+    {
+        onTokenExpire: TokenExpireFunction[], // an array of function to be called when a user auth token expires
+        onMessagingPipelineConnectCbs: MessagingPipelineConnectCb[], // for the time being only used for websocket connection, callback to inform the user when a websocket connection is successful for the first time
+        In a situation if the app has already loaded and the user has missed some messages because of a delay in the websocket connection , then this callback can be used to fetch the latest messages for the channel the user is on
+        mitterInstanceReady: () => void, // to inform the user that mitter messaging pipeline  is ready . Currently not implemented 
+    }
+
+```  
     After taking the configs , the React-Native package fills in the default values if the user hasnt entered a value for any config and inject the config into the core
 
 * Details of the messaging pipeline driver implemented by the package
@@ -429,24 +430,24 @@ The React-Native Package implements
  
  * Details of the configuration and callback functions exposed by the package
      ```
-                public mitterNodeUserConfig: MitterNodeUserConfig -  
-                    {
-                        accessKey:{
-                            accessKey: string,
-                            accessSecret: string
-                        }, 
-                        applicationId: string
-                        mitterApiBaseUrl?: string , // base url for mitter server
-                    }
-                
-                public mitterNodeUserHooks?: MitterNodeUserHooks, - callback functions in response to some event
-                    {
-                        onTokenExpire: TokenExpireFunction[], // an array of function to be called when a user auth token expires
-                            In a situation if the app has already loaded and the user has missed some messages because of a delay in the websocket connection , then this callback can be used to fetch the latest messages for the channel the user is on
-                        mitterInstanceReady: () => void, // to inform the user that mitter messaging pipeline  is ready . Currently not implemented 
-                    }
-                
-                ```  
+        public mitterNodeUserConfig: MitterNodeUserConfig -  
+            {
+                accessKey:{
+                    accessKey: string,
+                    accessSecret: string
+                }, 
+                applicationId: string
+                mitterApiBaseUrl?: string , // base url for mitter server
+            }
+        
+        public mitterNodeUserHooks?: MitterNodeUserHooks, - callback functions in response to some event
+            {
+                onTokenExpire: TokenExpireFunction[], // an array of function to be called when a user auth token expires
+                    In a situation if the app has already loaded and the user has missed some messages because of a delay in the websocket connection , then this callback can be used to fetch the latest messages for the channel the user is on
+                mitterInstanceReady: () => void, // to inform the user that mitter messaging pipeline  is ready . Currently not implemented 
+            }
+        
+    ```  
  
  * Details on how it uses core package and exposes the mitter object 
  
