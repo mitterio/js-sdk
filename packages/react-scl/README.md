@@ -1,4 +1,7 @@
-### mitter-io/react-scl
+# Mitter.io SCL (React)
+
+The standard component library for ReactJS applications.
+### react-scl
  * Function of the package
  
  This package is used for only for front-end UI in the web. Currently there 
