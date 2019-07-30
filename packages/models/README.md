@@ -1,4 +1,4 @@
-### Models
+### mitter-io/models
 
 * Function of the package
 

@@ -1,6 +1,5 @@
-# mitter-core
+### mitter-io/core
 
-### Core
 * Function of the package
 
     This package is the core component of the mitter js SDK. This package exposes the mitter class 

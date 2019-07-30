@@ -1,4 +1,4 @@
-### React-Native
+### mitter-io/react-native
 
 * Function of the package
 
@@ -68,7 +68,7 @@
       }
   
   ```  
-    After taking the configs , the React-Native package fills in the default values if the user hasnt entered a value for any config and inject the config into the core
+  After taking the configs , the React-Native package fills in the default values if the user hasnt entered a value for any config and inject the config into the core
 
 * Details of the messaging pipeline driver implemented by the package
     

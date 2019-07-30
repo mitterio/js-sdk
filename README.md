@@ -78,7 +78,7 @@ Attached is a diagram which will make the dependencies clear
    Then type in wml start
            
 
-### Models
+### mitter-io/models
 
 * Function of the package
 
@@ -104,7 +104,7 @@ Attached is a diagram which will make the dependencies clear
 
 
 
-### Core
+### mitter-io/core
 * Function of the package
 
     This package is the core component of the mitter js SDK. This package exposes the mitter class 
@@ -245,7 +245,7 @@ Attached is a diagram which will make the dependencies clear
   3. Profile Builder - Util for building channel profiles and user profiles
 
 
-### Web
+### mitter-io/web
 * Function of the package
 
   The package is to be used in web-environment to interact with mitter .
@@ -323,7 +323,7 @@ After taking the configs , the web package fills in the default values if the us
 * Details of the platform Specific features implemented by the package
         The web Package implements a randomIdGenerator function which is based around the nanoid package
 
-### React-Native
+### mitter-io/react-native
 
 
 * Function of the package
@@ -395,7 +395,7 @@ public mitterUserHooks?: MitterUserHooks, - callback functions in response to so
     }
 
 ```  
-    After taking the configs , the React-Native package fills in the default values if the user hasnt entered a value for any config and inject the config into the core
+After taking the configs , the React-Native package fills in the default values if the user hasnt entered a value for any config and inject the config into the core
 
 * Details of the messaging pipeline driver implemented by the package
     
@@ -415,7 +415,7 @@ The React-Native Package implements
  3. randomIdGenerator :  uses `react-native-uuid`
  
  
- ### Node
+ ### mitter-io/node
  * Function of the package
  
     Library for consuming mitter.io APIs for backend applications on node and node-like environments.
@@ -475,7 +475,7 @@ The React-Native Package implements
     ```
  
 
-### React-SCL
+### mitter-io/react-scl
  * Function of the package
  
  This package is used for only for front-end UI in the web. Currently there 
