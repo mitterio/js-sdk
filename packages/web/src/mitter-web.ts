@@ -1,17 +1,17 @@
-import { Mitter as MitterCore, MitterConstants, PlatformImplementedFeatures, MitterCoreConfig, MitterUserConfig, MitterUserHooks } from '@mitter-io/core'
+import { Mitter as MitterCore, MitterConstants, PlatformImplementedFeatures, MitterCoreConfig, MitterUserConfig, MitterUserCbs } from '@mitter-io/core'
 import WebKvStore from './kv-store/KvStore'
 import WebSocketPipelineDriver from './drivers/WebSocketMessagingPipelineDriver'
-import {getDefaultMitterUserHooks, getMitterCoreConfig} from './utils';
+import {getDefaultMitterUserCbs, getMitterCoreConfig} from './utils';
 import nanoid from 'nanoid'
 
 export const Mitter = {
     forWeb: function(
         mitterUserConfig: MitterUserConfig,
-        mitterUserHooks?: Partial<MitterUserHooks>
+        mitterUserCbs?: Partial<MitterUserCbs>
 ): MitterCore {
         return new MitterCore(
           getMitterCoreConfig(mitterUserConfig),
-          getDefaultMitterUserHooks(mitterUserHooks),
+          getDefaultMitterUserCbs(mitterUserCbs),
           new WebKvStore(),
           new WebSocketPipelineDriver(),
           window,

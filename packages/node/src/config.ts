@@ -1,4 +1,4 @@
-import {MitterCoreConfig, MitterUserHooks} from '@mitter-io/core'
+import {MitterCoreConfig, MitterUserCbs} from '@mitter-io/core'
 import {AccessKeyApplicationCredentials} from "./auth/application-credentials";
 import {MakeKeyPartial} from "@mitter-io/models";
 
@@ -11,4 +11,4 @@ export type MitterNodeCoreConfig = {accessKey: AccessKeyApplicationCredentials} 
 export type MitterNodeUserConfig = MakeKeyPartial<MitterNodeCoreConfig, "mitterApiBaseUrl">
 
 
-export type MitterNodeUserHooks = Pick<MitterUserHooks, "mitterInstanceReady" |"onTokenExpire">
+export type MitterNodeUserHooks = Pick<MitterUserCbs, "mitterInstanceReady" |"onTokenExpire">

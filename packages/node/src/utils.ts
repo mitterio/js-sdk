@@ -1,4 +1,4 @@
-import {MitterConstants, MitterUserHooks } from "@mitter-io/core";
+import {MitterConstants, MitterUserCbs } from "@mitter-io/core";
 import {MitterNodeCoreConfig, MitterNodeUserConfig, MitterNodeUserHooks} from "./config";
 
 export const noOp = () => {}
@@ -12,7 +12,7 @@ export function getMitterNodeCoreConfig(mitterNodeUserConfig: MitterNodeUserConf
     }
 }
 
-export function getDefaultMitterUserHooks(hooks: Partial<MitterNodeUserHooks> = {}): MitterUserHooks {
+export function getDefaultMitterUserCbs(hooks: Partial<MitterNodeUserHooks> = {}): MitterUserCbs {
     return {
         mitterInstanceReady: () => {},
         onTokenExpire: [noOp],

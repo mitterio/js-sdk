@@ -1,10 +1,5 @@
 // tslint:disable-next-line:no-empty
-import {
-  MitterConstants,
-  MitterCoreConfig,
-  MitterUserConfig,
-  MitterUserHooks
-} from '@mitter-io/core'
+import { MitterConstants, MitterCoreConfig, MitterUserConfig, MitterUserCbs } from '@mitter-io/core'
 
 export const noOp = () => {}
 
@@ -21,7 +16,7 @@ export function getMitterCoreConfig(mitterUserConfig: MitterUserConfig): MitterC
   }
 }
 
-export function getDefaultMitterUserHooks(hooks: Partial<MitterUserHooks> = {}): MitterUserHooks {
+export function getDefaultMitterUserCbs(hooks: Partial<MitterUserCbs> = {}): MitterUserCbs {
   return {
     mitterInstanceReady: () => {},
     onTokenExpire: [noOp],

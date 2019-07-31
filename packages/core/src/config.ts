@@ -11,7 +11,7 @@ export type MitterCoreConfig = {
     disableXHRCaching: boolean,
 }
 
-export type MitterUserHooks = {
+export type MitterUserCbs = {
     onTokenExpire: TokenExpireFunction[],
     onMessagingPipelineConnectCbs: MessagingPipelineConnectCb[],
     mitterInstanceReady: () => void,

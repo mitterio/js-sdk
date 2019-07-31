@@ -2,7 +2,7 @@ import { MessagingPipelinePayload, User } from '@mitter-io/models'
 import { AxiosInstance } from 'axios'
 import { UserAuthorizationInterceptor } from './auth/user-interceptors'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
-import {KvStore, MitterUserHooks, PlatformMitter} from './mitter-core'
+import {KvStore, MitterUserCbs, PlatformMitter} from './mitter-core'
 import { MitterApiConfiguration } from './MitterApiConfiguration'
 import { MitterAxiosApiInterceptor } from './MitterApiGateway'
 import { MitterClientSet } from './MitterClientSet'
@@ -27,7 +27,7 @@ export abstract class MitterBase implements PlatformMitter, MitterApiConfigurati
 
 
     constructor(
-        public mitterUserHooks: MitterUserHooks,
+        public mitterUserCbs: MitterUserCbs,
         public platformImplementedFeatures: PlatformImplementedFeatures,
 
     ) {}
@@ -63,13 +63,13 @@ export class Mitter extends MitterBase {
 
     constructor(
         public mitterCoreConfig: MitterCoreConfig,
-        public mitterUserHooks: MitterUserHooks,
+        public mitterUserCbs: MitterUserCbs,
         public readonly kvStore: KvStore,
         pipelineDrivers: MessagingPipelineDriver[] | MessagingPipelineDriver,
         globalHostObject: any,
         platformImplementedFeatures: PlatformImplementedFeatures,
     ) {
-        super(mitterUserHooks, platformImplementedFeatures)
+        super(mitterUserCbs, platformImplementedFeatures)
 
         this.mitterAxiosInterceptor = new MitterAxiosApiInterceptor(
             /* the application id */
@@ -84,7 +84,6 @@ export class Mitter extends MitterBase {
             /* The base url for mitter apis */
             this.mitterCoreConfig.mitterApiBaseUrl,
             this.mitterCoreConfig.disableXHRCaching,
-            // this.getMitterHooks
         )
 
         this.messagingPipelineDriverHost = new MessagingPipelineDriverHost(
@@ -220,7 +219,7 @@ export class Mitter extends MitterBase {
     }
 
     private executeOnTokenExpireFunctions() {
-        this.mitterUserHooks.onTokenExpire.forEach(onTokenExpire => {
+        this.mitterUserCbs.onTokenExpire.forEach(onTokenExpire => {
             onTokenExpire()
         })
     }

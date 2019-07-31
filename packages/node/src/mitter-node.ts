@@ -3,12 +3,12 @@ import {
     MitterAxiosApiInterceptor,
     PlatformImplementedFeatures,
     MitterApiConfiguration,
-    MitterUserHooks,
+    MitterUserCbs,
 } from '@mitter-io/core'
 import { AxiosInstance } from 'axios'
 import { AccessKeySigningInterceptor } from './auth/access-key-interceptor'
 import {MitterNodeCoreConfig, MitterNodeUserConfig, MitterNodeUserHooks} from "./config";
-import {getDefaultMitterUserHooks, getMitterNodeCoreConfig} from './utils';
+import {getDefaultMitterUserCbs, getMitterNodeCoreConfig} from './utils';
 
 export class MitterNode extends MitterBase {
     private accessKeySigningInterceptor: AccessKeySigningInterceptor
@@ -18,10 +18,10 @@ export class MitterNode extends MitterBase {
         /*private applicationId: string,
         private accessKey: AccessKeyApplicationCredentials,
         public mitterApiBaseUrl: string,*/
-        mitterUserHooks: MitterUserHooks
+        mitterUserCbs: MitterUserCbs
     ) {
         super(
-            mitterUserHooks,
+            mitterUserCbs,
             {} as PlatformImplementedFeatures
         )
         this.accessKeySigningInterceptor = new AccessKeySigningInterceptor(mitterNodeCoreConfig.accessKey)
@@ -61,7 +61,7 @@ export const Mitter = {
     ): MitterNode {
         return new MitterNode(
             getMitterNodeCoreConfig(mitterNodeUserConfig),
-            getDefaultMitterUserHooks(mitterNodeUserHooks)
+            getDefaultMitterUserCbs(mitterNodeUserHooks)
         )
     }
 }
