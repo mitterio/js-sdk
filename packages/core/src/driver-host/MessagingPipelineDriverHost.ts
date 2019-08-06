@@ -258,7 +258,7 @@ export class MessagingPipelineDriverHost {
             })
             .catch((resp: AxiosError) => {
                 if (resp.response!.status === 409) {
-                    /*return this.usersClient.getUserDeliveryTargetByMechanismSpecification(deliveryTarget.mechanismSpecification)
+                    return this.usersClient.getUserDeliveryTargetByMechanismSpecification(deliveryTarget.mechanismSpecification)
                         .then((wiredDeliveryTarget) => {
                             this.savedDeliveryTargets = new SavedDeliveryTargets(
                                 Object.assign({}, this.savedDeliveryTargets.deliveryTargets, {
@@ -268,16 +268,16 @@ export class MessagingPipelineDriverHost {
                             this.syncDeliveryTargetsToStore()
                             this.subscribeToChannels(deliveryTarget)
                             return wiredDeliveryTarget as DeliveryTarget
-                        })*/
+                        })
 
-                    this.savedDeliveryTargets = new SavedDeliveryTargets(
+                    /*this.savedDeliveryTargets = new SavedDeliveryTargets(
                         Object.assign({}, this.savedDeliveryTargets.deliveryTargets, {
                             [driverSpec.name]: deliveryTarget
                         })
                     )
                     this.syncDeliveryTargetsToStore()
                     this.subscribeToChannels(deliveryTarget)
-                    return deliveryTarget
+                    return deliveryTarget*/
                 } else {
                      throw resp
                 }
