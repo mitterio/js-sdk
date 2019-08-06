@@ -2,7 +2,7 @@ import { MessagingPipelinePayload, User } from '@mitter-io/models'
 import { AxiosInstance } from 'axios'
 import { UserAuthorizationInterceptor } from './auth/user-interceptors'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
-import {KvStore, MitterUserCbs, PlatformMitter} from './mitter-core'
+import {KvStore, MitterUserCbs, OperatingDeliveryTarget, PlatformMitter} from './mitter-core'
 import { MitterApiConfiguration } from './MitterApiConfiguration'
 import { MitterAxiosApiInterceptor } from './MitterApiGateway'
 import { MitterClientSet } from './MitterClientSet'
@@ -22,6 +22,8 @@ export interface PlatformMitter {
 export interface MitterApiConfigurationProvider {
     mitterApiConfigurationProvider(): MitterApiConfiguration
 }
+
+
 
 export abstract class MitterBase implements PlatformMitter, MitterApiConfigurationProvider {
 
@@ -70,7 +72,7 @@ export class Mitter extends MitterBase {
         platformImplementedFeatures: PlatformImplementedFeatures,
     ) {
         super(mitterUserCbs, platformImplementedFeatures)
-
+        console.log('mitterUserCbs', mitterUserCbs)
         this.mitterAxiosInterceptor = new MitterAxiosApiInterceptor(
             /* the application id */
             this.mitterCoreConfig.applicationId,
@@ -96,7 +98,8 @@ export class Mitter extends MitterBase {
                 } else {
                     this.onPipelinesInitialized.resolve()
                 }
-            }
+            },
+            this.onPipelineInitialization
         )
 
         this.messagingPipelineDriverHost.subscribe((messagingPayload: any) =>
@@ -166,8 +169,18 @@ export class Mitter extends MitterBase {
         this.messagingPipelineDriverHost.refresh()
     }
 
-    stopMessagingPipeline(): void {
-        this.messagingPipelineDriverHost.stop()
+    getOperatingDeliveryTargets(): OperatingDeliveryTarget {
+        return this.messagingPipelineDriverHost.getOperatingDeliveryTargets()
+    }
+
+    onPipelineInitialization = (operatingDeliveryTarget: OperatingDeliveryTarget) => {
+        this.mitterUserCbs.pipelineInitializationCbs.forEach(pipelineInitCb => {
+            pipelineInitCb(operatingDeliveryTarget)
+        })
+    }
+
+    stopMessagingPipeline(driverName: string): void {
+        this.messagingPipelineDriverHost.stop(driverName)
     }
 
     getUserAuthorization(): Promise<string | undefined> {

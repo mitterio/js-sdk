@@ -1,5 +1,6 @@
 // tslint:disable-next-line:no-empty
 import { MitterConstants, MitterCoreConfig, MitterUserConfig, MitterUserCbs } from '@mitter-io/core'
+import { PipelineInitializationCb } from '../../core/src/config'
 
 export const noOp = () => {}
 
@@ -21,6 +22,7 @@ export function getDefaultMitterUserCbs(hooks: Partial<MitterUserCbs> = {}): Mit
     mitterInstanceReady: () => {},
     onTokenExpire: [noOp],
     onMessagingPipelineConnectCbs: [noOp],
+    pipelineInitializationCbs: [noOp],
     ...hooks
   }
 }

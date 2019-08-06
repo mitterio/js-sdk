@@ -115,6 +115,15 @@ export interface UsersApi {
         }
     }
 
+    '/v1/delivery-targets/:mechanismSpecification/mechanismSpecification': {
+        GET: {
+            params: {
+                mechanismSpecification: string
+            }
+            response: WiredDeliveryTarget
+        }
+    }
+
     '/v1/delivery-targets': {
         GET: {
             params: {
@@ -435,6 +444,17 @@ export class UsersClient {
         return this.usersAxiosClient
             .get<'/v1/delivery-targets'>(
                 `/v1/delivery-targets/${deliveryTargetId}`
+            )
+            .then(x => x.data)
+
+    }
+
+    getUserDeliveryTargetByMechanismSpecification(
+        mechanismSpecification: string
+    ): Promise<WiredDeliveryTarget> {
+        return this.usersAxiosClient
+            .get<'/v1/delivery-targets/:mechanismSpecification/mechanismSpecification'>(
+                `/v1/delivery-targets/${mechanismSpecification}/mechanismSpecification`
             )
             .then(x => x.data)
 

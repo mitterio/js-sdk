@@ -8,7 +8,7 @@ import {
 } from '@mitter-io/models'
 
 import MessagingPipelineDriver, {
-    BasePipelineSink,
+    BasePipelineSink, OperatingDeliveryTarget,
     PipelineDriverSpec,
     PipelineSink
 } from './../specs/MessagingPipelineDriver'
@@ -32,13 +32,14 @@ export class MessagingPipelineDriverHost {
     private pipelineDrivers: Array<MessagingPipelineDriver>
     private subscriptions: Array<MessageSink> = []
     private usersClient: UsersClient
-    private operatingDeliveryTarget: DeliveryTarget | undefined
+    private operatingDeliveryTargets: OperatingDeliveryTarget
 
     constructor(
         pipelineDrivers: Array<MessagingPipelineDriver> | MessagingPipelineDriver,
         private mitterContext: Mitter,
         private kvStore: KvStore | undefined = undefined,
-        private onAllPipelinesInitialized: (e?: any) => void = () => {}
+        private onAllPipelinesInitialized: (e?: any) => void = () => {},
+        private onPipelineInitializtion: (operatingDeliveryTarget: OperatingDeliveryTarget) => void
     ) {
         if (pipelineDrivers instanceof Array) {
             this.pipelineDrivers = pipelineDrivers
@@ -48,12 +49,13 @@ export class MessagingPipelineDriverHost {
 
         this.mitterContext.userAuthorizationAvailable(() => this.refresh())
         this.usersClient = this.mitterContext.clients().users()
-        this.operatingDeliveryTarget = undefined
+        this.operatingDeliveryTargets = {}
     }
 
     public subscribe(messageSink: MessageSink) {
         this.subscriptions.push(messageSink)
     }
+
 
     public refresh() {
         /*this.loadStoredEndpoints()
@@ -75,8 +77,12 @@ export class MessagingPipelineDriverHost {
         )
     }
 
-    public stop() {
-        if(this.operatingDeliveryTarget !== undefined) {
+    public getOperatingDeliveryTargets():OperatingDeliveryTarget {
+        return this.operatingDeliveryTargets
+    }
+
+    public stop(driverName: string) {
+        if(this.operatingDeliveryTargets[driverName] !== undefined) {
             // ideally delete the delivery target here
         }
         else {
@@ -181,7 +187,8 @@ export class MessagingPipelineDriverHost {
                         this.announceSinkForDriver(
                             driver,
                             deliveryTarget,
-                            this.generatePipelineSink(driverSpec)
+                            this.generatePipelineSink(driverSpec),
+                            driverSpec.name
                         )
                     } else {
                         if (driver.pipelineSinkChanged !== undefined) {
@@ -200,10 +207,12 @@ export class MessagingPipelineDriverHost {
     private announceSinkForDriver(
         driver: MessagingPipelineDriver,
         deliveryTarget: DeliveryTarget,
-        pipelineSink: PipelineSink
+        pipelineSink: PipelineSink,
+        driverName: string
     ) {
         driver.deliveryTargetRegistered(pipelineSink, deliveryTarget)
-        this.operatingDeliveryTarget = deliveryTarget
+        this.onPipelineInitializtion({[driverName]: deliveryTarget})
+        this.operatingDeliveryTargets[driverName] = deliveryTarget
 
         if (driver.pipelineSinkChanged !== undefined) {
             driver.pipelineSinkChanged(pipelineSink)
@@ -249,16 +258,28 @@ export class MessagingPipelineDriverHost {
             })
             .catch((resp: AxiosError) => {
                 if (resp.response!.status === 409) {
-                    this.savedDeliveryTargets = new SavedDeliveryTargets(
+                    return this.usersClient.getUserDeliveryTargetByMechanismSpecification(deliveryTarget.mechanismSpecification)
+                        .then((wiredDeliveryTarget) => {
+                            this.savedDeliveryTargets = new SavedDeliveryTargets(
+                                Object.assign({}, this.savedDeliveryTargets.deliveryTargets, {
+                                    [driverSpec.name]: deliveryTarget
+                                })
+                            )
+                            this.syncDeliveryTargetsToStore()
+                            this.subscribeToChannels(deliveryTarget)
+                            return wiredDeliveryTarget as DeliveryTarget
+                        })
+
+                    /*this.savedDeliveryTargets = new SavedDeliveryTargets(
                         Object.assign({}, this.savedDeliveryTargets.deliveryTargets, {
                             [driverSpec.name]: deliveryTarget
                         })
                     )
                     this.syncDeliveryTargetsToStore()
                     this.subscribeToChannels(deliveryTarget)
-                    return deliveryTarget
+                    return deliveryTarget*/
                 } else {
-                    throw resp
+                     throw resp
                 }
             })
     }
