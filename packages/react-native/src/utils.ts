@@ -1,6 +1,5 @@
 // tslint:disable-next-line:no-empty
 import { MitterConstants, MitterCoreConfig, MitterUserConfig, MitterUserCbs } from '@mitter-io/core'
-import { PipelineInitializationCb } from '../../core/src/config'
 
 export const noOp = () => {}
 
