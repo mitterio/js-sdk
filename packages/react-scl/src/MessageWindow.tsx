@@ -272,7 +272,8 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
              * are supposed to be unique , keeping it here as  a safety net
              * */
 
-            const scrollToRow = messageListClone.length - initialMessageCount
+            // const scrollToRow = messageListClone.length - initialMessageCount
+            const scrollToRow = messages.length === 0 ? 0 : messages.length
             this.messageIds =  this.getMessageIds(messageListClone)
 
             this.setState({
