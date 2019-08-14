@@ -18,7 +18,6 @@ export function getDefaultMitterUserCbs(hooks: Partial<MitterUserCbs> = {}): Mit
     mitterInstanceReady: () => {},
     onTokenExpire: [noOp],
     onMessagingPipelineConnectCbs: [noOp],
-    pipelineInitializationCbs:[noOp],
     ...hooks
   }
 }

@@ -54,6 +54,6 @@ export default interface MessagingPipelineDriver {
     halt(): void
 }
 
-export type OperatingDeliveryTarget = {
+export type OperatingDeliveryTargets = {
     [driverName: string]: DeliveryTarget
 }

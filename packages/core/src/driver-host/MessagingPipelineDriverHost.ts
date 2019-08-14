@@ -4,19 +4,27 @@ import {
     RegisteredDeliveryTarget,
     MessageResolutionSubscription,
     predicateForSubscription,
-    MessagingPipelinePayload
+    MessagingPipelinePayload,
+    WiredMessageResolutionSubscription
 } from '@mitter-io/models'
 
 import MessagingPipelineDriver, {
-    BasePipelineSink, OperatingDeliveryTarget,
+    BasePipelineSink, OperatingDeliveryTargets,
     PipelineDriverSpec,
     PipelineSink
 } from './../specs/MessagingPipelineDriver'
 import {KvStore, Mitter, UsersClient} from '../mitter-core'
 import { noOp } from '../utils'
-import axios, { AxiosError, AxiosResponse } from 'axios'
+import { AxiosError } from 'axios'
+import {isIdentifier} from "rollup/dist/typings/ast/nodes/Identifier";
 
 export type MessageSink = (payload: MessagingPipelinePayload) => void
+
+export type onPipelineInitialiation =  (
+        initSubscribedChannelIds: Array<string>,
+        operatingDeliveryTarget?: OperatingDeliveryTargets,
+        initialSubscription?: WiredMessageResolutionSubscription | undefined
+    ) => void
 
 class SavedDeliveryTargets {
     constructor(public readonly deliveryTargets: { [driver: string]: DeliveryTarget } = {}) {}
@@ -32,14 +40,14 @@ export class MessagingPipelineDriverHost {
     private pipelineDrivers: Array<MessagingPipelineDriver>
     private subscriptions: Array<MessageSink> = []
     private usersClient: UsersClient
-    private operatingDeliveryTargets: OperatingDeliveryTarget
+    private operatingDeliveryTargets: OperatingDeliveryTargets
 
     constructor(
         pipelineDrivers: Array<MessagingPipelineDriver> | MessagingPipelineDriver,
         private mitterContext: Mitter,
         private kvStore: KvStore | undefined = undefined,
         private onAllPipelinesInitialized: (e?: any) => void = () => {},
-        private onPipelineInitializtion: (operatingDeliveryTarget: OperatingDeliveryTarget) => void
+        private onPipelineInitialization: onPipelineInitialiation
     ) {
         if (pipelineDrivers instanceof Array) {
             this.pipelineDrivers = pipelineDrivers
@@ -77,7 +85,7 @@ export class MessagingPipelineDriverHost {
         )
     }
 
-    public getOperatingDeliveryTargets():OperatingDeliveryTarget {
+    public getOperatingDeliveryTargets():OperatingDeliveryTargets {
         return this.operatingDeliveryTargets
     }
 
@@ -184,12 +192,17 @@ export class MessagingPipelineDriverHost {
 
                 operatingDeliveryTarget.then(deliveryTarget => {
                     if (deliveryTarget !== undefined) {
-                        this.announceSinkForDriver(
-                            driver,
-                            deliveryTarget,
-                            this.generatePipelineSink(driverSpec),
-                            driverSpec.name
-                        )
+                        this.subscribeToChannels(deliveryTarget)
+                            .then(wiredMessageResolutionSubscription => {
+                                this.announceSinkForDriver(
+                                    driver,
+                                    deliveryTarget,
+                                    this.generatePipelineSink(driverSpec),
+                                    driverSpec.name,
+                                    wiredMessageResolutionSubscription
+                                )
+                            })
+
                     } else {
                         if (driver.pipelineSinkChanged !== undefined) {
                             driver.pipelineSinkChanged(
@@ -204,14 +217,31 @@ export class MessagingPipelineDriverHost {
         return Promise.all(pipelineInits)
     }
 
+
+    private getInitSubscribedChannelIds(initialSubscription: WiredMessageResolutionSubscription | undefined) :Array<string> {
+
+        if(initialSubscription === undefined)
+            return []
+        return initialSubscription.channelIds.map(channelIdIdentifier => channelIdIdentifier.identifier)
+    }
+
+    private onStatefulPipelineInitialization(
+        operatingDeliveryTarget: OperatingDeliveryTargets,
+        initialSubscription: WiredMessageResolutionSubscription | undefined
+    ) {
+
+        this.onPipelineInitialization(this.getInitSubscribedChannelIds(initialSubscription), operatingDeliveryTarget, initialSubscription)
+    }
+
     private announceSinkForDriver(
         driver: MessagingPipelineDriver,
         deliveryTarget: DeliveryTarget,
         pipelineSink: PipelineSink,
-        driverName: string
+        driverName: string,
+        initialSubscription: WiredMessageResolutionSubscription | undefined
     ) {
         driver.deliveryTargetRegistered(pipelineSink, deliveryTarget)
-        this.onPipelineInitializtion({[driverName]: deliveryTarget})
+        this.onStatefulPipelineInitialization({[driverName]: deliveryTarget}, initialSubscription)
         this.operatingDeliveryTargets[driverName] = deliveryTarget
 
         if (driver.pipelineSinkChanged !== undefined) {
@@ -225,7 +255,7 @@ export class MessagingPipelineDriverHost {
             .then((resp: WiredDeliveryTarget) => {
                 // wired delivery target extends delivery target
                 delete resp.identifier
-                this.subscribeToChannels(deliveryTarget)
+                // this.subscribeToChannels(deliveryTarget)
                 return resp
             })
             .catch((resp: AxiosError) => {
@@ -253,11 +283,12 @@ export class MessagingPipelineDriverHost {
                 )
 
                 this.syncDeliveryTargetsToStore()
-                this.subscribeToChannels(deliveryTarget)
+                // this.subscribeToChannels(deliveryTarget)
                 return deliveryTarget
             })
             .catch((resp: AxiosError) => {
                 if (resp.response!.status === 409) {
+                    console.log('409 received')
                     return this.usersClient.getUserDeliveryTargetByMechanismSpecification(deliveryTarget.mechanismSpecification)
                         .then((wiredDeliveryTarget) => {
                             this.savedDeliveryTargets = new SavedDeliveryTargets(
@@ -267,6 +298,7 @@ export class MessagingPipelineDriverHost {
                             )
                             this.syncDeliveryTargetsToStore()
                             this.subscribeToChannels(deliveryTarget)
+                            console.log('in getUserDeliveryTargetByMechanismSpecification', wiredDeliveryTarget)
                             return wiredDeliveryTarget as DeliveryTarget
                         })
 
@@ -329,10 +361,10 @@ export class MessagingPipelineDriverHost {
         this.subscriptions.forEach(subscription => subscription(payload))
     }
 
-    private subscribeToChannels(deliveryTarget: DeliveryTarget): void {
+    private subscribeToChannels(deliveryTarget: DeliveryTarget): Promise<WiredMessageResolutionSubscription |  undefined> {
         const channelsToSubscribe = this.mitterContext.mitterCoreConfig.initMessagingPipelineSubscriptions
         if(channelsToSubscribe.length === 0)
-            return
+            return Promise.resolve(undefined)
         let subscriptionId = Date.now().toString()
 
         if(this.mitterContext.platformImplementedFeatures.randomIdGenerator) {
@@ -340,13 +372,25 @@ export class MessagingPipelineDriverHost {
         }
 
         const messageResolutionSubscription = new MessageResolutionSubscription(subscriptionId, channelsToSubscribe)
-        this.usersClient.addSubscription(deliveryTarget.deliveryTargetId, messageResolutionSubscription)
+        return this.usersClient.addSubscription(deliveryTarget.deliveryTargetId, messageResolutionSubscription)
             .then((resp) => {
                 if(predicateForSubscription(resp)) {
                     console.log('channels that are subscribed to ',resp.channelIds )
+                    return resp
                 }
             })
-            .catch(resp => {
+            .catch((resp:AxiosError) => {
+                if (resp.response!.status === 409) {
+                    return  ({
+                        '@subscriptionType': 'message-resolution-subscription',
+                        'subscriptionId': messageResolutionSubscription.subscriptionId,
+                        'channelIds': messageResolutionSubscription.channelIds.map(channelId => {
+                            return {identifier: channelId}
+                        }),
+                        'identifier': messageResolutionSubscription.subscriptionId,
+                    }) as WiredMessageResolutionSubscription
+                }
+                return undefined
                 console.log('error in subscribing to channels', resp)
             })
     }

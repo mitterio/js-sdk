@@ -150,6 +150,28 @@ export interface UsersApi {
         }
     }
 
+    '/v1/delivery-targets/:deliveryTargetId/subscriptions': {
+        DELETE: {
+            params: {
+                deliveryTargetId: string
+                subscriptionId: string
+
+            }
+            response: WiredUserResolutionSubscription | WiredMessageResolutionSubscription
+        }
+    }
+
+    '/v1/delivery-targets/:deliveryTargetId/subscriptions/:subscriptionId': {
+        DELETE: {
+            params: {
+                deliveryTargetId: string
+                subscriptionId: string
+
+            }
+            response: WiredUserResolutionSubscription | WiredMessageResolutionSubscription
+        }
+    }
+
     '/v1/users/:userId/profile': {
         GET: {
             params: {
@@ -465,11 +487,23 @@ export class UsersClient {
         subscription: UserResolutionSubscription | MessageResolutionSubscription
     ): Promise<WiredUserResolutionSubscription | WiredMessageResolutionSubscription> {
         return this.usersAxiosClient
-            .post<'/v1/delivery-targets/:deliveryTargetId'>(
+            .post<'/v1/delivery-targets/:deliveryTargetId/subscriptions'>(
                 `/v1/delivery-targets/${deliveryTargetId}/subscriptions`,
                 subscription
             )
             .then(x => x.data)
+    }
+
+    deleteSubscription(
+        deliveryTargetId: string,
+        subscriptionId: string
+    ): Promise<WiredUserResolutionSubscription | WiredMessageResolutionSubscription> {
+        return this.usersAxiosClient
+            .post<'/v1/delivery-targets/:deliveryTargetId/subscriptions/:subscriptionId'>(
+                `/v1/delivery-targets/${deliveryTargetId}/subscriptions/${subscriptionId}`
+            )
+            .then(x => x.data)
+
     }
 
     /***

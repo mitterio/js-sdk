@@ -140,12 +140,8 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                     this.activeSocket.connect(
                         headers,
                         frame => {
-                          const connectCbs = this.mitterContext!.mitterUserCbs.onMessagingPipelineConnectCbs
-                          if(connectCbs !== undefined) {
-                            connectCbs.forEach(connectCb => {
-                              connectCb(initSubscriptions)
-                            })
-                          }
+                            this.mitterContext!.onPipelineInitialization(initSubscriptions)
+
                             this.activeSocket!!.subscribe(
                                 '/',
                               (message) => {

@@ -1,8 +1,8 @@
-import { MessagingPipelinePayload, User } from '@mitter-io/models'
+import { MessagingPipelinePayload, User, WiredMessageResolutionSubscription } from '@mitter-io/models'
 import { AxiosInstance } from 'axios'
 import { UserAuthorizationInterceptor } from './auth/user-interceptors'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
-import {KvStore, MitterUserCbs, OperatingDeliveryTarget, PlatformMitter} from './mitter-core'
+import {KvStore, MitterUserCbs, OperatingDeliveryTargets, PlatformMitter} from './mitter-core'
 import { MitterApiConfiguration } from './MitterApiConfiguration'
 import { MitterAxiosApiInterceptor } from './MitterApiGateway'
 import { MitterClientSet } from './MitterClientSet'
@@ -99,7 +99,7 @@ export class Mitter extends MitterBase {
                     this.onPipelinesInitialized.resolve()
                 }
             },
-            this.onPipelineInitialization
+            this.onMessagingPipelineConnect
         )
 
         this.messagingPipelineDriverHost.subscribe((messagingPayload: any) =>
@@ -169,13 +169,16 @@ export class Mitter extends MitterBase {
         this.messagingPipelineDriverHost.refresh()
     }
 
-    getOperatingDeliveryTargets(): OperatingDeliveryTarget {
+    getOperatingDeliveryTargets(): OperatingDeliveryTargets {
         return this.messagingPipelineDriverHost.getOperatingDeliveryTargets()
     }
 
-    onPipelineInitialization = (operatingDeliveryTarget: OperatingDeliveryTarget) => {
-        this.mitterUserCbs.pipelineInitializationCbs.forEach(pipelineInitCb => {
-            pipelineInitCb(operatingDeliveryTarget)
+    onMessagingPipelineConnect = (initSubscribedChannelIds: Array<string>,
+                                  operatingDeliveryTarget?: OperatingDeliveryTargets,
+                                  initialSubscription?: WiredMessageResolutionSubscription | undefined
+            ) => {
+        this.mitterUserCbs.onMessagingPipelineConnectCbs.forEach(pipelineConnectCb => {
+            pipelineConnectCb(initSubscribedChannelIds, operatingDeliveryTarget, initialSubscription)
         })
     }
 
