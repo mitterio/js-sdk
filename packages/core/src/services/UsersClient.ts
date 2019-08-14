@@ -140,23 +140,12 @@ export interface UsersApi {
         }
     }
 
-    '/v1/delivery-targets/:deliveryTargetId': {
+    '/v1/delivery-targets/:deliveryTargetId/subscriptions': {
         POST: {
             params: {
                 deliveryTargetId: string
             }
             body: UserResolutionSubscription | MessageResolutionSubscription
-            response: WiredUserResolutionSubscription | WiredMessageResolutionSubscription
-        }
-    }
-
-    '/v1/delivery-targets/:deliveryTargetId/subscriptions': {
-        DELETE: {
-            params: {
-                deliveryTargetId: string
-                subscriptionId: string
-
-            }
             response: WiredUserResolutionSubscription | WiredMessageResolutionSubscription
         }
     }
@@ -487,7 +476,7 @@ export class UsersClient {
         subscription: UserResolutionSubscription | MessageResolutionSubscription
     ): Promise<WiredUserResolutionSubscription | WiredMessageResolutionSubscription> {
         return this.usersAxiosClient
-            .post<'/v1/delivery-targets/:deliveryTargetId/subscriptions'>(
+            .post<'/v1/delivery-targets/:deliveryTargetId/subscriptions'>(d
                 `/v1/delivery-targets/${deliveryTargetId}/subscriptions`,
                 subscription
             )
@@ -499,7 +488,7 @@ export class UsersClient {
         subscriptionId: string
     ): Promise<WiredUserResolutionSubscription | WiredMessageResolutionSubscription> {
         return this.usersAxiosClient
-            .post<'/v1/delivery-targets/:deliveryTargetId/subscriptions/:subscriptionId'>(
+            .delete<'/v1/delivery-targets/:deliveryTargetId/subscriptions/:subscriptionId'>(
                 `/v1/delivery-targets/${deliveryTargetId}/subscriptions/${subscriptionId}`
             )
             .then(x => x.data)

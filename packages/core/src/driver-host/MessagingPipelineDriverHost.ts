@@ -16,7 +16,6 @@ import MessagingPipelineDriver, {
 import {KvStore, Mitter, UsersClient} from '../mitter-core'
 import { noOp } from '../utils'
 import { AxiosError } from 'axios'
-import {isIdentifier} from "rollup/dist/typings/ast/nodes/Identifier";
 
 export type MessageSink = (payload: MessagingPipelinePayload) => void
 
