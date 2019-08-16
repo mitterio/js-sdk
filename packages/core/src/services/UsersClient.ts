@@ -115,7 +115,7 @@ export interface UsersApi {
         }
     }
 
-    '/v1/delivery-targets/:mechanismSpecification/mechanismSpecification': {
+    '/v1/delivery-targets/:mechanismSpecification/mechanism-specification': {
         GET: {
             params: {
                 mechanismSpecification: string
@@ -464,8 +464,8 @@ export class UsersClient {
         mechanismSpecification: string
     ): Promise<WiredDeliveryTarget> {
         return this.usersAxiosClient
-            .get<'/v1/delivery-targets/:mechanismSpecification/mechanismSpecification'>(
-                `/v1/delivery-targets/${mechanismSpecification}/mechanismSpecification`
+            .get<'/v1/delivery-targets/:mechanismSpecification/mechanism-specification'>(
+                `/v1/delivery-targets/${mechanismSpecification}/mechanism-specification`
             )
             .then(x => x.data)
 
@@ -476,7 +476,7 @@ export class UsersClient {
         subscription: UserResolutionSubscription | MessageResolutionSubscription
     ): Promise<WiredUserResolutionSubscription | WiredMessageResolutionSubscription> {
         return this.usersAxiosClient
-            .post<'/v1/delivery-targets/:deliveryTargetId/subscriptions'>(d
+            .post<'/v1/delivery-targets/:deliveryTargetId/subscriptions'>(
                 `/v1/delivery-targets/${deliveryTargetId}/subscriptions`,
                 subscription
             )
@@ -534,7 +534,7 @@ export class UsersClient {
      *
      * @param {string} userId - The  unique identifier  of the user
      * @param {string} keys
-     * @param {string} keys - comma separated keys against which entity profile attributes are
+     * @param {string} keys - comma separated keys against which entity profile attributesare
      * queried
      * @returns {Promise<EntityProfileAttribute[]>} - List of searched entity profile attributes
      * The shape of Entity Profile attribute can be found in our tsdocs section
