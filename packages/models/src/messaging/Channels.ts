@@ -1,9 +1,12 @@
 import IdentifiableEntity from '../annotations/IdentifiableEntity'
+import { AuditInfo } from '../commons/common-models'
+import { User } from '../user/User'
+import { Message } from './Messages'
 import { TimelineEvent } from './TimelineEvents'
 import { EntityMetadata } from '../entity/EntityMetadata'
 import { EntityProfile } from '../entity/EntityProfile'
 import { Identifier } from '../annotations/Identifier'
-import { PickedPartial } from '../utils/PickedPartial'
+import { PickedPartial } from '../utils/ts-types'
 import { AppliedAclList } from '../acolyte/AppliedAclList'
 
 export enum StandardRuleSetNames {
@@ -28,7 +31,8 @@ export class Channel implements IdentifiableEntity<Channel> {
         public timelineEvents: Array<TimelineEvent> = [],
         public appliedAcls: AppliedAclList = { plusAppliedAcls: [], minusAppliedAcls: [] },
         public systemChannel: boolean = false,
-        public entityMetadata: EntityMetadata = {}
+        public entityMetadata: EntityMetadata = {},
+        public auditInfo?: AuditInfo
     ) {}
 
     identifier(): string {
@@ -43,10 +47,20 @@ export class ChannelParticipation {
     constructor(
         public participantId: Identifier | string,
         public participationStatus: ParticipationStatus = ParticipationStatus.Active,
-        public channelId: Identifier | string
+        public channelId: Identifier | string,
+        public participant: User,
+        public auditInfo?: AuditInfo
     ) {}
 }
 
 export class ParticipatedChannel {
     constructor(public participationStatus: ParticipationStatus, public channel: Channel) {}
+}
+
+export class ChannelSummary {
+    constructor(
+        public channelId: Identifier | string,
+        public messages: Array<Message>,
+        public unreadMessageCount: number
+    ){}
 }

@@ -7,13 +7,15 @@ import {
     User,
     UserLocator,
     AttachedEntityMetadata,
-    EntityMetadata
+    EntityMetadata,
+    QueriableMetadata, WiredPresence
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
 import { PlatformImplementedFeatures } from '../models/platformImplementedFeatures'
 import { clientGenerator } from './common'
 import { MitterConstants } from './constants'
+import queryString from 'query-string'
 
 const base = `${MitterConstants.Api.VersionPrefix}/users`
 
@@ -62,7 +64,7 @@ export interface UsersApi {
 
     '/v1/users/:userId/presence': {
         GET: {
-            response: Presence
+            response: WiredPresence
         }
         POST: {
             body: Presence
@@ -115,6 +117,15 @@ export interface UsersApi {
     }
 
     '/v1/users/:userId/profile/:key': {
+        GET: {
+            params: {
+                userId: string
+                key: string
+            }
+            response: EntityProfileAttribute[]
+        }
+
+
         POST: {
             params: {
                 userId: string
@@ -125,16 +136,6 @@ export interface UsersApi {
         }
     }
 
-    '/v1/users/:userId/profile/:keys': {
-        GET: {
-            params: {
-                userId: string
-                key: string
-            }
-        }
-
-        response: EntityProfileAttribute[]
-    }
 
     '/v1/attribute-def/users': {
         GET: {
@@ -180,6 +181,19 @@ export interface UsersApi {
 
             response: AttachedEntityMetadata
         }
+    },
+
+    'v1/counts/:countClass/:subject1/:subject2/:subject3': {
+        GET: {
+            params: {
+                countClass: string,
+                subject1: string,
+                subject2: string,
+                subject3: string
+            }
+            response: number
+        }
+
     }
 
 }
@@ -213,19 +227,30 @@ export class UsersClient {
      * @param {string[] | undefined} locators - User locators can be email Id or phone no. or both
      * @param {boolean} shouldFetchMetadata - To fetch the metadata of the user
      * @param {string} withProfileAttributes - string query to get the profile attributes of the user
+     * @param {QueriableMetadata | undefined} - he metadata to query for , the shape of the object
+     * can be found in our tsdocs section under @mitter-io/models
      * @returns {Promise<User[]>} - Returns a promisified list of  users filtered by the locators
      * If no locators are given it will return the entire list
      */
-    getUsers(locators: string[] | undefined = undefined, shouldFetchMetadata: boolean = false, withProfileAttributes?: string): Promise<User[]> {
+    getUsers(locators: string[] | undefined = undefined,
+             shouldFetchMetadata: boolean = false,
+             withProfileAttributes: string | undefined = undefined,
+             metadata: QueriableMetadata | undefined = undefined,
+    ): Promise<User[]> {
         return this.usersAxiosClient
             .get<'/v1/users'>('/v1/users', {
                 params: Object.assign(
                     {},
+                    metadata !== undefined ? { metadata: metadata } : {},
                     locators === undefined ? { sandboxed: false } : {},
                     locators !== undefined ? { locators } : {},
                     { shouldFetchMetadata: shouldFetchMetadata },
                     withProfileAttributes === undefined ? {} : { withProfileAttributes: withProfileAttributes }
-                )
+                ),
+                paramsSerializer: (params) => {
+                    params.metadata = JSON.stringify(metadata)
+                    return queryString.stringify(params, {encode: true})
+                }
             })
             .then(x => x.data)
     }
@@ -267,15 +292,15 @@ export class UsersClient {
 
     /***
      *
-     * @param {string} userId - The  unique identifier  of the user
+     * @param {string} userIds - Comma Separated User Ids for whom the presence should be fetched
      *
-     * @returns {Promise<Presence>} - Returns a user presence object. The shape of the user
+     * @returns {Promise<Presence>} - Returns a impressed presence object. The shape of the impressed
      * presence object can be found in our tsdocs section  under @mitter-io/models.
      * More details on user presence can be found in our docs under the Users section
      */
-    getUserPresence(userId: string): Promise<Presence> {
+    getUserPresence(userIds: string): Promise<WiredPresence> {
         return this.usersAxiosClient
-            .get<'/v1/users/:userId/presence'>(`/v1/users/${userId}/presence`)
+            .get<'/v1/users/:userId/presence'>(`/v1/users/${userIds}/presence`)
             .then(x => x.data)
     }
 
@@ -400,7 +425,7 @@ export class UsersClient {
 
     getUserProfileAttributes(userId: string, keys: string): Promise<EntityProfileAttribute[]> {
         return this.usersAxiosClient
-            .get<'/v1/users/:userId/profile/:keys'>(`/v1/users/${userId}/profile/${keys}`)
+            .get<'/v1/users/:userId/profile/:key'>(`/v1/users/${userId}/profile/${keys}`)
             .then(x => x.data)
     }
 
@@ -472,6 +497,22 @@ export class UsersClient {
     getMetadataForUser(userId: string, key: string):Promise<AttachedEntityMetadata> {
         return this.usersAxiosClient
             .get<'/v1/users/:entityId/metadata/:key'>(`/v1/users/${userId}/metadata/${key}`)
+            .then(x => x.data)
+    }
+
+    getCount(countClass: string, subject1?: string, subject2?: string, subject3?: string): Promise<number> {
+        let url = `v1/counts/${countClass}`
+        const subjects = [subject1, subject2, subject3]
+        for(let i = 0; i < subjects.length; i++ ) {
+            if(subjects[i]) {
+                url += `/${subjects[i]}`
+            }
+            else {
+                break
+            }
+        }
+        return this.usersAxiosClient
+            .get<'v1/counts/:countClass/:subject1/:subject2/:subject3'>(url)
             .then(x => x.data)
     }
 }

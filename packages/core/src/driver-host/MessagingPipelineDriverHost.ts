@@ -4,7 +4,7 @@ import MessagingPipelineDriver, {
     PipelineDriverSpec,
     PipelineSink
 } from './../specs/MessagingPipelineDriver'
-import { KvStore, Mitter, UsersClient } from '../mitter-core'
+import {KvStore, MessagingPipelineConnectCb, Mitter, UsersClient} from '../mitter-core'
 import { noOp } from '../utils'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 

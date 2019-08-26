@@ -1,4 +1,4 @@
-import { Message } from '@mitter-io/models'
+import { Message, ChannelReferencingMessage } from '@mitter-io/models'
 import { GenericRequestParameters } from '../auth/interceptors-base'
 import { BlobConfig, UriConfig } from '../services/MessagesClient'
 
@@ -9,7 +9,7 @@ export interface PlatformImplementedFeatures {
               channelId: string,
               message: Message,
               fileObject: T
-          ) => Promise<Message> | Error)
+          ) => Promise<ChannelReferencingMessage> | Error)
         | undefined
     base64Decoder: undefined | ((encodedString: string) => string)
 }

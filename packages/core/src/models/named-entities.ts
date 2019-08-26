@@ -5,3 +5,5 @@ export const StandardHeaders = {
     AccessKeyHeader: 'X-Mitter-Application-Access-Key',
     AccessKeyAuthorizationHeader: 'Authorization'
 }
+
+export const RequestTimeStamp = 'requestTimeStamp'

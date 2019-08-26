@@ -4,7 +4,8 @@ import {
     MessageTimelineEvent,
     TimelineEvent,
     AttachedEntityMetadata,
-    EntityMetadata
+    EntityMetadata,
+    QueriableMetadata
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -16,8 +17,8 @@ import {
     MULTIPART_MESSAGE_NAME_KEY,
     MULTIPART_MESSAGE_FILE_NAME
 } from '../constants'
-import MessagePaginationManager from '../utils/pagination/MessagePaginationManager'
-
+import { MessagePaginationManager } from '../utils/pagination/MessagePaginationManager'
+import queryString from 'query-string'
 const base = `${MitterConstants.Api.VersionPrefix}/messages`
 
 export const MessagesPaths = {
@@ -49,13 +50,28 @@ export interface MessagesApi {
         }
     }
 
+    '/v1/messages': {
+        GET: {
+            query: {
+                shouldFetchMetadata: boolean,
+                shouldFetchChannel: boolean,
+                metadata: string,
+                channelIds: string,
+                senderIds: string
+            }
+            response: ChannelReferencingMessage[]
+        }
+    }
+
     '/v1/channels/:channelId/messages': {
         GET: {
             params: {
-                channelId: string
+                channelId: string,
             }
 
             query: {
+                shouldFetchChannel: boolean
+                shouldFetchMetadata: boolean
                 after?: string
                 before?: string
                 limit?: number
@@ -70,6 +86,8 @@ export interface MessagesApi {
             }
 
             body: Message | FormData
+
+            response: ChannelReferencingMessage
         }
     }
 
@@ -99,6 +117,7 @@ export interface MessagesApi {
                 channelId: string
                 messageIds: string
             }
+            response: void
         }
     }
 
@@ -121,7 +140,18 @@ export interface MessagesApi {
             response: AttachedEntityMetadata
         }
     }
+    'v1/counts/:countClass/:subject1/:subject2/:subject3': {
+        GET: {
+            params: {
+                countClass: string,
+                subject1: string,
+                subject2: string,
+                subject3: string
+            }
+            response: number
+        }
 
+    }
 
 }
 
@@ -148,7 +178,7 @@ export class MessagesClient {
      * More details on messages can be found in our docs under the Messages section
      * @returns {Promise<Message>} - Returns a promisified Message object
      */
-    public sendMessage(channelId: string, message: Message): Promise<Message> {
+    public sendMessage(channelId: string, message: Message): Promise<ChannelReferencingMessage> {
         return this.messagesAxiosClient
             .post<'/v1/channels/:channelId/messages'>(
                 `/v1/channels/${encodeURIComponent(channelId)}/messages`,
@@ -173,6 +203,98 @@ export class MessagesClient {
 
     /***
      *
+     * @param {QueriableMetadata} metadata - the metadata to query for , the shape of the object
+     * can be found in our tsdocs section under @mitter-io/models
+     *
+     * @param {string} channelIds - the channelIds against which to query for
+     *
+     * @param {string} senderIds - the senderIds against which to query for
+     *
+     * @param {boolean} shouldFetchMetadata - to fetch metadata for the message
+     *
+     *  @param {string | undefined} before - Fetch all messages that were sent before this
+     * message id. The returned list is sorted in a descending order (newest first).
+     *
+     * @param {string | undefined} after -  Fetch all messages that were sent after this message id.
+     * The returned list is sorted in an ascending order (oldest first)
+     *
+     * @param {number} limit - The maximum number of messages to be returned in this query. Please
+     * refer to limits for the maximum allowed value on this parameter
+     *
+     * @returns {Promise<ChannelReferencingMessage[]>} - Returns a Promisified list of messages
+     * filtered by the query params
+     */
+    public getQueriedMessages(metadata: QueriableMetadata | undefined = undefined,
+                              channelIds: string | undefined = undefined,
+                              senderIds: string | undefined = undefined,
+                              shouldFetchMetadata: boolean = false,
+                              shouldFetchChannel: boolean = false,
+                              withChannelProfileAttributes: string | undefined = undefined,
+                              before: string | undefined = undefined,
+                              after: string | undefined = undefined,
+                              limit: number = MAX_MESSAGE_LIST_LENGTH
+                              ): Promise<ChannelReferencingMessage[]> {
+
+
+        return this.messagesAxiosClient
+            .get<'/v1/messages'>('/v1/messages', {
+                params: Object.assign(
+                    {},
+                    {shouldFetchMetadata: shouldFetchMetadata},
+                    {shouldFetchChannel: shouldFetchChannel},
+                    withChannelProfileAttributes !== undefined ? { withChannelProfileAttributes } : {},
+                    metadata !== undefined ? { metadata: metadata } : {},
+                    channelIds !== undefined ? { channelIds } : {},
+                    senderIds !== undefined ? { senderIds } : {},
+                    after !== undefined ? { after } : {},
+                    before !== undefined ? { before } : {},
+                    limit !== undefined ? { limit } : {}
+                ),
+                paramsSerializer: (params) => {
+                    params.metadata = JSON.stringify(metadata)
+                    return queryString.stringify(params, {encode: true})
+                }
+            }).then(x => x.data)
+
+    }
+
+    /***
+     *
+     * @param {QueriableMetadata} metadata - the metadata to query for , the shape of the object
+     * can be found in our tsdocs section under @mitter-io/models
+     *
+     * @param {string} channelIds - the channelIds against which to query for
+     *
+     * @param {string} senderIds - the senderIds against which to query for
+     *
+     * @param {boolean} shouldFetchMetadata - to fetch metadata for the message
+     *
+     * @param {number} limit - The maximum number of messages to be returned in this query. Please
+     * refer to limits for the maximum allowed value on this parameter
+     *
+     * @returns {MessagePaginationManager} - returns a pagination manager for messages for that channel
+     */
+
+    public getPaginatedQueriedMessagesManager(
+        metadata?: QueriableMetadata,
+        channelIds?: string,
+        senderIds?: string,
+        shouldFetchMetadata: boolean = false,
+        shouldFetchChannel: boolean = false,
+        withChannelProfileAttributes: string | undefined = undefined,
+        limit: number = MAX_MESSAGE_LIST_LENGTH
+    ): MessagePaginationManager {
+        if (limit > MAX_MESSAGE_LIST_LENGTH) {
+            limit = MAX_MESSAGE_LIST_LENGTH
+        }
+        return new MessagePaginationManager(
+            (before: string | undefined, after: string | undefined) =>
+            this.getQueriedMessages(metadata, channelIds, senderIds, shouldFetchMetadata, shouldFetchChannel, withChannelProfileAttributes, before, after, limit)
+        )
+    }
+
+    /***
+     *
      * @param {string} channelId - The  unique identifier for the channel from which messages
      * have to be fetched
      * @param {number} limit - number of messages to be fetched
@@ -180,12 +302,15 @@ export class MessagesClient {
      */
     public getPaginatedMessagesManager(
         channelId: string,
+        shouldFetchMetadata: boolean = false,
+        shouldFetchChannel: boolean = false,
+        withChannelProfileAttributes: string | undefined ,
         limit: number = MAX_MESSAGE_LIST_LENGTH
     ): MessagePaginationManager {
         if (limit > MAX_MESSAGE_LIST_LENGTH) {
             limit = MAX_MESSAGE_LIST_LENGTH
         }
-        return new MessagePaginationManager(channelId, limit, this)
+        return new MessagePaginationManager((before: string | undefined, after: string | undefined) => this.getMessages(channelId,shouldFetchMetadata,shouldFetchChannel,withChannelProfileAttributes,before,after,limit))
     }
 
     /**
@@ -208,6 +333,9 @@ export class MessagesClient {
 
     public getMessages(
         channelId: string,
+        shouldFetchMetadata: boolean = false,
+        shouldFetchChannel: boolean = false,
+        withChannelProfileAttributes: string | undefined = undefined,
         before: string | undefined = undefined,
         after: string | undefined = undefined,
         limit: number = MAX_MESSAGE_LIST_LENGTH
@@ -219,6 +347,9 @@ export class MessagesClient {
             .get<'/v1/channels/:channelId/messages'>(`/v1/channels/${channelId}/messages`, {
                 params: Object.assign(
                     {},
+                    {shouldFetchMetadata: shouldFetchMetadata},
+                    {shouldFetchChannel: shouldFetchChannel},
+                    withChannelProfileAttributes !== undefined ? { withChannelProfileAttributes } : {},
                     after !== undefined ? { after } : {},
                     before !== undefined ? { before } : {},
                     limit !== undefined ? { limit } : {}
@@ -316,7 +447,7 @@ export class MessagesClient {
         channelId: string,
         message: Message,
         fileObject: T
-    ): Promise<Message> | Error {
+    ): Promise<ChannelReferencingMessage> | Error {
         if (this.platformImplementedFeatures.processMultipartRequest !== undefined) {
             const uploadPath =
                 this.mitterApiConfiguration.mitterApiBaseUrl + `/v1/channels/${channelId}/messages`
@@ -381,6 +512,22 @@ export class MessagesClient {
     getMetadataForMessage(messageId: string, key: string): Promise<AttachedEntityMetadata> {
         return this.messagesAxiosClient
             .get<'/v1/messages/:entityId/metadata/:key'>(`/v1/messages/${messageId}/metadata/${key}`)
+            .then(x => x.data)
+    }
+
+    getCount(countClass: string, subject1?: string, subject2?: string, subject3?: string): Promise<number> {
+        let url = `v1/counts/${countClass}`
+        const subjects = [subject1, subject2, subject3]
+        for(let i = 0; i < subjects.length; i++ ) {
+            if(subjects[i]) {
+                url += `/${subjects[i]}`
+            }
+            else {
+                break
+            }
+        }
+        return this.messagesAxiosClient
+            .get<'v1/counts/:countClass/:subject1/:subject2/:subject3'>(url)
             .then(x => x.data)
     }
 }

@@ -4,24 +4,27 @@ import {
     PipelineDriverInitialization,
     Mitter,
     BasePipelineSink,
-    StandardHeaders
 } from '@mitter-io/core'
 
 import { DeliveryEndpoint } from '@mitter-io/models'
-
-import SockJs from 'sockjs-client'
 import * as Stomp from '@stomp/stompjs'
 import { Message } from '@stomp/stompjs'
 import { noOp } from '../utils'
+import WebSocketStandardHeaders from './WebSocketStandardHeaders'
+import nanoid from 'nanoid'
+import {heartbeatIncomingMs, heartbearOutgoingMs, reconnect_delay} from "./WebSocketConstants";
+import {MessagingPipelineConnectCb} from "../../../core/src/config";
+
 
 export default class WebSocketPipelineDriver implements MessagingPipelineDriver {
     private activeSocket: Stomp.Client | undefined = undefined
     private pipelineSink: BasePipelineSink | undefined = undefined
-    private connectionTime: number = 0
     private mitterContext: Mitter | undefined = undefined
+    private deliveryTargetId: string
 
     constructor() {
         this.connectToStream = this.connectToStream.bind(this)
+        this.deliveryTargetId = nanoid()
     }
 
     endpointRegistered(pipelineSink: PipelineSink, userDeliveryEndpoint: DeliveryEndpoint): void {
@@ -46,9 +49,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
             },
 
             initialized: new Promise((resolve, reject) => {
-                mitter.getUserAuthorization().then(userAuthorization => {
-                    this.connectToStream(resolve, reject)
-                })
+                  this.connectToStream(resolve, reject)
             })
         }
     }
@@ -80,11 +81,13 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
             }
         } else {
             this.mitterContext.getUserAuthorization().then(userAuthorization => {
-                const sockJs = new SockJs(
-                    `${this.mitterContext!.mitterApiBaseUrl}/v1/socket/control/sockjs`
-                )
-                this.activeSocket = Stomp.over(sockJs)
+                this.activeSocket = Stomp.over(new WebSocket(`${this.mitterContext!.mitterCoreConfig.weaverUrl}`))
                 this.activeSocket.debug = noOp
+                this.activeSocket.reconnect_delay = reconnect_delay
+                this.activeSocket.heartbeat = {
+                  incoming: heartbeatIncomingMs,
+                  outgoing: heartbearOutgoingMs
+                }
 
                 let reject: (err: Error | string) => void = noOp
                 let resolve: (result: boolean) => void = noOp
@@ -97,27 +100,52 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                     reject = rejectFn
                 }
 
-                if (userAuthorization === undefined || this.activeSocket === undefined) {
-                    reject(Error('Cannot construct websocket without user authorization'))
+                if (this.activeSocket === undefined) {
+                    reject(Error('Cannot construct'))
                 } else {
-                    const authHeaders: any = {
-                        [StandardHeaders.UserAuthorizationHeader]: userAuthorization
+                    const headers: any = {
+                      [WebSocketStandardHeaders.DeliveryTargetId]: this.deliveryTargetId,
                     }
 
-                    if (this.mitterContext!.applicationId !== undefined) {
-                        authHeaders[
-                            StandardHeaders.ApplicationIdHeader
-                        ] = this.mitterContext!.applicationId
+                    if (this.mitterContext!.mitterCoreConfig.applicationId !== undefined) {
+                      headers[
+                            WebSocketStandardHeaders.MitterApplicationId
+                        ] = this.mitterContext!.mitterCoreConfig.applicationId
                     }
 
-                    // this.activeSocket.reconnect_delay = 1000
+                   if(userAuthorization) {
+                      headers[
+                        WebSocketStandardHeaders.MitterUserAuthorization
+                        ] = userAuthorization
+                    }
+
+
+
+                    const initSubscriptions = this.mitterContext!.mitterCoreConfig.initMessagingPipelineSubscriptions
+
+                    if(initSubscriptions.length > 0) {
+                      headers[
+                        WebSocketStandardHeaders.InitSubscriptions
+                        ] = initSubscriptions.toString()
+                    }
+
 
                     this.activeSocket.connect(
-                        authHeaders,
+                        headers,
                         frame => {
+                          const connectCbs = this.mitterContext!.mitterUserHooks.onMessagingPipelineConnectCbs
+                          if(connectCbs !== undefined) {
+                            connectCbs.forEach(connectCb => {
+                              connectCb(initSubscriptions)
+                            })
+                          }
                             this.activeSocket!!.subscribe(
-                                '/user/queue/event-stream',
-                                this.processMessage.bind(this)
+                                '/',
+                              (message) => {
+                                  this.processMessage(message)
+                                  message.ack()
+                              },
+                              {ack: 'client'}
                             )
 
                             resolve(true)
@@ -126,7 +154,7 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
                             reject(error)
                         },
                         closeEvent => {
-                            setTimeout(this.connectToStream, 3000)
+                            setTimeout(this.connectToStream, reconnect_delay)
                         }
                     )
                 }

@@ -13,8 +13,8 @@ export class MessageQuery {
     public channelId: string,
     public limit: number = 10,
     public withReadSelectors: Array<string>,
-    public beforeMessageId: Identifiable<Message> | null,
-    public afterMessageId: Identifiable<Message> | null
+    public beforeMessageId: string | null,
+    public afterMessageId: string | null
   ) {}
 }
 

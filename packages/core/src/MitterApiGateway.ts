@@ -6,6 +6,7 @@ import axios, {
     AxiosRequestConfig,
     AxiosResponse
 } from 'axios'
+import {RequestTimeStamp } from "./models/named-entities";
 
 export class MitterAxiosApiInterceptor {
     // tslint:disable-next-line:variable-name
@@ -17,12 +18,30 @@ export class MitterAxiosApiInterceptor {
     constructor(
         private applicationId: string | undefined,
         private genericInterceptor: GenericInterceptor,
-        private mitterApiBaseUrl: string
+        private mitterApiBaseUrl: string,
+        private disableXHRCaching: boolean
     ) {}
+
+    getRequestTimeStampHeader(url: string): string {
+        const requestTimeStampHeader = `${RequestTimeStamp}=${Date.now()}`
+        if(url!.match(/\?/) !== null) {
+            return `&${requestTimeStampHeader}`
+        }
+        else {
+            return `?${requestTimeStampHeader}`
+        }
+    }
 
     requestInterceptor(config: AxiosRequestConfig) {
         if (this.interceptFilter(config!!.baseURL!!)) {
             // if (this.interceptFilter(config!!.url!!)) {
+            if(this.disableXHRCaching  &&
+                config.url &&
+                config.method &&
+                config.method.toLowerCase() === 'get')
+            {
+                config.url = config.url + this.getRequestTimeStampHeader(config.url)
+            }
             this.genericInterceptor({
                 data: config.data,
                 path: config.url!!,

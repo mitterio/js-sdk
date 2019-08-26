@@ -1,30 +1,20 @@
-import { Mitter as MitterCore, MitterConstants, PlatformImplementedFeatures } from '@mitter-io/core'
+import { Mitter as MitterCore, MitterConstants, PlatformImplementedFeatures, MitterCoreConfig, MitterUserConfig, MitterUserHooks } from '@mitter-io/core'
 import WebKvStore from './kv-store/KvStore'
-import WebSocketPipelineDriver from './drivers/WebsocketMessagingPipelineDriver'
-
-type TokenExpireFunction = () => void
-
-export { WebKvStore }
-export { TokenExpireFunction }
+import WebSocketPipelineDriver from './drivers/WebSocketMessagingPipelineDriver'
+import {getDefaultMitterUserHooks, getMitterCoreConfig} from './utils';
 
 export const Mitter = {
     forWeb: function(
-        applicationId: string | undefined = undefined,
-        onTokenExpire: TokenExpireFunction[] = [],
-        mitterApiBaseUrl: string = MitterConstants.MitterApiUrl,
-        mitterInstanceReady: () => void = () => {}
-    ): MitterCore {
+        mitterUserConfig: MitterUserConfig,
+        mitterUserHooks?: Partial<MitterUserHooks>
+): MitterCore {
         return new MitterCore(
-            new WebKvStore(),
-            applicationId,
-            mitterApiBaseUrl,
-
-            onTokenExpire,
-
-            mitterInstanceReady,
-            new WebSocketPipelineDriver(),
-            window,
-            {} as PlatformImplementedFeatures
+          getMitterCoreConfig(mitterUserConfig),
+          getDefaultMitterUserHooks(mitterUserHooks),
+          new WebKvStore(),
+          new WebSocketPipelineDriver(),
+          window,
+          {} as PlatformImplementedFeatures
         )
     }
 }

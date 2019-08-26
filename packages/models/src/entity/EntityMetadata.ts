@@ -13,3 +13,9 @@ export type AttachedEntityMetadata = {
 export interface MetadataAttachable {
   entityMetadata: EntityMetadata
 }
+
+export type QueriableMetadata = {
+    key: string,
+    value: any,
+    operator: 'Contains' | 'Equals'
+}

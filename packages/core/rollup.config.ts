@@ -21,7 +21,8 @@ export default {
   external: [
       'websocket',
       'axios',
-      'sockjs-client'
+      'sockjs-client',
+      'query-string'
   ],
   watch: {
     include: ['src/**', 'node_modules']

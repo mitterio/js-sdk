@@ -1,4 +1,4 @@
-import { User, UserLocator } from '@mitter-io/models'
+import { User, UserLocator, AttachedProfile, EntityMetadata, AuditInfo } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { Mitter } from '../Mitter'
 import { ChannelsApi, channelsClientGenerator, UsersApi, usersClientGenerator } from '../services'
@@ -50,6 +50,14 @@ export default class MitterUser extends MitterObject<MitterUser, User> {
 
     get userLocators(): Promise<UserLocator[]> {
         return super.proxy('userLocators')
+    }
+
+    get entityProfile(): Promise<AttachedProfile | null> {
+        return super.proxy('entityProfile')
+    }
+
+    get entityMetadata(): Promise<EntityMetadata> {
+        return super.proxy('entityMetadata')
     }
 
     channels() {

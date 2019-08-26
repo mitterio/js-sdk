@@ -1,37 +1,64 @@
 import { Channel } from '@mitter-io/models'
-import { ChannelsClient } from '../../services'
 import { Pagination } from './PaginationInterface'
 
-export default class ChannelListPaginationManager implements Pagination<Channel> {
+export class ChannelListPaginationManager implements Pagination<Channel> {
     before: string | undefined
     after: string | undefined
+    countOffset: number | undefined
 
-    constructor(public limit: number, private channelsClient: ChannelsClient) {}
+    constructor(
+        private getChannelFn: (before: string | undefined, after: string | undefined, countOffset: number | undefined) => Promise<Channel[]>,
+        public limit: number,
+        private paginateUsingCountOffset?: boolean,
+        private initCountOffset?: number
+    )
+    {
+        if(this.paginateUsingCountOffset) {
+            this.countOffset = this.initCountOffset || 0
+        }
+    }
 
-    private updatePageDetails(channelList: Channel[]) {
+    private updatePageDetails(channelList: Channel[], order: 'next' | 'prev') {
         if (channelList.length > 0) {
-            this.before = channelList[channelList.length - 1].channelId!
-            this.after = channelList[0].channelId!
+            if(!this.paginateUsingCountOffset) {
+                if(order === 'prev') {
+                    this.before = channelList[channelList.length - 1].channelId!
+                    this.after = channelList[0].channelId!
+                }
+                else {
+                    this.before = channelList[0].channelId!
+                    this.after = channelList[channelList.length - 1].channelId!
+                }
+            }
+            else {
+                    this.countOffset = this.countOffset! + channelList.length
+            }
+
         }
     }
 
     async nextPage(): Promise<Channel[]> {
-        const channelList = await (this.channelsClient.getAllChannels(
+        const channelList = await (this.getChannelFn(
             undefined,
             this.after,
-            this.limit
+            this.countOffset
         ) as Promise<Channel[]>)
-        this.updatePageDetails(channelList)
+        this.updatePageDetails(channelList, 'next')
         return channelList
     }
 
     async prevPage(): Promise<Channel[]> {
-        const channelList = await (this.channelsClient.getAllChannels(
+        let countOffset = undefined
+        if(this.paginateUsingCountOffset) {
+            countOffset = this.countOffset! - this.limit
+            countOffset = countOffset < 0 ? 0 : countOffset
+        }
+        const channelList = await (this.getChannelFn(
             this.before,
             undefined,
-            this.limit
+            countOffset
         ) as Promise<Channel[]>)
-        this.updatePageDetails(channelList)
+        this.updatePageDetails(channelList, 'prev')
         return channelList
     }
 }

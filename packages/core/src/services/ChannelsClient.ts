@@ -12,10 +12,13 @@ import {
     AttributeDef,
     EntityProfile,
     AttachedEntityMetadata,
-    EntityMetadata
+    EntityMetadata,
+    QueriableMetadata, StandardRuleSetNames, ChannelSummary
 } from '@mitter-io/models'
-import ChannelPaginationManager from '../utils/pagination/ChannelPaginationManager'
 import { MAX_CHANNEL_LIST_LENGTH } from '../constants'
+import queryString from 'query-string'
+import {ParticipatedChannelsPaginationManager} from "../utils/pagination/ParticipatedChannelsPaginationManager";
+import {ChannelListPaginationManager} from "../utils/pagination/ChannelPaginationManager";
 
 const base = `${MitterConstants.Api.VersionPrefix}/channels`
 
@@ -179,6 +182,28 @@ export interface ChannelsApi {
             response: AttachedEntityMetadata
         }
     }
+
+    'v1/counts/:countClass/:subject1/:subject2/:subject3': {
+        GET: {
+            params: {
+                countClass: string,
+                subject1: string,
+                subject2: string,
+                subject3: string
+            }
+            response: number
+        }
+
+    }
+
+    '/v1/open-connect/channels-counter/channels/:channelIds/summary': {
+        GET: {
+            params: {
+                channelIds: string
+            }
+            response: ChannelSummary[]
+        }
+    }
 }
 
 export const channelsClientGenerator = clientGenerator<ChannelsApi>()
@@ -215,13 +240,23 @@ export class ChannelsClient {
      * @returns {ChannelListPaginationManager} - returns a pagination manager for channels
      */
     public getPaginatedChannelsManager(
-        limit: number = MAX_CHANNEL_LIST_LENGTH
-    ): ChannelPaginationManager {
+        limit: number = MAX_CHANNEL_LIST_LENGTH,
+        paginateUsingCountOffset: boolean =false,
+        initCountOffset:number = 0,
+        shouldFetchMetadata: boolean = false,
+        withProfileAttributes?: string
+    ): ChannelListPaginationManager {
         if (limit > MAX_CHANNEL_LIST_LENGTH) {
             limit = MAX_CHANNEL_LIST_LENGTH
         }
-        return new ChannelPaginationManager(limit, this)
+        return new ChannelListPaginationManager(
+            (before: string | undefined, after: string | undefined, countOffset: number | undefined) => this.getAllChannels(before, after, limit, countOffset, shouldFetchMetadata, withProfileAttributes),
+            limit,
+            paginateUsingCountOffset,
+            initCountOffset
+        )
     }
+
 
     /***
      * @param {string | undefined} before - Fetch all channels that were created before
@@ -234,17 +269,25 @@ export class ChannelsClient {
      * Please refer to limits for the maximum allowed value on this parameter
      *
      * @param {boolean} shouldFetchMetadata - To fetch the metadata of the channel
+     *
      * @param {string} withProfileAttributes - fetch profile attributes of the channel
+     *
+     * @param {QueriableMetadata | undefined} - he metadata to query for , the shape of the object
+     * can be found in our tsdocs section under @mitter-io/models
+     *
      * @returns {Promise<Channel[]>}  - Returns a Promisified list of channels filtered by the
      * query params
      */
+
 
     public getAllChannels(
         before: string | undefined = undefined,
         after: string | undefined = undefined,
         limit: number = MAX_CHANNEL_LIST_LENGTH,
+        entityCountOffset: number | undefined = undefined,
         shouldFetchMetadata: boolean = false,
-        withProfileAttributes?: string
+        withProfileAttributes: string | undefined = undefined,
+        metadata: QueriableMetadata | undefined = undefined,
     ): Promise<Channel[]> {
         if (limit > MAX_CHANNEL_LIST_LENGTH) {
             limit = MAX_CHANNEL_LIST_LENGTH
@@ -253,12 +296,18 @@ export class ChannelsClient {
             .get<'/v1/channels'>('/v1/channels', {
                 params: Object.assign(
                     {},
+                    metadata !== undefined ? { metadata: metadata } : {},
                     after !== undefined ? { after } : {},
                     before !== undefined ? { before } : {},
                     limit !== undefined ? { limit } : {},
+                    entityCountOffset !== undefined ? { entityCountOffset } : {},
                     {shouldFetchMetadata: shouldFetchMetadata},
                     withProfileAttributes === undefined ? {}: {withProfileAttributes: withProfileAttributes}
-                )
+                ),
+                paramsSerializer: (params) => {
+                    params.metadata = JSON.stringify(metadata)
+                    return queryString.stringify(params, {encode: true})
+                }
             })
             .then(x => x.data)
     }
@@ -287,14 +336,52 @@ export class ChannelsClient {
      * @returns {Promise<ParticipatedChannel[]>} - Promisified list of channels in which the
      * user is a participant of .
      */
-    public participatedChannels(shouldFetchMetadata: boolean = false,): Promise<ParticipatedChannel[]> {
+    public participatedChannels(
+        before: string | undefined = undefined,
+        after: string | undefined = undefined,
+        limit: number = MAX_CHANNEL_LIST_LENGTH,
+        entityCountOffset: number | undefined = undefined,
+        shouldFetchMetadata: boolean = false,
+        rulesetFilter: StandardRuleSetNames | undefined = undefined
+    ): Promise<ParticipatedChannel[]> {
         return this.channelsAxiosClient
             .get<'/v1/users/me/channels'>('/v1/users/me/channels', {
-                params: {
-                    shouldFetchMetadata: shouldFetchMetadata,
-                }
+                params: Object.assign(
+                    {},
+                    after !== undefined ? { after } : {},
+                    before !== undefined ? { before } : {},
+                    limit !== undefined ? { limit } : {},
+                    entityCountOffset !== undefined ? { entityCountOffset } : {},
+                    {shouldFetchMetadata: shouldFetchMetadata},
+                    rulesetFilter !== undefined ? { rulesetFilter } : {},
+                ),
             })
             .then(x => x.data)
+    }
+
+    public getPaginatedParticipatedChannelsManager(
+        limit: number = MAX_CHANNEL_LIST_LENGTH,
+        paginateUsingCountOffset: boolean =false,
+        initCountOffset:number = 0,
+        shouldFetchMetadata: boolean = false,
+        rulesetFilter: StandardRuleSetNames | undefined = undefined
+    ): ParticipatedChannelsPaginationManager {
+        if (limit > MAX_CHANNEL_LIST_LENGTH) {
+            limit = MAX_CHANNEL_LIST_LENGTH
+        }
+        return new ParticipatedChannelsPaginationManager(
+            (before: string | undefined, after: string | undefined, countOffset: number | undefined) => this.participatedChannels(
+                before,
+                after,
+                limit,
+                countOffset,
+                shouldFetchMetadata,
+                rulesetFilter
+            ),
+            limit,
+            paginateUsingCountOffset,
+            initCountOffset
+        )
     }
 
     /***
@@ -527,6 +614,28 @@ export class ChannelsClient {
     getMetadataForChannel(channelId: string, key: string):Promise<AttachedEntityMetadata> {
         return this.channelsAxiosClient
             .get<'/v1/channels/:entityId/metadata/:key'>(`/v1/channels/${channelId}/metadata/${key}`)
+            .then(x => x.data)
+    }
+
+    getCount(countClass: string, subject1?: string, subject2?: string, subject3?: string): Promise<number> {
+        let url = `v1/counts/${countClass}`
+        const subjects = [subject1, subject2, subject3]
+        for(let i = 0; i < subjects.length; i++ ) {
+            if(subjects[i]) {
+                url += `/${subjects[i]}`
+            }
+            else {
+                break
+            }
+        }
+        return this.channelsAxiosClient
+            .get<'v1/counts/:countClass/:subject1/:subject2/:subject3'>(url)
+            .then(x => x.data)
+    }
+
+    getSummaryForChannels(channelIds: string): Promise<ChannelSummary[]>{
+        return this.channelsAxiosClient
+            .get<'/v1/open-connect/channels-counter/channels/:channelIds/summary'>(`/v1/open-connect/channels-counter/channels/${channelIds}/summary`, {})
             .then(x => x.data)
     }
 }

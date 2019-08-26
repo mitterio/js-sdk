@@ -12,9 +12,7 @@
     "emitDecoratorMetadata": true,
     "declarationDir": "dist/types",
     "outDir": "dist/lib",
-    "typeRoots": [
-      "node_modules/@types"
-    ]
+    "typeRoots": ["node_modules/@types", "custom_typings"]
   },
   "include": [
     "src", "../my-mitter-app/src/ChannelComponent.js"
