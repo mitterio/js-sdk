@@ -140,11 +140,6 @@ export class MessagingPipelineDriverHost {
             let preProvisionPromise = Promise.resolve<DeliveryTarget | void>(undefined)
 
             if (driverSpec.name in this.savedDeliveryTargets.deliveryTargets) {
-                console.log('driver', driverSpec.name)
-                console.log(
-                    'delivery Target',
-                    this.savedDeliveryTargets.deliveryTargets[driverSpec.name]
-                )
                 preProvisionPromise = this.syncDeliveryTarget(
                     this.savedDeliveryTargets.deliveryTargets[driverSpec.name]
                 )
@@ -165,7 +160,6 @@ export class MessagingPipelineDriverHost {
                         .then(() => driver.getDeliveryTarget())
                         .then(deliveryTarget => {
                             if (deliveryTarget !== undefined) {
-                                console.log('delivery Target is ', deliveryTarget)
                                 return this.registerDeliveryTarget(driverSpec, deliveryTarget).then(
                                     provisionedDeliveryTarget => provisionedDeliveryTarget
                                 )
@@ -287,7 +281,6 @@ export class MessagingPipelineDriverHost {
             })
             .catch((resp: AxiosError) => {
                 if (resp.response!.status === 409) {
-                    console.log('409 received')
                     return this.usersClient.getUserDeliveryTargetByMechanismSpecification(deliveryTarget.mechanismSpecification)
                         .then((wiredDeliveryTarget) => {
                             this.savedDeliveryTargets = new SavedDeliveryTargets(
@@ -297,7 +290,6 @@ export class MessagingPipelineDriverHost {
                             )
                             this.syncDeliveryTargetsToStore()
                             this.subscribeToChannels(deliveryTarget)
-                            console.log('in getUserDeliveryTargetByMechanismSpecification', wiredDeliveryTarget)
                             return wiredDeliveryTarget as DeliveryTarget
                         })
 
@@ -374,7 +366,7 @@ export class MessagingPipelineDriverHost {
         return this.usersClient.addSubscription(deliveryTarget.deliveryTargetId, messageResolutionSubscription)
             .then((resp) => {
                 if(predicateForSubscription(resp)) {
-                    console.log('channels that are subscribed to ',resp.channelIds )
+                    console.log('subscribed to channels ',resp.channelIds )
                     return resp
                 }
             })

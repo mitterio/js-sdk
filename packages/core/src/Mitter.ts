@@ -72,7 +72,6 @@ export class Mitter extends MitterBase {
         platformImplementedFeatures: PlatformImplementedFeatures,
     ) {
         super(mitterUserCbs, platformImplementedFeatures)
-        console.log('mitterUserCbs', mitterUserCbs)
         this.mitterAxiosInterceptor = new MitterAxiosApiInterceptor(
             /* the application id */
             this.mitterCoreConfig.applicationId,
