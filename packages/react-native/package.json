@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/react-native",
-  "version": "0.6.46",
+  "version": "0.6.47",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-react-native.umd.js",
@@ -133,8 +133,8 @@
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
-    "@mitter-io/core": "^0.6.46",
-    "@mitter-io/models": "^0.6.45",
+    "@mitter-io/core": "^0.6.47",
+    "@mitter-io/models": "^0.6.47",
     "axios": "^0.18.0",
     "base-64": "^0.1.0",
     "nanoid": "^2.0.3",
