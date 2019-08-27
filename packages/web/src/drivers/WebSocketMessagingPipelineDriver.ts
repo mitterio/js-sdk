@@ -6,14 +6,18 @@ import {
     BasePipelineSink,
 } from '@mitter-io/core'
 
-import { DeliveryEndpoint } from '@mitter-io/models'
+import { DeliveryEndpoint, DeliveryTarget } from '@mitter-io/models'
 import * as Stomp from '@stomp/stompjs'
 import { Message } from '@stomp/stompjs'
 import { noOp } from '../utils'
 import WebSocketStandardHeaders from './WebSocketStandardHeaders'
 import nanoid from 'nanoid'
-import {heartbeatIncomingMs, heartbearOutgoingMs, reconnect_delay} from "./WebSocketConstants";
-import {MessagingPipelineConnectCb} from "../../../core/src/config";
+import {
+  heartbeatIncomingMs,
+  heartbearOutgoingMs,
+  reconnect_delay,
+  webSocketInitSubscriptionsPrefix
+} from "./WebSocketConstants";
 
 
 export default class WebSocketPipelineDriver implements MessagingPipelineDriver {
@@ -27,12 +31,12 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
         this.deliveryTargetId = nanoid()
     }
 
-    endpointRegistered(pipelineSink: PipelineSink, userDeliveryEndpoint: DeliveryEndpoint): void {
+    deliveryTargetRegistered(pipelineSink: PipelineSink, userDeliveryTarget: DeliveryTarget): void {
         // Do nothing. For a driver not handling endpoints, this method will never be called
         console.warn('Assertion error. This should never be called')
     }
 
-    getDeliveryEndpoint(): Promise<DeliveryEndpoint | undefined> {
+    getDeliveryTarget(): Promise<DeliveryTarget | undefined> {
         return Promise.resolve(undefined)
     }
 
@@ -122,23 +126,22 @@ export default class WebSocketPipelineDriver implements MessagingPipelineDriver 
 
 
                     const initSubscriptions = this.mitterContext!.mitterCoreConfig.initMessagingPipelineSubscriptions
+                    const preFixedInitSubscriptions = initSubscriptions.map(channelId => {
+                      return webSocketInitSubscriptionsPrefix + channelId
+                    })
 
                     if(initSubscriptions.length > 0) {
                       headers[
                         WebSocketStandardHeaders.InitSubscriptions
-                        ] = initSubscriptions.toString()
+                        ] = preFixedInitSubscriptions.toString()
                     }
 
 
                     this.activeSocket.connect(
                         headers,
                         frame => {
-                          const connectCbs = this.mitterContext!.mitterUserHooks.onMessagingPipelineConnectCbs
-                          if(connectCbs !== undefined) {
-                            connectCbs.forEach(connectCb => {
-                              connectCb(initSubscriptions)
-                            })
-                          }
+                            this.mitterContext!.onMessagingPipelineConnect(initSubscriptions)
+
                             this.activeSocket!!.subscribe(
                                 '/',
                               (message) => {

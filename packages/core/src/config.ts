@@ -1,8 +1,8 @@
-import {PickedPartial} from "@mitter-io/models";
+import {PickedPartial, WiredMessageResolutionSubscription} from "@mitter-io/models";
+import {OperatingDeliveryTargets} from "./mitter-core";
 
 export type TokenExpireFunction = () => void
-export type MessagingPipelineConnectCb = (initSubscription: Array<string>) => void
-
+export type MessagingPipelineConnectCb = (initSubscribedChannelIds: Array<string>, operatingDeliveryTarget?: OperatingDeliveryTargets, initialSubscription?: WiredMessageResolutionSubscription) => void
 export type MitterCoreConfig = {
     applicationId: string
     weaverUrl:string,
@@ -11,10 +11,10 @@ export type MitterCoreConfig = {
     disableXHRCaching: boolean,
 }
 
-export type MitterUserHooks = {
+export type MitterUserCbs = {
     onTokenExpire: TokenExpireFunction[],
     onMessagingPipelineConnectCbs: MessagingPipelineConnectCb[],
-    mitterInstanceReady: () => void,
+    mitterInstanceReady: () => void
 }
 
 export type MitterUserConfig = PickedPartial<MitterCoreConfig,

@@ -6,8 +6,9 @@ import {
 } from '@mitter-io/core'
 
 import firebase from 'react-native-firebase'
-import { DeliveryEndpoint, FcmDeliveryEndpoint } from '@mitter-io/models'
+import { DeliveryTarget, StandardDeliveryTargetType } from '@mitter-io/models'
 import { noOp } from '../utils'
+import uuid from 'react-native-uuid'
 
 // tslint:disable-next-line:variable-name
 export const FcmDriverSpecName = 'io.mitter.drivers.fcm'
@@ -24,17 +25,18 @@ export default class MitterFcmPipelineDriver implements MessagingPipelineDriver 
     }
   }
 
-  async getDeliveryEndpoint(): Promise<DeliveryEndpoint> {
+  async getDeliveryTarget(): Promise<DeliveryTarget> {
     return firebase
       .messaging()
       .getToken()
       .then(fcmToken => {
-        return new FcmDeliveryEndpoint(fcmToken)
+        // return new FcmDeliveryEndpoint(fcmToken)
+        return new DeliveryTarget(uuid.v4(), StandardDeliveryTargetType.Fcm, fcmToken)
       })
   }
 
-  endpointRegistered(pipelineSink: PipelineSink, deliveryEndpoint: DeliveryEndpoint): void {
-    registerFirebaseListener(pipelineSink, deliveryEndpoint)
+  deliveryTargetRegistered(pipelineSink: PipelineSink, deliveryTarget: DeliveryTarget): void {
+    registerFirebaseListener(pipelineSink, deliveryTarget)
   }
 
   halt() {
@@ -44,7 +46,7 @@ export default class MitterFcmPipelineDriver implements MessagingPipelineDriver 
 
 function registerFirebaseListener(
   pipelineSink: PipelineSink,
-  _deliveryEndpoint: DeliveryEndpoint
+  _deliveryTarget: DeliveryTarget
 ): void {
   console.log('registering firebase listener')
   firebase.messaging().onMessage(message => {
@@ -54,6 +56,19 @@ function registerFirebaseListener(
       pipelineSink.received(payload)
     } catch (e) {
       console.warn(e)
+    }
+  })
+
+  firebase.notifications().onNotification(notification => {
+    // Process your notification as required
+    try {
+      console.log('notification from fcm recevied', notification)
+      const payload = JSON.parse((notification as any)._data.data)
+      pipelineSink.received(payload)
+      return Promise.resolve()
+    } catch (e) {
+      console.warn(e)
+      return Promise.resolve()
     }
   })
 }

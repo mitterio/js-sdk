@@ -14,4 +14,3 @@ The following additional packages are available:
 
 1. Models (for typescript users)
 2. React SCL (standard component library for ReactJS)
-

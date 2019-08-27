@@ -8,7 +8,15 @@ import {
     UserLocator,
     AttachedEntityMetadata,
     EntityMetadata,
-    QueriableMetadata, WiredPresence
+    QueriableMetadata,
+    WiredPresence,
+    DeliveryTarget,
+    WiredDeliveryTarget,
+    RegisteredDeliveryTarget,
+    MessageResolutionSubscription,
+    UserResolutionSubscription,
+    WiredUserResolutionSubscription,
+    WiredMessageResolutionSubscription
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -104,6 +112,52 @@ export interface UsersApi {
             }
             body: DeliveryEndpoint['serializedEndpoint']
             response: void
+        }
+    }
+
+    '/v1/delivery-targets/:mechanismSpecification/mechanism-specification': {
+        GET: {
+            params: {
+                mechanismSpecification: string
+            }
+            response: WiredDeliveryTarget
+        }
+    }
+
+    '/v1/delivery-targets': {
+        GET: {
+            params: {
+                deliveryTargetId: string
+            }
+            response: WiredDeliveryTarget
+        }
+        POST: {
+            query: {
+                mappedUserId?: string
+            }
+            body: DeliveryTarget
+            response: RegisteredDeliveryTarget
+        }
+    }
+
+    '/v1/delivery-targets/:deliveryTargetId/subscriptions': {
+        POST: {
+            params: {
+                deliveryTargetId: string
+            }
+            body: UserResolutionSubscription | MessageResolutionSubscription
+            response: WiredUserResolutionSubscription | WiredMessageResolutionSubscription
+        }
+    }
+
+    '/v1/delivery-targets/:deliveryTargetId/subscriptions/:subscriptionId': {
+        DELETE: {
+            params: {
+                deliveryTargetId: string
+                subscriptionId: string
+
+            }
+            response: WiredUserResolutionSubscription | WiredMessageResolutionSubscription
         }
     }
 
@@ -377,6 +431,70 @@ export class UsersClient {
             .then(x => x.data)
     }
 
+    addUserDeliveryTarget(
+        deliveryTarget: DeliveryTarget,
+        userId: string | undefined
+    ): Promise<RegisteredDeliveryTarget> {
+        return this.usersAxiosClient
+            .post<'/v1/delivery-targets'>(
+                '/v1/delivery-targets',
+                deliveryTarget,
+                {
+                    params: Object.assign(
+                        {},
+                        userId !== undefined ? { mappedUserId: userId}: {}
+                    )
+                }
+            )
+            .then(x =>  x.data)
+    }
+
+    getUserDeliveryTarget(
+        deliveryTargetId: string
+    ): Promise<WiredDeliveryTarget> {
+        return this.usersAxiosClient
+            .get<'/v1/delivery-targets'>(
+                `/v1/delivery-targets/${deliveryTargetId}`
+            )
+            .then(x => x.data)
+
+    }
+
+    getUserDeliveryTargetByMechanismSpecification(
+        mechanismSpecification: string
+    ): Promise<WiredDeliveryTarget> {
+        return this.usersAxiosClient
+            .get<'/v1/delivery-targets/:mechanismSpecification/mechanism-specification'>(
+                `/v1/delivery-targets/${mechanismSpecification}/mechanism-specification`
+            )
+            .then(x => x.data)
+
+    }
+
+    addSubscription(
+        deliveryTargetId: string,
+        subscription: UserResolutionSubscription | MessageResolutionSubscription
+    ): Promise<WiredUserResolutionSubscription | WiredMessageResolutionSubscription> {
+        return this.usersAxiosClient
+            .post<'/v1/delivery-targets/:deliveryTargetId/subscriptions'>(
+                `/v1/delivery-targets/${deliveryTargetId}/subscriptions`,
+                subscription
+            )
+            .then(x => x.data)
+    }
+
+    deleteSubscription(
+        deliveryTargetId: string,
+        subscriptionId: string
+    ): Promise<WiredUserResolutionSubscription | WiredMessageResolutionSubscription> {
+        return this.usersAxiosClient
+            .delete<'/v1/delivery-targets/:deliveryTargetId/subscriptions/:subscriptionId'>(
+                `/v1/delivery-targets/${deliveryTargetId}/subscriptions/${subscriptionId}`
+            )
+            .then(x => x.data)
+
+    }
+
     /***
      *
      * @param {string} userId - The  unique identifier  of the user
@@ -416,7 +534,7 @@ export class UsersClient {
      *
      * @param {string} userId - The  unique identifier  of the user
      * @param {string} keys
-     * @param {string} keys - comma separated keys against which entity profile attributes are
+     * @param {string} keys - comma separated keys against which entity profile attributesare
      * queried
      * @returns {Promise<EntityProfileAttribute[]>} - List of searched entity profile attributes
      * The shape of Entity Profile attribute can be found in our tsdocs section

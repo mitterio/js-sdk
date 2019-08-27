@@ -101,8 +101,7 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
       messageWindow.forceFetchNewerMessages()
     }
   }
-
-
+  
   render() {
     if (this.state.refreshing) {
       return <React.Fragment/>

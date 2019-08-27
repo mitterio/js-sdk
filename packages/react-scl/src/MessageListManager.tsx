@@ -13,7 +13,7 @@ interface MessageListManagerProps {
   onEndCallback: () => void
   loader: () => ReactElement<any>
   isLoading: boolean
-  scrolloIndex?: number
+  scrollToIndex?: number
 }
 
 

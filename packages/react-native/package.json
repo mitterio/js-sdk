@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/react-native",
-  "version": "0.6.46",
+  "version": "0.7.0",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-react-native.umd.js",
@@ -92,7 +92,9 @@
     "@commitlint/config-conventional": "^7.1.2",
     "@types/base-64": "^0.1.2",
     "@types/jest": "^23.3.2",
+    "@types/nanoid": "^2.0.0",
     "@types/react-native": "^0.57.7",
+    "@types/react-native-uuid": "^1.4.0",
     "@types/rn-fetch-blob": "^1.2.1",
     "colors": "^1.3.2",
     "commitizen": "^3.0.0",
@@ -131,11 +133,13 @@
     "validate-commit-msg": "^2.12.2"
   },
   "dependencies": {
-    "@mitter-io/core": "^0.6.46",
-    "@mitter-io/models": "^0.6.45",
+    "@mitter-io/core": "^0.7.0",
+    "@mitter-io/models": "^0.7.0",
     "axios": "^0.18.0",
     "base-64": "^0.1.0",
+    "nanoid": "^2.0.3",
     "react-native-base64": "^0.0.2",
+    "react-native-uuid": "^1.4.9",
     "rollup-plugin-babel": "^3.0.7",
     "whatwg-fetch": "^2.0.4"
   },

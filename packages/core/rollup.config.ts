@@ -22,7 +22,8 @@ export default {
       'websocket',
       'axios',
       'sockjs-client',
-      'query-string'
+      'query-string',
+      'nanoid'
   ],
   watch: {
     include: ['src/**', 'node_modules']

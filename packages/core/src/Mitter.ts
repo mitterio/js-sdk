@@ -1,8 +1,8 @@
-import { MessagingPipelinePayload, User } from '@mitter-io/models'
+import { MessagingPipelinePayload, User, WiredMessageResolutionSubscription } from '@mitter-io/models'
 import { AxiosInstance } from 'axios'
 import { UserAuthorizationInterceptor } from './auth/user-interceptors'
 import { MessagingPipelineDriverHost } from './driver-host/MessagingPipelineDriverHost'
-import {KvStore, MitterUserHooks, PlatformMitter} from './mitter-core'
+import {KvStore, MitterUserCbs, OperatingDeliveryTargets, PlatformMitter} from './mitter-core'
 import { MitterApiConfiguration } from './MitterApiConfiguration'
 import { MitterAxiosApiInterceptor } from './MitterApiGateway'
 import { MitterClientSet } from './MitterClientSet'
@@ -23,11 +23,13 @@ export interface MitterApiConfigurationProvider {
     mitterApiConfigurationProvider(): MitterApiConfiguration
 }
 
+
+
 export abstract class MitterBase implements PlatformMitter, MitterApiConfigurationProvider {
 
 
     constructor(
-        public mitterUserHooks: MitterUserHooks,
+        public mitterUserCbs: MitterUserCbs,
         public platformImplementedFeatures: PlatformImplementedFeatures,
 
     ) {}
@@ -63,14 +65,13 @@ export class Mitter extends MitterBase {
 
     constructor(
         public mitterCoreConfig: MitterCoreConfig,
-        public mitterUserHooks: MitterUserHooks,
+        public mitterUserCbs: MitterUserCbs,
         public readonly kvStore: KvStore,
         pipelineDrivers: MessagingPipelineDriver[] | MessagingPipelineDriver,
         globalHostObject: any,
         platformImplementedFeatures: PlatformImplementedFeatures,
     ) {
-        super(mitterUserHooks, platformImplementedFeatures)
-
+        super(mitterUserCbs, platformImplementedFeatures)
         this.mitterAxiosInterceptor = new MitterAxiosApiInterceptor(
             /* the application id */
             this.mitterCoreConfig.applicationId,
@@ -84,7 +85,6 @@ export class Mitter extends MitterBase {
             /* The base url for mitter apis */
             this.mitterCoreConfig.mitterApiBaseUrl,
             this.mitterCoreConfig.disableXHRCaching,
-            // this.getMitterHooks
         )
 
         this.messagingPipelineDriverHost = new MessagingPipelineDriverHost(
@@ -97,7 +97,8 @@ export class Mitter extends MitterBase {
                 } else {
                     this.onPipelinesInitialized.resolve()
                 }
-            }
+            },
+            this.onMessagingPipelineConnect
         )
 
         this.messagingPipelineDriverHost.subscribe((messagingPayload: any) =>
@@ -167,6 +168,23 @@ export class Mitter extends MitterBase {
         this.messagingPipelineDriverHost.refresh()
     }
 
+    getOperatingDeliveryTargets(): OperatingDeliveryTargets {
+        return this.messagingPipelineDriverHost.getOperatingDeliveryTargets()
+    }
+
+    onMessagingPipelineConnect = (initSubscribedChannelIds: Array<string>,
+                                  operatingDeliveryTarget?: OperatingDeliveryTargets,
+                                  initialSubscription?: WiredMessageResolutionSubscription | undefined
+            ) => {
+        this.mitterUserCbs.onMessagingPipelineConnectCbs.forEach(pipelineConnectCb => {
+            pipelineConnectCb(initSubscribedChannelIds, operatingDeliveryTarget, initialSubscription)
+        })
+    }
+
+    stopMessagingPipeline(driverName: string): void {
+        this.messagingPipelineDriverHost.stop(driverName)
+    }
+
     getUserAuthorization(): Promise<string | undefined> {
         if (this.cachedUserAuthorization !== undefined) {
             return Promise.resolve(this.cachedUserAuthorization)
@@ -216,7 +234,7 @@ export class Mitter extends MitterBase {
     }
 
     private executeOnTokenExpireFunctions() {
-        this.mitterUserHooks.onTokenExpire.forEach(onTokenExpire => {
+        this.mitterUserCbs.onTokenExpire.forEach(onTokenExpire => {
             onTokenExpire()
         })
     }

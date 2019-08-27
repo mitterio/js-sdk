@@ -27,7 +27,6 @@ type MessageWindowState = {
   approxUnreadCount: number
   messages: ChannelReferencingMessage[]
   isFetching: boolean
-  showFetchingIndicator: boolean
   inMountingState: boolean
 }
 
@@ -72,8 +71,6 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       approxUnreadCount: 0,
       messages: dedupedInitialMessages,
       isFetching: false,
-      // Indicator needs to be always shown when fetching older messages
-      showFetchingIndicator: true,
       inMountingState: true
     }
 
@@ -101,6 +98,11 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   }
 
   componentDidUpdate(prevProps: MessageWindowProps, prevState: MessageWindowState) {
+    /** scroll to bottom on first load as react virtualized
+     * is unable to scroll to bottom due to some calculation problemts
+     * within the library
+     *
+     * */
     if(this.state.inMountingState === false && prevState.inMountingState === true) {
       const virtualizedList = document.getElementById(this.virtualizedListId)
       if(virtualizedList) {
@@ -267,7 +269,8 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
              * are supposed to be unique , keeping it here as  a safety net
              * */
 
-            const scrollToRow = messageListClone.length - initialMessageCount
+            // const scrollToRow = messageListClone.length - initialMessageCount
+            const scrollToRow = messages.length === 0 ? 0 : messages.length
             this.messageIds =  this.getMessageIds(messageListClone)
 
             this.setState({
@@ -304,7 +307,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
     if (!this.state.isFetching && !this.state.inMountingState) {
 
 
-      this.setState({isFetching: true, showFetchingIndicator: false}, () =>
+      this.setState({isFetching: true}, () =>
         this.props.fetchNewerMessages(messageId)
           .then((messages: ChannelReferencingMessage[]) => {
             const messageListClone = this.getMessageListClone()
@@ -321,8 +324,6 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
             this.setState({
               messages: messageListClone,
               isFetching: false,
-              // Indicator needs to be always shown when fetching older messages
-              showFetchingIndicator: true
             }, () => {
               if (messages.length > 0)
                 this.setState({
@@ -387,7 +388,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
     return (
       <React.Fragment>
         {
-          (this.state.isFetching && this.state.showFetchingIndicator) && this.props.loader
+          this.state.isFetching && this.props.loader
         }
         <AutoSizer
         >

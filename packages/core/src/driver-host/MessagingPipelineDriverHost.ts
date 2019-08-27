@@ -1,35 +1,52 @@
-import { DeliveryEndpoint, MessagingPipelinePayload } from '@mitter-io/models'
+import {
+    DeliveryTarget,
+    WiredDeliveryTarget,
+    RegisteredDeliveryTarget,
+    MessageResolutionSubscription,
+    predicateForSubscription,
+    MessagingPipelinePayload,
+    WiredMessageResolutionSubscription
+} from '@mitter-io/models'
+
 import MessagingPipelineDriver, {
-    BasePipelineSink,
+    BasePipelineSink, OperatingDeliveryTargets,
     PipelineDriverSpec,
     PipelineSink
 } from './../specs/MessagingPipelineDriver'
-import {KvStore, MessagingPipelineConnectCb, Mitter, UsersClient} from '../mitter-core'
+import {KvStore, Mitter, UsersClient} from '../mitter-core'
 import { noOp } from '../utils'
-import axios, { AxiosError, AxiosResponse } from 'axios'
+import { AxiosError } from 'axios'
 
 export type MessageSink = (payload: MessagingPipelinePayload) => void
 
-class SavedDeliveryEndpoints {
-    constructor(public readonly deliveryEndpoints: { [driver: string]: DeliveryEndpoint } = {}) {}
+export type onPipelineInitialiation =  (
+        initSubscribedChannelIds: Array<string>,
+        operatingDeliveryTarget?: OperatingDeliveryTargets,
+        initialSubscription?: WiredMessageResolutionSubscription | undefined
+    ) => void
+
+class SavedDeliveryTargets {
+    constructor(public readonly deliveryTargets: { [driver: string]: DeliveryTarget } = {}) {}
 }
 
 export class MessagingPipelineDriverHost {
     // tslint:disable-next-line:variable-name
     private static readonly StoreKeys = {
-        SavedDeliveryEndpoints: 'savedDeliveryEndpoints'
+        SavedDeliveryTargets: 'savedDeliveryTargets'
     }
 
-    private savedDeliveryEndpoints: SavedDeliveryEndpoints = new SavedDeliveryEndpoints()
+    private savedDeliveryTargets: SavedDeliveryTargets = new SavedDeliveryTargets()
     private pipelineDrivers: Array<MessagingPipelineDriver>
     private subscriptions: Array<MessageSink> = []
     private usersClient: UsersClient
+    private operatingDeliveryTargets: OperatingDeliveryTargets
 
     constructor(
         pipelineDrivers: Array<MessagingPipelineDriver> | MessagingPipelineDriver,
         private mitterContext: Mitter,
         private kvStore: KvStore | undefined = undefined,
-        private onAllPipelinesInitialized: (e?: any) => void = () => {}
+        private onAllPipelinesInitialized: (e?: any) => void = () => {},
+        private onPipelineInitialization: onPipelineInitialiation
     ) {
         if (pipelineDrivers instanceof Array) {
             this.pipelineDrivers = pipelineDrivers
@@ -39,11 +56,13 @@ export class MessagingPipelineDriverHost {
 
         this.mitterContext.userAuthorizationAvailable(() => this.refresh())
         this.usersClient = this.mitterContext.clients().users()
+        this.operatingDeliveryTargets = {}
     }
 
     public subscribe(messageSink: MessageSink) {
         this.subscriptions.push(messageSink)
     }
+
 
     public refresh() {
         /*this.loadStoredEndpoints()
@@ -54,7 +73,7 @@ export class MessagingPipelineDriverHost {
             .catch(e => {
                 this.onAllPipelinesInitialized(e)
             })*/
-        this.loadStoredEndpoints().then(() =>
+        this.loadStoredDeliveryTargets().then(() =>
             this.initializeMessagingPipelines()
                 .then(() => {
                     this.onAllPipelinesInitialized()
@@ -65,24 +84,37 @@ export class MessagingPipelineDriverHost {
         )
     }
 
-    private async loadStoredEndpoints(): Promise<void> {
-        this.savedDeliveryEndpoints = new SavedDeliveryEndpoints()
+    public getOperatingDeliveryTargets():OperatingDeliveryTargets {
+        return this.operatingDeliveryTargets
+    }
+
+    public stop(driverName: string) {
+        if(this.operatingDeliveryTargets[driverName] !== undefined) {
+            // ideally delete the delivery target here
+        }
+        else {
+            console.log('no operating delivery target found for the user,')
+        }
+    }
+
+    private async loadStoredDeliveryTargets(): Promise<void> {
+        this.savedDeliveryTargets = new SavedDeliveryTargets()
 
         if (this.kvStore === undefined) {
             console.warn(
-                'You are not using a store for persisting delivery endpoints.' +
-                    ' This might cause your users to very quickly hit provisioning limits on their endpoints'
+                'You are not using a store for persisting delivery targets.' +
+                    ' This might cause your users to very quickly hit provisioning limits on their targets'
             )
 
             return
         }
 
-        let savedDeliveryEndpoints = await this.kvStore.getItem<SavedDeliveryEndpoints>(
-            MessagingPipelineDriverHost.StoreKeys.SavedDeliveryEndpoints
+        let savedDeliveryTargets = await this.kvStore.getItem<SavedDeliveryTargets>(
+            MessagingPipelineDriverHost.StoreKeys.SavedDeliveryTargets
         )
-        console.log('stored delivery endpoints are ', savedDeliveryEndpoints)
-        if (savedDeliveryEndpoints !== undefined) {
-            this.savedDeliveryEndpoints = savedDeliveryEndpoints
+        console.log('stored delivery targets are ', savedDeliveryTargets)
+        if (savedDeliveryTargets !== undefined) {
+            this.savedDeliveryTargets = savedDeliveryTargets
         }
     }
 
@@ -105,41 +137,35 @@ export class MessagingPipelineDriverHost {
             }
             console.log(`Initializing pipeline driver '${driverSpec.name}'`)
 
-            let preProvisionPromise = Promise.resolve<DeliveryEndpoint | void>(undefined)
+            let preProvisionPromise = Promise.resolve<DeliveryTarget | void>(undefined)
 
-            if (driverSpec.name in this.savedDeliveryEndpoints.deliveryEndpoints) {
-                console.log('driver', driverSpec.name)
-                console.log(
-                    'delivery Endpoint',
-                    this.savedDeliveryEndpoints.deliveryEndpoints[driverSpec.name]
-                )
-                preProvisionPromise = this.syncEndpoint(
-                    this.savedDeliveryEndpoints.deliveryEndpoints[driverSpec.name]
+            if (driverSpec.name in this.savedDeliveryTargets.deliveryTargets) {
+                preProvisionPromise = this.syncDeliveryTarget(
+                    this.savedDeliveryTargets.deliveryTargets[driverSpec.name]
                 )
                 console.log(
-                    `Found an endpoint already present for ${
+                    `Found a delivery target already present for ${
                         driverSpec.name
                     }. If invalid, it will be re-provisioned`
                 )
             }
 
-            preProvisionPromise.then(syncedEndpoint => {
-                let operatingEndpoint: Promise<DeliveryEndpoint | void>
+            preProvisionPromise.then(syncedDeliveryTarget => {
+                let operatingDeliveryTarget: Promise<DeliveryTarget | void>
 
-                if (syncedEndpoint === undefined) {
-                    console.log('The endpoint on sync was determined to be invalid, refreshing')
+                if (syncedDeliveryTarget === undefined) {
+                    console.log('The delivery target on sync was determined to be invalid, refreshing')
 
-                    operatingEndpoint = driverInitialized
-                        .then(() => driver.getDeliveryEndpoint())
-                        .then(deliveryEndpoint => {
-                            if (deliveryEndpoint !== undefined) {
-                                console.log('delivery Endpoint is ', deliveryEndpoint)
-                                return this.registerEndpoint(driverSpec, deliveryEndpoint).then(
-                                    provisionedEndpoint => provisionedEndpoint
+                    operatingDeliveryTarget = driverInitialized
+                        .then(() => driver.getDeliveryTarget())
+                        .then(deliveryTarget => {
+                            if (deliveryTarget !== undefined) {
+                                return this.registerDeliveryTarget(driverSpec, deliveryTarget).then(
+                                    provisionedDeliveryTarget => provisionedDeliveryTarget
                                 )
                             } else {
                                 // return undefined
-                                throw new Error('no endpoint found')
+                                throw new Error('no delivery target found')
                                 // return Promise.reject('no endpoint found')
                             }
                         })
@@ -152,18 +178,24 @@ export class MessagingPipelineDriverHost {
                         })
                 } else {
                     console.log(
-                        'The endpoint on sync was determined to be valid. Continuing with the same'
+                        'The delivery target on sync was determined to be valid. Continuing with the same'
                     )
-                    operatingEndpoint = Promise.resolve(syncedEndpoint)
+                    operatingDeliveryTarget = Promise.resolve(syncedDeliveryTarget)
                 }
 
-                operatingEndpoint.then(endpoint => {
-                    if (endpoint !== undefined) {
-                        this.announceSinkForDriver(
-                            driver,
-                            endpoint,
-                            this.generatePipelineSink(driverSpec)
-                        )
+                operatingDeliveryTarget.then(deliveryTarget => {
+                    if (deliveryTarget !== undefined) {
+                        this.subscribeToChannels(deliveryTarget)
+                            .then(wiredMessageResolutionSubscription => {
+                                this.announceSinkForDriver(
+                                    driver,
+                                    deliveryTarget,
+                                    this.generatePipelineSink(driverSpec),
+                                    driverSpec.name,
+                                    wiredMessageResolutionSubscription
+                                )
+                            })
+
                     } else {
                         if (driver.pipelineSinkChanged !== undefined) {
                             driver.pipelineSinkChanged(
@@ -178,28 +210,51 @@ export class MessagingPipelineDriverHost {
         return Promise.all(pipelineInits)
     }
 
+
+    private getInitSubscribedChannelIds(initialSubscription: WiredMessageResolutionSubscription | undefined) :Array<string> {
+
+        if(initialSubscription === undefined)
+            return []
+        return initialSubscription.channelIds.map(channelIdIdentifier => channelIdIdentifier.identifier)
+    }
+
+    private onStatefulPipelineInitialization(
+        operatingDeliveryTarget: OperatingDeliveryTargets,
+        initialSubscription: WiredMessageResolutionSubscription | undefined
+    ) {
+
+        this.onPipelineInitialization(this.getInitSubscribedChannelIds(initialSubscription), operatingDeliveryTarget, initialSubscription)
+    }
+
     private announceSinkForDriver(
         driver: MessagingPipelineDriver,
-        endpoint: DeliveryEndpoint,
-        pipelineSink: PipelineSink
+        deliveryTarget: DeliveryTarget,
+        pipelineSink: PipelineSink,
+        driverName: string,
+        initialSubscription: WiredMessageResolutionSubscription | undefined
     ) {
-        driver.endpointRegistered(pipelineSink, endpoint)
+        driver.deliveryTargetRegistered(pipelineSink, deliveryTarget)
+        this.onStatefulPipelineInitialization({[driverName]: deliveryTarget}, initialSubscription)
+        this.operatingDeliveryTargets[driverName] = deliveryTarget
 
         if (driver.pipelineSinkChanged !== undefined) {
             driver.pipelineSinkChanged(pipelineSink)
         }
     }
 
-    private syncEndpoint(deliveryEndpoint: DeliveryEndpoint): Promise<DeliveryEndpoint | void> {
+    private syncDeliveryTarget(deliveryTarget: DeliveryTarget): Promise<DeliveryTarget | void> {
         return this.usersClient
-            .getUserDeliveryEndpoint(deliveryEndpoint.serializedEndpoint)
-            .then((resp: DeliveryEndpoint) => {
+            .getUserDeliveryTarget(deliveryTarget.deliveryTargetId)
+            .then((resp: WiredDeliveryTarget) => {
+                // wired delivery target extends delivery target
+                delete resp.identifier
+                // this.subscribeToChannels(deliveryTarget)
                 return resp
             })
             .catch((resp: AxiosError) => {
                 if (resp.response!.status === 409) {
                     // return Promise.resolve(deliveryEndpoint)
-                    return deliveryEndpoint
+                    return deliveryTarget
                 } else {
                     return undefined
                     //  throw resp
@@ -207,48 +262,62 @@ export class MessagingPipelineDriverHost {
             })
     }
 
-    private registerEndpoint(
+    private registerDeliveryTarget(
         driverSpec: PipelineDriverSpec,
-        deliveryEndpoint: DeliveryEndpoint
-    ): Promise<DeliveryEndpoint | void> {
+        deliveryTarget: DeliveryTarget
+    ): Promise<DeliveryTarget | void> {
         return this.usersClient
-            .addUserDeliveryEndpoint(deliveryEndpoint)
-            .then((endpoint: DeliveryEndpoint) => {
-                this.savedDeliveryEndpoints = new SavedDeliveryEndpoints(
-                    Object.assign({}, this.savedDeliveryEndpoints.deliveryEndpoints, {
-                        [driverSpec.name]: endpoint
+            .addUserDeliveryTarget(deliveryTarget, this.mitterContext.me().identifier)
+            .then((registeredTarget: RegisteredDeliveryTarget) => {
+                this.savedDeliveryTargets = new SavedDeliveryTargets(
+                    Object.assign({}, this.savedDeliveryTargets.deliveryTargets, {
+                        [driverSpec.name]: deliveryTarget
                     })
                 )
 
-                this.syncEndpointsToStore()
-                return endpoint
+                this.syncDeliveryTargetsToStore()
+                // this.subscribeToChannels(deliveryTarget)
+                return deliveryTarget
             })
             .catch((resp: AxiosError) => {
                 if (resp.response!.status === 409) {
-                    this.savedDeliveryEndpoints = new SavedDeliveryEndpoints(
-                        Object.assign({}, this.savedDeliveryEndpoints.deliveryEndpoints, {
-                            [driverSpec.name]: deliveryEndpoint
+                    return this.usersClient.getUserDeliveryTargetByMechanismSpecification(deliveryTarget.mechanismSpecification)
+                        .then((wiredDeliveryTarget) => {
+                            this.savedDeliveryTargets = new SavedDeliveryTargets(
+                                Object.assign({}, this.savedDeliveryTargets.deliveryTargets, {
+                                    [driverSpec.name]: deliveryTarget
+                                })
+                            )
+                            this.syncDeliveryTargetsToStore()
+                            this.subscribeToChannels(deliveryTarget)
+                            return wiredDeliveryTarget as DeliveryTarget
+                        })
+
+                    /*this.savedDeliveryTargets = new SavedDeliveryTargets(
+                        Object.assign({}, this.savedDeliveryTargets.deliveryTargets, {
+                            [driverSpec.name]: deliveryTarget
                         })
                     )
-                    this.syncEndpointsToStore()
-                    return deliveryEndpoint
+                    this.syncDeliveryTargetsToStore()
+                    this.subscribeToChannels(deliveryTarget)
+                    return deliveryTarget*/
                 } else {
-                    throw resp
+                     throw resp
                 }
             })
     }
 
-    private syncEndpointsToStore() {
+    private syncDeliveryTargetsToStore() {
         if (this.kvStore === undefined) {
             return
         }
 
         this.kvStore
             .setItem(
-                MessagingPipelineDriverHost.StoreKeys.SavedDeliveryEndpoints,
-                this.savedDeliveryEndpoints
+                MessagingPipelineDriverHost.StoreKeys.SavedDeliveryTargets,
+                this.savedDeliveryTargets
             )
-            .catch(e => console.warn('Error syncing delivery endpoints to storage', e))
+            .catch(e => console.warn('Error syncing delivery targets to storage', e))
     }
 
     private generateStatelessPipelineSink(driverSpec: PipelineDriverSpec): BasePipelineSink {
@@ -265,8 +334,8 @@ export class MessagingPipelineDriverHost {
                 this.consumeNewPayload(driverSpec, payload)
             },
 
-            endpointInvalidated: (deliveryEndpoint: DeliveryEndpoint) => {
-                this.invalidateEndpoint(driverSpec, deliveryEndpoint)
+            deliveryTargetInvalidated: (deliveryTarget: DeliveryTarget) => {
+                this.invalidateDeliveryTarget(driverSpec, deliveryTarget)
             },
 
             authorizedUserUnavailable: noOp,
@@ -275,11 +344,45 @@ export class MessagingPipelineDriverHost {
         }
     }
 
-    private invalidateEndpoint(_: PipelineDriverSpec, __: DeliveryEndpoint) {
+    private invalidateDeliveryTarget(_: PipelineDriverSpec, __: DeliveryTarget) {
         throw new Error('')
     }
 
     private consumeNewPayload(_: PipelineDriverSpec, payload: MessagingPipelinePayload) {
         this.subscriptions.forEach(subscription => subscription(payload))
+    }
+
+    private subscribeToChannels(deliveryTarget: DeliveryTarget): Promise<WiredMessageResolutionSubscription |  undefined> {
+        const channelsToSubscribe = this.mitterContext.mitterCoreConfig.initMessagingPipelineSubscriptions
+        if(channelsToSubscribe.length === 0)
+            return Promise.resolve(undefined)
+        let subscriptionId = Date.now().toString()
+
+        if(this.mitterContext.platformImplementedFeatures.randomIdGenerator) {
+            subscriptionId = this.mitterContext.platformImplementedFeatures.randomIdGenerator()
+        }
+
+        const messageResolutionSubscription = new MessageResolutionSubscription(subscriptionId, channelsToSubscribe)
+        return this.usersClient.addSubscription(deliveryTarget.deliveryTargetId, messageResolutionSubscription)
+            .then((resp) => {
+                if(predicateForSubscription(resp)) {
+                    console.log('subscribed to channels ',resp.channelIds )
+                    return resp
+                }
+            })
+            .catch((resp:AxiosError) => {
+                if (resp.response!.status === 409) {
+                    return  ({
+                        '@subscriptionType': 'message-resolution-subscription',
+                        'subscriptionId': messageResolutionSubscription.subscriptionId,
+                        'channelIds': messageResolutionSubscription.channelIds.map(channelId => {
+                            return {identifier: channelId}
+                        }),
+                        'identifier': messageResolutionSubscription.subscriptionId,
+                    }) as WiredMessageResolutionSubscription
+                }
+                return undefined
+                console.log('error in subscribing to channels', resp)
+            })
     }
 }
