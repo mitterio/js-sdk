@@ -9,6 +9,7 @@ export const base64ValidationRegex = new RegExp(
 
 export function getMitterCoreConfig(mitterUserConfig: MitterUserConfig): MitterCoreConfig {
   return {
+    weaverUrl: '',
     mitterApiBaseUrl: MitterConstants.MitterApiUrl,
     initMessagingPipelineSubscriptions: [],
     disableXHRCaching: true,
