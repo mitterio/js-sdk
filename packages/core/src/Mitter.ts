@@ -168,6 +168,10 @@ export class Mitter extends MitterBase {
         this.messagingPipelineDriverHost.refresh()
     }
 
+    clearCachedDeliveryTargets(): Promise<void> {
+        return this.messagingPipelineDriverHost.clearCachedDeliveryTargets()
+    }
+
     getOperatingDeliveryTargets(): OperatingDeliveryTargets {
         return this.messagingPipelineDriverHost.getOperatingDeliveryTargets()
     }
