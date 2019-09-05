@@ -285,10 +285,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^12.0.9"
 
-"@mitter-io/models@^0.6.45":
-  version "0.6.45"
-  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.6.45.tgz#12530306a2507a0489fb07c76b3294b1a84059fe"
-  integrity sha512-0WBTDU5+gcD+tDfpUHN3lGyVEJl+EBO35RS3HSDUtkjfky1Lqu8EoZONRpuue0+lZV7L/vGf3e/o5mK10rQySw==
+"@mitter-io/models@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.7.0.tgz#4efd0224fea1fdd419636a856210a7abc0f4a35a"
+  integrity sha512-Xl5TK61Xij3dlG62bTq3nIFg3yBvRjhst1IQSaFiCSdid9QJ4xd+jJb4o3rrlfBniElXtZ6E3NUBplIL20693w==
   dependencies:
     s3-publish "^1.0.9"
 

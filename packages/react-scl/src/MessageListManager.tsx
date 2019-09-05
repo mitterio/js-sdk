@@ -43,10 +43,10 @@ export class MessageListManager extends React.PureComponent<MessageListManagerPr
 
   }
 
-  /*getSnapshotBeforeUpdate(prevProps: MessageListManagerProps) {
+  /* getSnapshotBeforeUpdate(prevProps: MessageListManagerProps) {
    this.scrollToIndex = this.props.messages.length - prevProps.messages.length
    console.log('%c scroll to index'+ this.scrollToIndex, 'color:pink')
- }*/
+ } */
 
   componentDidMount() {
     if(typeof this.props.onComponentMount === 'function'){

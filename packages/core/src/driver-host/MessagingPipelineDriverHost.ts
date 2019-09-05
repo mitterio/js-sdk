@@ -63,6 +63,17 @@ export class MessagingPipelineDriverHost {
         this.subscriptions.push(messageSink)
     }
 
+    public clearCachedDeliveryTargets(): Promise<void> {
+        if(this.kvStore) {
+            return this.kvStore.setItem(
+                MessagingPipelineDriverHost.StoreKeys.SavedDeliveryTargets,
+                {}
+            )
+        }
+        else {
+           return  Promise.resolve(undefined)
+        }
+    }
 
     public refresh() {
         /*this.loadStoredEndpoints()
@@ -113,7 +124,7 @@ export class MessagingPipelineDriverHost {
             MessagingPipelineDriverHost.StoreKeys.SavedDeliveryTargets
         )
         console.log('stored delivery targets are ', savedDeliveryTargets)
-        if (savedDeliveryTargets !== undefined) {
+        if (savedDeliveryTargets !== undefined && Object.keys(savedDeliveryTargets).length > 0) {
             this.savedDeliveryTargets = savedDeliveryTargets
         }
     }

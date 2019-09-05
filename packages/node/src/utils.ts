@@ -3,8 +3,6 @@ import {MitterNodeCoreConfig, MitterNodeUserConfig, MitterNodeUserHooks} from ".
 
 export const noOp = () => {}
 
-
-
 export function getMitterNodeCoreConfig(mitterNodeUserConfig: MitterNodeUserConfig): MitterNodeCoreConfig {
     return {
         mitterApiBaseUrl: MitterConstants.MitterApiUrl,
