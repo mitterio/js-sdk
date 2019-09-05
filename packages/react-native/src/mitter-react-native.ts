@@ -7,6 +7,7 @@ import { getDefaultMitterUserCbs, getMitterCoreConfig } from './utils'
 import uuid from 'react-native-uuid'
 
 export { NativeKvStore }
+
 export const Mitter = {
   forReactNative: function(
     mitterUserConfig: MitterUserConfig,

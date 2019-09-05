@@ -35,7 +35,7 @@ export class Paginated<T extends Identifiable<T>> {
 }
 
 export class EntityQuery<T extends Identifiable<T>> {
-  /*AclAccessorSelector should be used instead of array*/
+  /* AclAccessorSelector should be used instead of array */
   constructor(
     public beforeId: Identifiable<T> | null,
     public afterId: Identifiable<T> | null,
