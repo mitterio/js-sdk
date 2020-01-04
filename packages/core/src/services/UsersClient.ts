@@ -16,7 +16,8 @@ import {
     MessageResolutionSubscription,
     UserResolutionSubscription,
     WiredUserResolutionSubscription,
-    WiredMessageResolutionSubscription, WiredUserOnlineCountForApplication
+    WiredMessageResolutionSubscription,
+    WiredUserOnlineCountForApplication
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -247,7 +248,6 @@ export interface UsersApi {
             }
             response: number
         }
-
     }
 
     'v1/open-connect/channels-counter/channels/:channelId/users/online/:referenceId': {
@@ -256,13 +256,15 @@ export interface UsersApi {
                 channelId: string
                 referenceId: string
             }
+            response: void
         }
-        response: void
     }
 
     'v1/open-connect/channels-counter/users/online': {
-        GET:{}
-        response: WiredUserOnlineCountForApplication
+        GET:{
+            response: WiredUserOnlineCountForApplication
+        }
+
     }
 
 }
