@@ -220,8 +220,7 @@ export class MessagingPipelineDriverHost {
 
         return Promise.all(pipelineInits)
     }
-
-
+    
     private getInitSubscribedChannelIds(initialSubscription: WiredMessageResolutionSubscription | undefined) :Array<string> {
 
         if(initialSubscription === undefined)
