@@ -18,12 +18,12 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
-"@mitter-io/core@^0.6.45":
-  version "0.6.45"
-  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.6.45.tgz#bb90bc91265b138f67c9bf35ee0f521f31e3528b"
-  integrity sha512-0abbZhJS9A4Xmk2DreiMCUmNgnELe7xn1Q1wAAcEQ34Dm2FQ6KnZMuD/XRtPmup+bpZhHLJY/p3TPRs7mE/k3g==
+"@mitter-io/core@^0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.7.2.tgz#57edb4ebf89f92a89a5783c6137677a5097f4645"
+  integrity sha512-Q9WRO129oJChVkuW7zcsdIffhlFhL1c8aGmGAlroXa7vygQcDK89RZs9/Lp5OUAK4nTYqEgOOpz5AB7Fh2hCqw==
   dependencies:
-    "@mitter-io/models" "^0.6.45"
+    "@mitter-io/models" "^0.7.2"
     "@stomp/stompjs" "^4.0.7"
     "@types/isomorphic-fetch" "^0.0.34"
     "@types/lodash.camelcase" "^4.3.4"
@@ -31,16 +31,18 @@
     "@types/stompjs" "^2.3.4"
     "@types/urijs" "^1.15.38"
     isomorphic-fetch "^2.2.1"
+    nanoid "^2.0.3"
+    query-string "5.0.0"
     restyped-axios "^2.0.0"
     s3-publish "^1.0.9"
     typed-rest-client "^1.0.9"
     urijs "^1.19.1"
     whatwg-fetch "^2.0.4"
 
-"@mitter-io/models@^0.6.45":
-  version "0.6.45"
-  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.6.45.tgz#12530306a2507a0489fb07c76b3294b1a84059fe"
-  integrity sha512-0WBTDU5+gcD+tDfpUHN3lGyVEJl+EBO35RS3HSDUtkjfky1Lqu8EoZONRpuue0+lZV7L/vGf3e/o5mK10rQySw==
+"@mitter-io/models@^0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.7.2.tgz#8af5dbabbf24dc1af63e568c671e18e4f5c97b60"
+  integrity sha512-tz2JJ7cXpeJ8L081lcS1qN344w0yovqHeynAS3kW1ekyw4tphDX8ZjfpfKPvhdv4/DWq3keX94YO57+SukzYpA==
   dependencies:
     s3-publish "^1.0.9"
 
@@ -5437,6 +5439,11 @@ nanoid@^2.0.2:
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-2.0.2.tgz#2163edc84828cd42f9b8e4578979a4b5ffc1bb18"
   integrity sha512-X4yQ8VHoFvHcykGunT2Jxrsm1c4vH5UKtau7LLJYXO1istCRE3jD8JxDyGCzN+h7dpWBCvWaSYgloRuphKRqUQ==
 
+nanoid@^2.0.3:
+  version "2.1.8"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-2.1.8.tgz#2dbb0224231b246e3b4c819de7bfea6384dabf08"
+  integrity sha512-g1z+n5s26w0TGKh7gjn7HCqurNKMZWzH08elXzh/gM/csQHd/UqDV6uxMghQYg9IvqRPm1QpeMk50YMofHvEjQ==
+
 nanomatch@^1.2.9:
   version "1.2.13"
   resolved "https://registry.yarnpkg.com/nanomatch/-/nanomatch-1.2.13.tgz#b87a8aa4fc0de8fe6be88895b38983ff265bd119"
@@ -6641,6 +6648,15 @@ qs@~6.5.1:
   version "6.5.2"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
   integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
+
+query-string@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/query-string/-/query-string-5.0.0.tgz#fbdf7004b4d2aff792f9871981b7a2794f555947"
+  integrity sha1-+99wBLTSr/eS+YcZgbeieU9VWUc=
+  dependencies:
+    decode-uri-component "^0.2.0"
+    object-assign "^4.1.0"
+    strict-uri-encode "^1.0.0"
 
 query-string@^6.1.0:
   version "6.1.0"
@@ -7867,6 +7883,11 @@ stream-shift@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
   integrity sha1-1cdSgl5TZ+eG944Y5EXqIjoVWVI=
+
+strict-uri-encode@^1.0.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/strict-uri-encode/-/strict-uri-encode-1.1.0.tgz#279b225df1d582b1f54e65addd4352e18faa0713"
+  integrity sha1-J5siXfHVgrH1TmWt3UNS4Y+qBxM=
 
 strict-uri-encode@^2.0.0:
   version "2.0.0"
