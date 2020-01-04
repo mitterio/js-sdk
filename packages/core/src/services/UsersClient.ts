@@ -180,7 +180,6 @@ export interface UsersApi {
             response: EntityProfileAttribute[]
         }
 
-
         POST: {
             params: {
                 userId: string
