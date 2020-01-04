@@ -13,7 +13,7 @@ import {
     EntityProfile,
     AttachedEntityMetadata,
     EntityMetadata,
-    QueriableMetadata, StandardRuleSetNames, ChannelSummary
+    QueriableMetadata, StandardRuleSetNames, ChannelSummary, WiredUserOnlineCountForChannel
 } from '@mitter-io/models'
 import { MAX_CHANNEL_LIST_LENGTH } from '../constants'
 import queryString from 'query-string'
@@ -202,6 +202,15 @@ export interface ChannelsApi {
                 channelIds: string
             }
             response: ChannelSummary[]
+        }
+    }
+
+    'v1/open-connect/channels-counter/channels/:channelId/users/online': {
+        GET: {
+            params: {
+                channelId: string
+            }
+            response: WiredUserOnlineCountForChannel
         }
     }
 }
@@ -636,6 +645,12 @@ export class ChannelsClient {
     getSummaryForChannels(channelIds: string): Promise<ChannelSummary[]>{
         return this.channelsAxiosClient
             .get<'/v1/open-connect/channels-counter/channels/:channelIds/summary'>(`/v1/open-connect/channels-counter/channels/${channelIds}/summary`, {})
+            .then(x => x.data)
+    }
+
+    getOnlineCountForChannel(channelId: string):Promise<WiredUserOnlineCountForChannel> {
+        return this.channelsAxiosClient
+            .get<'v1/open-connect/channels-counter/channels/:channelId/users/online'>(`v1/open-connect/channels-counter/channels/${channelId}/users/online`, {})
             .then(x => x.data)
     }
 }

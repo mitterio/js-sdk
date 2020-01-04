@@ -5,3 +5,11 @@ export type WiredCount = {
     },
     count: number
 }
+
+export type WiredUserOnlineCountForChannel = {
+    count: number
+}
+
+export type WiredUserOnlineCountForApplication = {
+    count: number
+}

@@ -10,5 +10,4 @@ export type MitterNodeCoreConfig = {accessKey: AccessKeyApplicationCredentials} 
  * */
 export type MitterNodeUserConfig = MakeKeyPartial<MitterNodeCoreConfig, "mitterApiBaseUrl">
 
-
 export type MitterNodeUserHooks = Pick<MitterUserCbs, "mitterInstanceReady" |"onTokenExpire">

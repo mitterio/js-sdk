@@ -40,7 +40,6 @@ export function nativeFileUploader<T extends BlobConfig | UriConfig>(
     if ([400, 401, 403, 413].indexOf(status) > -1) {
       throw res.data
     }
-
     return res.data as Promise<ChannelReferencingMessage>
   })
 }

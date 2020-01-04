@@ -16,7 +16,8 @@ import {
     MessageResolutionSubscription,
     UserResolutionSubscription,
     WiredUserResolutionSubscription,
-    WiredMessageResolutionSubscription
+    WiredMessageResolutionSubscription,
+    WiredUserOnlineCountForApplication
 } from '@mitter-io/models'
 import { TypedAxiosInstance } from 'restyped-axios'
 import { MitterApiConfiguration } from '../MitterApiConfiguration'
@@ -246,6 +247,22 @@ export interface UsersApi {
                 subject3: string
             }
             response: number
+        }
+    }
+
+    'v1/open-connect/channels-counter/channels/:channelId/users/online/:referenceId': {
+        POST: {
+            params: {
+                channelId: string
+                referenceId: string
+            }
+            response: void
+        }
+    }
+
+    'v1/open-connect/channels-counter/users/online': {
+        GET:{
+            response: WiredUserOnlineCountForApplication
         }
 
     }
@@ -631,6 +648,18 @@ export class UsersClient {
         }
         return this.usersAxiosClient
             .get<'v1/counts/:countClass/:subject1/:subject2/:subject3'>(url)
+            .then(x => x.data)
+    }
+
+    setUserOnline(channelId: string, referenceId: string): Promise<void> {
+        return this.usersAxiosClient
+            .post<'v1/open-connect/channels-counter/channels/:channelId/users/online/:referenceId'>(`v1/open-connect/channels-counter/channels/${channelId}/users/online/${referenceId}`)
+            .then(x => x.data)
+    }
+
+    getUserOnlineCountForApplication(): Promise<WiredUserOnlineCountForApplication> {
+        return this.usersAxiosClient
+            .get<'v1/open-connect/channels-counter/users/online'>('v1/open-connect/channels-counter/users/online')
             .then(x => x.data)
     }
 }
