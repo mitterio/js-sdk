@@ -187,6 +187,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
   }
 
   deleteMessage = (messageId: string) => {
+    console.log("react-scl message marked for deletion", messageId)
     const messages = this.getMessageListClone();
     /*const filteredMessages = messages.filter(message => {
       return message.messageId !== messageId
@@ -201,6 +202,7 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
       messages.splice(toBeDeletedMessageIndex,1)
       this.setState({messages: messages}, () => {
         // this.internalList.current!.measureAllRows()
+        console.log("react-scl message deleted", messageId)
         this.internalList.current!.recomputeRowHeights()
       })
     }

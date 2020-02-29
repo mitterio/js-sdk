@@ -64,10 +64,11 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
             })
         }
         if(isNewMessageTimelineEventPayload(payload)) {
+          console.log("react-scl new timeline event",payload)
             Promise.resolve(payload)
               .then(payload => {
                   const timelineEvent=  payload.timelineEvent
-                  const messageId = payload.messageId
+                  const messageId = payload.messageId.identifier
                   if(timelineEvent.type === StandardTimeLineEventTypeNames.messages.DeletedTime) {
                     this.deleteMessage(messageId)
                   }
