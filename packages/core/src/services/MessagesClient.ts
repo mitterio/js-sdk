@@ -153,6 +153,24 @@ export interface MessagesApi {
 
     }
 
+    'v1/open-connect/channels-counter/channels/:channelId/messages/:messageId/flag': {
+        POST: {
+            params: {
+                channelId: string,
+                messageId: string
+            }
+        }
+    }
+
+    'v1/open-connect/channels-counter/channels/:channelId/messages/:messageId': {
+        DELETE: {
+            params: {
+                channelId: string,
+                messageId: string
+            }
+        }
+    }
+
 }
 
 export const messagesClientGenerator = clientGenerator<MessagesApi>()
@@ -528,6 +546,32 @@ export class MessagesClient {
         }
         return this.messagesAxiosClient
             .get<'v1/counts/:countClass/:subject1/:subject2/:subject3'>(url)
+            .then(x => x.data)
+    }
+
+
+    /***
+     *
+     * @param channelId: channelId to flag
+     * @param messageId: messageId to flag
+     */
+    flag(channelId: string, messageId: string): Promise<void> {
+        return this.messagesAxiosClient
+            .post<'v1/open-connect/channels-counter/channels/:channelId/messages/:messageId/flag'>
+            (`v1/open-connect/channels-counter/channels/${channelId}/messages/${messageId}/flag`)
+            .then(x => x.data)
+
+    }
+
+    /***
+     *
+     * @param channelId: channelId to flag
+     * @param messageId: messageId to flag
+     */
+    markDelete(channelId: string, messageId: string): Promise<void> {
+        return this.messagesAxiosClient
+            .delete<'v1/open-connect/channels-counter/channels/:channelId/messages/:messageId'>
+            (`v1/open-connect/channels-counter/channels/${channelId}/messages/${messageId}`)
             .then(x => x.data)
     }
 }

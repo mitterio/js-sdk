@@ -8,7 +8,8 @@ export const StandardTimeLineEventTypeNames = {
         SentTime: 'mitter.mtet.SentTime',
         ReceivedTime: 'mitter.mtet.ReceivedTime',
         DeliveredTime: 'mitter.mtet.DeliveredTime',
-        ReadTime: 'mitter.mtet.ReadTime'
+        ReadTime: 'mitter.mtet.ReadTime',
+        DeletedTime: 'mitter.mtet.DeletedTime'
     }
 }
 

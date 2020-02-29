@@ -95,6 +95,21 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
 
     this.fetchOlderMessages(before)
     this.hasComponentMounted = true
+
+    /*setInterval(() => {
+      const messages = this.getMessageListClone();
+      const length = messages.length;
+      let randomMessageNumber =  Math.ceil(Math.random()*length)
+      console.log("randomMessageNumber",randomMessageNumber);
+      randomMessageNumber = randomMessageNumber -1
+      const message = messages.splice(randomMessageNumber,1)
+      console.log("removing", message)
+      this.setState({messages: messages}, () => {
+       // this.internalList.current!.measureAllRows()
+        this.internalList.current!.recomputeRowHeights()
+      })
+
+    }, 1000)*/
   }
 
   componentDidUpdate(prevProps: MessageWindowProps, prevState: MessageWindowState) {
@@ -167,6 +182,26 @@ export default class MessageWindow extends React.Component<MessageWindowProps, M
           // this.internalList.current!.scrollToRow(scrollToRow)
         }
         // this.internalList.current!.scrollToPosition(this.getScrollHeight())
+      })
+    }
+  }
+
+  deleteMessage = (messageId: string) => {
+    const messages = this.getMessageListClone();
+    /*const filteredMessages = messages.filter(message => {
+      return message.messageId !== messageId
+    })*/
+    /*  find index is used instead of filter as the pipeline might send
+    * duplicate copies and that is already handled
+    * */
+    const toBeDeletedMessageIndex = messages.findIndex(message => {
+        return message.messageId === messageId
+    })
+    if(toBeDeletedMessageIndex >= 0) {
+      messages.splice(toBeDeletedMessageIndex,1)
+      this.setState({messages: messages}, () => {
+        // this.internalList.current!.measureAllRows()
+        this.internalList.current!.recomputeRowHeights()
       })
     }
   }
