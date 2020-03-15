@@ -10,6 +10,7 @@ export function getMitterNodeCoreConfig(mitterNodeUserConfig: MitterNodeUserConf
     }
 }
 
+
 export function getDefaultMitterUserCbs(hooks: Partial<MitterNodeUserHooks> = {}): MitterUserCbs {
     return {
         mitterInstanceReady: () => {},

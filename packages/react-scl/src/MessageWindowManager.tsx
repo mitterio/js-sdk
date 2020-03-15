@@ -1,9 +1,14 @@
 import React, {ReactElement, RefObject} from 'react'
-import {ChannelReferencingMessage, MessagingPipelinePayload, NewMessagePayload} from "@mitter-io/models";
+import {
+  ChannelReferencingMessage,
+  MessagingPipelinePayload,
+  NewMessagePayload,
+  StandardTimeLineEventTypeNames
+} from "@mitter-io/models";
 import {Producer} from './Producer/Producer'
 import {getViewFromProducer} from "./ViewProducers/utils";
 import MessageWindow from "./MessageWindow";
-import {isNewMessagePayload, Mitter} from "@mitter-io/core";
+import {isNewMessagePayload, isNewMessageTimelineEventPayload, Mitter} from "@mitter-io/core";
 import {getChannelReferencingMessage} from "./utils";
 
 
@@ -58,6 +63,21 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
               console.log('error in listening to new messages')
             })
         }
+
+        if(isNewMessageTimelineEventPayload(payload)) {
+          console.log("react-scl new timeline event",payload)
+            Promise.resolve(payload)
+              .then(payload => {
+                  const timelineEvent=  payload.timelineEvent
+                  const messageId = payload.messageId.identifier
+                  if(timelineEvent.type === StandardTimeLineEventTypeNames.messages.DeletedTime) {
+                    this.deleteMessage(messageId)
+                  }
+              })
+              .catch(ex => {
+                console.log('error in processing new timeline event')
+              })
+        }
       })
     }
   }
@@ -74,6 +94,10 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
 
   pushNewMessage = (toBeInsertedMessage: ChannelReferencingMessage) => {
     this.messageWindowRef.current!.onNewMessagePayload(toBeInsertedMessage)
+  }
+
+  deleteMessage = (messageId: string) => {
+    this.messageWindowRef.current!.deleteMessage(messageId)
   }
 
   refresh = () => {

@@ -1,6 +1,6 @@
 {
   "name": "@mitter-io/react-scl",
-  "version": "0.7.4",
+  "version": "0.7.6",
   "description": "",
   "keywords": [],
   "main": "dist/mitter-react-component-library.umd.js",
@@ -133,8 +133,8 @@
     "react-dom": "^16.7.0"
   },
   "dependencies": {
-    "@mitter-io/core": "^0.7.4",
-    "@mitter-io/models": "^0.7.4",
+    "@mitter-io/core": "^0.7.6",
+    "@mitter-io/models": "^0.7.6",
     "lodash": "^4.17.11",
     "react-resize-detector": "^4.1.4",
     "react-resize-observer": "^1.1.1",
