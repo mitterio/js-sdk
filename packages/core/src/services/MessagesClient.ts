@@ -163,7 +163,7 @@ export interface MessagesApi {
     }
 
     'v1/open-connect/channels-counter/channels/:channelId/messages/:messageId': {
-        DELETE: {
+        POST: {
             params: {
                 channelId: string,
                 messageId: string
@@ -570,7 +570,7 @@ export class MessagesClient {
      */
     markDelete(channelId: string, messageId: string): Promise<void> {
         return this.messagesAxiosClient
-            .delete<'v1/open-connect/channels-counter/channels/:channelId/messages/:messageId'>
+            .post<'v1/open-connect/channels-counter/channels/:channelId/messages/:messageId'>
             (`v1/open-connect/channels-counter/channels/${channelId}/messages/${messageId}`)
             .then(x => x.data)
     }
