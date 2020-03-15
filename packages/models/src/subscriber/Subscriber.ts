@@ -1,5 +1,4 @@
 import IdentifiableEntity from '../annotations/IdentifiableEntity'
-
 export class Subscriber implements IdentifiableEntity<Subscriber> {
   constructor(
     public subscriberId: string,

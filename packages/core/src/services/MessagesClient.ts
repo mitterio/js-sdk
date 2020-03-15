@@ -159,6 +159,7 @@ export interface MessagesApi {
                 channelId: string,
                 messageId: string
             }
+            response: void
         }
     }
 
@@ -168,6 +169,7 @@ export interface MessagesApi {
                 channelId: string,
                 messageId: string
             }
+            response: void
         }
     }
 
