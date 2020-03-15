@@ -63,6 +63,7 @@ export class MessageWindowManager extends React.Component<MessageWindowManagerPr
               console.log('error in listening to new messages')
             })
         }
+
         if(isNewMessageTimelineEventPayload(payload)) {
           console.log("react-scl new timeline event",payload)
             Promise.resolve(payload)
