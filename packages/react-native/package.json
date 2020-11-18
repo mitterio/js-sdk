@@ -123,7 +123,7 @@
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.17.0",
     "s3-publish": "^1.0.11",
-    "semantic-release": "^15.0.0",
+    "semantic-release": "^17.2.3",
     "ts-jest": "^23.10.2",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
