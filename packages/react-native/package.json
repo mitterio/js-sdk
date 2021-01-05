@@ -135,7 +135,7 @@
   "dependencies": {
     "@mitter-io/core": "^0.7.6",
     "@mitter-io/models": "^0.7.6",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "base-64": "^0.1.0",
     "nanoid": "^2.0.3",
     "react-native-base64": "^0.0.2",
