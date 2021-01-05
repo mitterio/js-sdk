@@ -118,7 +118,7 @@
     "@mitter-io/models": "^0.7.6",
     "@types/md5": "^2.1.32",
     "@types/randomstring": "^1.1.6",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "crypto": "^1.0.1",
     "http": "^0.0.0",
     "md5": "^2.2.1",
