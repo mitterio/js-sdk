@@ -173,12 +173,12 @@
     mkdirp "^0.5.1"
     rimraf "^2.5.2"
 
-"@mitter-io/core@^0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.7.2.tgz#57edb4ebf89f92a89a5783c6137677a5097f4645"
-  integrity sha512-Q9WRO129oJChVkuW7zcsdIffhlFhL1c8aGmGAlroXa7vygQcDK89RZs9/Lp5OUAK4nTYqEgOOpz5AB7Fh2hCqw==
+"@mitter-io/core@^0.7.6":
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.7.6.tgz#bb817cac4a15be749aebf0829cd0cd067acf8bf1"
+  integrity sha512-ffnp/P+r7iH3+t0Fz658kiGukqYif5JPYpiuaj1xvMgoa+SrgbNTBtpBjO290Br+VjVoljsk+CMfE3CZrMSlbg==
   dependencies:
-    "@mitter-io/models" "^0.7.2"
+    "@mitter-io/models" "^0.7.6"
     "@stomp/stompjs" "^4.0.7"
     "@types/isomorphic-fetch" "^0.0.34"
     "@types/lodash.camelcase" "^4.3.4"
@@ -194,10 +194,10 @@
     urijs "^1.19.1"
     whatwg-fetch "^2.0.4"
 
-"@mitter-io/models@^0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.7.2.tgz#8af5dbabbf24dc1af63e568c671e18e4f5c97b60"
-  integrity sha512-tz2JJ7cXpeJ8L081lcS1qN344w0yovqHeynAS3kW1ekyw4tphDX8ZjfpfKPvhdv4/DWq3keX94YO57+SukzYpA==
+"@mitter-io/models@^0.7.6":
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.7.6.tgz#331394bb0ccbc65abd306797e74bee7485bb6062"
+  integrity sha512-awaKR6SiWDy6U1iAyR+U8uCCdm0lhbV0kWTGxy44kb8huGVE26daWrPcnDHv0YE9qBVs7aYWV1q5D7JhtKGDxg==
   dependencies:
     s3-publish "^1.0.9"
 
@@ -3704,9 +3704,9 @@ hook-std@^1.1.0:
   integrity sha512-yntre2dbOAjgQ5yoRykyON0D9T96BfshR8IuiL/r3celeHD8I/76w4qo8m3z99houR4Z678jakV3uXrQdSvW/w==
 
 hosted-git-info@^2.1.4, hosted-git-info@^2.6.0, hosted-git-info@^2.7.1:
-  version "2.7.1"
-  resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.7.1.tgz#97f236977bd6e125408930ff6de3eec6281ec047"
-  integrity sha512-7T/BxH19zbcCTa8XkMlbK5lTo1WtgkFi3GvdWEyNuc4Vex7/9Dqbnpsf4JMydcfj9HCg4zUWFTL3Za6lapg5/w==
+  version "2.8.9"
+  resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.9.tgz#dffc0bf9a21c02209090f2aa69429e1414daf3f9"
+  integrity sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==
 
 html-encoding-sniffer@^1.0.2:
   version "1.0.2"
