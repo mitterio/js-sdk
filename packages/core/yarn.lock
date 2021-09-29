@@ -285,10 +285,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^12.0.9"
 
-"@mitter-io/models@^0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.7.2.tgz#8af5dbabbf24dc1af63e568c671e18e4f5c97b60"
-  integrity sha512-tz2JJ7cXpeJ8L081lcS1qN344w0yovqHeynAS3kW1ekyw4tphDX8ZjfpfKPvhdv4/DWq3keX94YO57+SukzYpA==
+"@mitter-io/models@^0.7.6":
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.7.6.tgz#331394bb0ccbc65abd306797e74bee7485bb6062"
+  integrity sha512-awaKR6SiWDy6U1iAyR+U8uCCdm0lhbV0kWTGxy44kb8huGVE26daWrPcnDHv0YE9qBVs7aYWV1q5D7JhtKGDxg==
   dependencies:
     s3-publish "^1.0.9"
 
@@ -3622,9 +3622,9 @@ husky@^0.14.0:
     strip-indent "^2.0.0"
 
 i@0.3.x:
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/i/-/i-0.3.6.tgz#d96c92732076f072711b6b10fd7d4f65ad8ee23d"
-  integrity sha1-2WyScyB28HJxG2sQ/X1PZa2O4j0=
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/i/-/i-0.3.7.tgz#2a7437a923d59c14b17243dc63a549af24d85799"
+  integrity sha512-FYz4wlXgkQwIPqhzC5TdNMLSE5+GS1IIDJZY/1ZiEPCT2S3COUVZeT5OW4BmW4r5LHLQuOosSwsvnroG9GR59Q==
 
 iconv-lite@0.4.24, iconv-lite@^0.4.17, iconv-lite@^0.4.4, iconv-lite@~0.4.13:
   version "0.4.24"
