@@ -124,7 +124,7 @@
     "@types/sockjs-client": "^1.1.0",
     "@types/stompjs": "^2.3.3",
     "axios": "^0.18.0",
-    "nanoid": "^2.0.2",
+    "nanoid": "^3.1.31",
     "rollup-plugin-babel": "^3.0.7",
     "s3-publish": "^1.0.9",
     "sockjs-client": "^1.1.5",
