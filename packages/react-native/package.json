@@ -137,7 +137,7 @@
     "@mitter-io/models": "^0.7.6",
     "axios": "^0.18.0",
     "base-64": "^0.1.0",
-    "nanoid": "^2.0.3",
+    "nanoid": "^3.1.31",
     "react-native-base64": "^0.0.2",
     "react-native-uuid": "^1.4.9",
     "rollup-plugin-babel": "^3.0.7",
