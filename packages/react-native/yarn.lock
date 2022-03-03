@@ -795,12 +795,12 @@
     mkdirp "^0.5.1"
     rimraf "^2.5.2"
 
-"@mitter-io/core@^0.6.46":
-  version "0.6.45"
-  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.6.45.tgz#bb90bc91265b138f67c9bf35ee0f521f31e3528b"
-  integrity sha512-0abbZhJS9A4Xmk2DreiMCUmNgnELe7xn1Q1wAAcEQ34Dm2FQ6KnZMuD/XRtPmup+bpZhHLJY/p3TPRs7mE/k3g==
+"@mitter-io/core@^0.7.6":
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.7.6.tgz#bb817cac4a15be749aebf0829cd0cd067acf8bf1"
+  integrity sha512-ffnp/P+r7iH3+t0Fz658kiGukqYif5JPYpiuaj1xvMgoa+SrgbNTBtpBjO290Br+VjVoljsk+CMfE3CZrMSlbg==
   dependencies:
-    "@mitter-io/models" "^0.6.45"
+    "@mitter-io/models" "^0.7.6"
     "@stomp/stompjs" "^4.0.7"
     "@types/isomorphic-fetch" "^0.0.34"
     "@types/lodash.camelcase" "^4.3.4"
@@ -808,16 +808,18 @@
     "@types/stompjs" "^2.3.4"
     "@types/urijs" "^1.15.38"
     isomorphic-fetch "^2.2.1"
+    nanoid "^2.0.3"
+    query-string "5.0.0"
     restyped-axios "^2.0.0"
     s3-publish "^1.0.9"
     typed-rest-client "^1.0.9"
     urijs "^1.19.1"
     whatwg-fetch "^2.0.4"
 
-"@mitter-io/models@^0.6.45":
-  version "0.6.45"
-  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.6.45.tgz#12530306a2507a0489fb07c76b3294b1a84059fe"
-  integrity sha512-0WBTDU5+gcD+tDfpUHN3lGyVEJl+EBO35RS3HSDUtkjfky1Lqu8EoZONRpuue0+lZV7L/vGf3e/o5mK10rQySw==
+"@mitter-io/models@^0.7.6":
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.7.6.tgz#331394bb0ccbc65abd306797e74bee7485bb6062"
+  integrity sha512-awaKR6SiWDy6U1iAyR+U8uCCdm0lhbV0kWTGxy44kb8huGVE26daWrPcnDHv0YE9qBVs7aYWV1q5D7JhtKGDxg==
   dependencies:
     s3-publish "^1.0.9"
 
@@ -8157,6 +8159,15 @@ qs@~6.5.2:
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
   integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
 
+query-string@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/query-string/-/query-string-5.0.0.tgz#fbdf7004b4d2aff792f9871981b7a2794f555947"
+  integrity sha1-+99wBLTSr/eS+YcZgbeieU9VWUc=
+  dependencies:
+    decode-uri-component "^0.2.0"
+    object-assign "^4.1.0"
+    strict-uri-encode "^1.0.0"
+
 query-string@^6.1.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/query-string/-/query-string-6.2.0.tgz#468edeb542b7e0538f9f9b1aeb26f034f19c86e1"
@@ -9631,6 +9642,11 @@ stream-shift@^1.0.0:
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
   integrity sha1-1cdSgl5TZ+eG944Y5EXqIjoVWVI=
 
+strict-uri-encode@^1.0.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/strict-uri-encode/-/strict-uri-encode-1.1.0.tgz#279b225df1d582b1f54e65addd4352e18faa0713"
+  integrity sha1-J5siXfHVgrH1TmWt3UNS4Y+qBxM=
+
 strict-uri-encode@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/strict-uri-encode/-/strict-uri-encode-2.0.0.tgz#b9c7330c7042862f6b142dc274bbcc5866ce3546"
@@ -10281,9 +10297,9 @@ uri-js@^4.2.2:
     punycode "^2.1.0"
 
 urijs@^1.19.1:
-  version "1.19.1"
-  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.19.1.tgz#5b0ff530c0cbde8386f6342235ba5ca6e995d25a"
-  integrity sha512-xVrGVi94ueCJNrBSTjWqjvtgvl3cyOTThp2zaMaFNGp3F542TR6sM3f2o8RqZl+AwteClSVmoCyt0ka4RjQOQg==
+  version "1.19.9"
+  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.19.9.tgz#3b15844835de3732866d420768c16f24be7d3e65"
+  integrity sha512-v0V+v5F3NQFt6TX0GpA2NKyrpythDJI+PHRo66sUIDP/U6cXbm6NqLVcXylQGwiwW5VYNj+OAei3EU0ALj9AWg==
 
 urix@^0.1.0:
   version "0.1.0"
