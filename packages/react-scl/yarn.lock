@@ -173,12 +173,12 @@
     mkdirp "^0.5.1"
     rimraf "^2.5.2"
 
-"@mitter-io/core@^0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.7.2.tgz#57edb4ebf89f92a89a5783c6137677a5097f4645"
-  integrity sha512-Q9WRO129oJChVkuW7zcsdIffhlFhL1c8aGmGAlroXa7vygQcDK89RZs9/Lp5OUAK4nTYqEgOOpz5AB7Fh2hCqw==
+"@mitter-io/core@^0.7.6":
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/@mitter-io/core/-/core-0.7.6.tgz#bb817cac4a15be749aebf0829cd0cd067acf8bf1"
+  integrity sha512-ffnp/P+r7iH3+t0Fz658kiGukqYif5JPYpiuaj1xvMgoa+SrgbNTBtpBjO290Br+VjVoljsk+CMfE3CZrMSlbg==
   dependencies:
-    "@mitter-io/models" "^0.7.2"
+    "@mitter-io/models" "^0.7.6"
     "@stomp/stompjs" "^4.0.7"
     "@types/isomorphic-fetch" "^0.0.34"
     "@types/lodash.camelcase" "^4.3.4"
@@ -194,10 +194,10 @@
     urijs "^1.19.1"
     whatwg-fetch "^2.0.4"
 
-"@mitter-io/models@^0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.7.2.tgz#8af5dbabbf24dc1af63e568c671e18e4f5c97b60"
-  integrity sha512-tz2JJ7cXpeJ8L081lcS1qN344w0yovqHeynAS3kW1ekyw4tphDX8ZjfpfKPvhdv4/DWq3keX94YO57+SukzYpA==
+"@mitter-io/models@^0.7.6":
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/@mitter-io/models/-/models-0.7.6.tgz#331394bb0ccbc65abd306797e74bee7485bb6062"
+  integrity sha512-awaKR6SiWDy6U1iAyR+U8uCCdm0lhbV0kWTGxy44kb8huGVE26daWrPcnDHv0YE9qBVs7aYWV1q5D7JhtKGDxg==
   dependencies:
     s3-publish "^1.0.9"
 
@@ -9182,9 +9182,9 @@ uri-js@^4.2.2:
     punycode "^2.1.0"
 
 urijs@^1.19.1:
-  version "1.19.1"
-  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.19.1.tgz#5b0ff530c0cbde8386f6342235ba5ca6e995d25a"
-  integrity sha512-xVrGVi94ueCJNrBSTjWqjvtgvl3cyOTThp2zaMaFNGp3F542TR6sM3f2o8RqZl+AwteClSVmoCyt0ka4RjQOQg==
+  version "1.19.10"
+  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.19.10.tgz#8e2fe70a8192845c180f75074884278f1eea26cb"
+  integrity sha512-EzauQlgKuJgsXOqoMrCiePBf4At5jVqRhXykF3Wfb8ZsOBMxPcfiVBcsHXug4Aepb/ICm2PIgqAUGMelgdrWEg==
 
 urix@^0.1.0:
   version "0.1.0"
